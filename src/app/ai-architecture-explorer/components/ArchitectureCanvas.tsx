@@ -204,7 +204,7 @@ export default function ArchitectureCanvas() {
                       >
                         <div
                           className="w-2 h-2 rounded-full mb-2"
-                          style={{ backgroundColor: fn.color }}
+                          style={{ backgroundColor: fn.color ?? '#747683' }}
                         />
                         <p className="text-sm font-semibold text-kpmg-on-surface font-body">
                           {fn.name}
@@ -244,7 +244,9 @@ export default function ArchitectureCanvas() {
                           }
                         `}
                       >
-                        <p className="text-xs font-medium text-kpmg-on-surface font-body">{svc.name}</p>
+                        <p className="text-xs font-medium text-kpmg-on-surface font-body">
+                          {svc.name}
+                        </p>
                       </div>
                     );
                   })}
@@ -258,7 +260,10 @@ export default function ArchitectureCanvas() {
             <span className="text-xs text-kpmg-outline font-body">AI Technique:</span>
             {Object.entries(TECHNIQUE_COLORS).map(([tech, color]) => (
               <div key={`legend-tech-${tech}`} className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ backgroundColor: color }} />
+                <span
+                  className="w-2 h-2 rounded-sm flex-shrink-0"
+                  style={{ backgroundColor: color }}
+                />
                 <span className="text-xs text-kpmg-on-surface-variant font-body">{tech}</span>
               </div>
             ))}
@@ -274,7 +279,9 @@ export default function ArchitectureCanvas() {
           >
             <div className="sticky top-0 bg-white border-b border-kpmg-outline-variant/30 px-5 py-4 flex items-start justify-between z-10">
               <div>
-                <span className="text-xs font-semibold text-kpmg-outline font-body">{selectedCase.code}</span>
+                <span className="text-xs font-semibold text-kpmg-outline font-body">
+                  {selectedCase.code}
+                </span>
                 <h3 className="font-display text-base font-bold text-kpmg-on-surface mt-0.5 leading-snug">
                   {selectedCase.title}
                 </h3>
@@ -295,8 +302,9 @@ export default function ArchitectureCanvas() {
                   <span
                     className="kpmg-badge"
                     style={{
-                      backgroundColor: STATUS_COLORS[selectedCase.status]?.bg || '#F0EDEC',
-                      color: STATUS_COLORS[selectedCase.status]?.text || '#747683',
+                      backgroundColor:
+                        STATUS_COLORS[selectedCase.status]?.bg ?? '#F0EDEC',
+                      color: STATUS_COLORS[selectedCase.status]?.text ?? '#747683',
                     }}
                   >
                     {selectedCase.status}
@@ -341,18 +349,33 @@ export default function ArchitectureCanvas() {
                   Reaches
                 </p>
                 <div className="space-y-2">
-                  {FUNCTIONS.filter((fn) => selectedCase.linkedFunctions.includes(fn.id)).map((fn) => {
+                  {FUNCTIONS.filter((fn) =>
+                    selectedCase.linkedFunctions.includes(fn.id),
+                  ).map((fn) => {
                     const fnSvcs = SERVICES.filter(
-                      (s) => s.functionId === fn.id && selectedCase.linkedServices.includes(s.id),
+                      (s) =>
+                        s.functionId === fn.id &&
+                        selectedCase.linkedServices.includes(s.id),
                     );
                     return (
-                      <div key={`reach-fn-${fn.id}`} className="p-2 rounded-lg bg-kpmg-surface-container-low">
+                      <div
+                        key={`reach-fn-${fn.id}`}
+                        className="p-2 rounded-lg bg-kpmg-surface-container-low"
+                      >
                         <div className="flex items-center gap-1.5 mb-1">
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: fn.color }} />
-                          <span className="text-xs font-semibold text-kpmg-on-surface font-body">{fn.name}</span>
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: fn.color ?? '#747683' }}
+                          />
+                          <span className="text-xs font-semibold text-kpmg-on-surface font-body">
+                            {fn.name}
+                          </span>
                         </div>
                         {fnSvcs.map((svc) => (
-                          <p key={`reach-svc-${svc.id}`} className="text-xs text-kpmg-outline font-body ml-3">
+                          <p
+                            key={`reach-svc-${svc.id}`}
+                            className="text-xs text-kpmg-outline font-body ml-3"
+                          >
                             → {svc.name}
                           </p>
                         ))}
