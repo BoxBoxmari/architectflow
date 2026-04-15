@@ -2,15 +2,15 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { AI_CASES, SCENARIOS, FUNCTIONS } from '@/lib/mockData';
+import { AI_CASES, FUNCTIONS } from '@/lib/mockData';
 import { CheckCircle2, Rocket, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 
 interface PilotFormData {
   sponsorName: string;
   sponsorEmail: string;
   targetFunction: string;
   selectedCase: string;
-  selectedScenario: string;
   priority: string;
   launchQuarter: string;
   expectedValueBand: string;
@@ -32,8 +32,7 @@ export default function PilotRequestContent() {
       sponsorName: 'Sarah Reynolds',
       sponsorEmail: 'sarah.reynolds@kpmg.com',
       targetFunction: 'fn-tax',
-      selectedCase: 'case-002',
-      selectedScenario: 'scen-002',
+      selectedCase: 'TAX-002',
       priority: 'high',
       launchQuarter: 'Q3 2026',
       expectedValueBand: '£1M–£2M',
@@ -46,7 +45,6 @@ export default function PilotRequestContent() {
   const selectedCase = AI_CASES.find(c => c.id === selectedCaseId);
 
   async function onSubmit(data: PilotFormData) {
-    // BACKEND INTEGRATION: POST /api/pilot-requests with form data
     setIsSubmitting(true);
     await new Promise(r => setTimeout(r, 1600));
     setIsSubmitting(false);
@@ -61,7 +59,7 @@ export default function PilotRequestContent() {
         <div className="w-16 h-16 rounded-full bg-kpmg-accent-positive/10 flex items-center justify-center mb-5">
           <CheckCircle2 size={32} className="text-kpmg-accent-positive" />
         </div>
-        <h2 className="font-display text-xl font-800 text-kpmg-on-surface mb-2">Pilot Request Submitted</h2>
+        <h2 className="font-display text-xl font-extrabold text-kpmg-on-surface mb-2">Pilot Request Submitted</h2>
         <p className="text-sm text-kpmg-on-surface-variant font-body max-w-sm leading-relaxed mb-2">
           Your request has been received by the KPMG AI Innovation team. Reference: <span className="font-semibold text-kpmg-primary">PR-2026-0047</span>
         </p>
@@ -79,16 +77,13 @@ export default function PilotRequestContent() {
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setSubmitted(false)}
-            className="kpmg-btn-secondary text-sm"
-          >
+          <button onClick={() => setSubmitted(false)} className="kpmg-btn-secondary text-sm">
             Submit Another Request
           </button>
-          <a href="/executive-overview" className="kpmg-btn-primary text-sm">
+          <Link href="/executive-overview" className="kpmg-btn-primary text-sm">
             Back to Overview
             <ChevronRight size={13} />
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -106,17 +101,22 @@ export default function PilotRequestContent() {
             <p className="text-xs font-semibold text-kpmg-primary uppercase tracking-widest font-body mb-0.5" style={{ fontSize: '10px' }}>
               Selected Case
             </p>
-            <p className="text-sm font-700 text-kpmg-on-surface font-display">{selectedCase.code} — {selectedCase.title}</p>
+            <p className="text-sm font-extrabold text-kpmg-on-surface font-display">{selectedCase.code} — {selectedCase.title}</p>
             <p className="text-xs text-kpmg-on-surface-variant font-body mt-0.5">
-              Est. value £{(selectedCase.metrics.annualizedReturn / 1000).toFixed(0)}k pa · {selectedCase.metrics.adoptionRate}% adoption · {selectedCase.status}
+              {selectedCase.source} · {selectedCase.tech} · {selectedCase.status}
             </p>
+            <ul className="mt-1 space-y-0.5">
+              {selectedCase.metrics.map((m, i) => (
+                <li key={`banner-m-${i}`} className="text-xs text-kpmg-outline font-body">• {m}</li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
 
       {/* Sponsor details */}
       <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-5">Sponsor Details</h2>
+        <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-5">Sponsor Details</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
@@ -127,9 +127,7 @@ export default function PilotRequestContent() {
               {...register('sponsorName', { required: 'Sponsor name is required' })}
               className="w-full px-3 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 transition-all font-body"
             />
-            {errors.sponsorName && (
-              <p className="text-xs text-kpmg-accent-negative mt-1 font-body">{errors.sponsorName.message}</p>
-            )}
+            {errors.sponsorName && <p className="text-xs text-kpmg-accent-negative mt-1 font-body">{errors.sponsorName.message}</p>}
           </div>
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
@@ -143,9 +141,7 @@ export default function PilotRequestContent() {
               })}
               className="w-full px-3 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 transition-all font-body"
             />
-            {errors.sponsorEmail && (
-              <p className="text-xs text-kpmg-accent-negative mt-1 font-body">{errors.sponsorEmail.message}</p>
-            )}
+            {errors.sponsorEmail && <p className="text-xs text-kpmg-accent-negative mt-1 font-body">{errors.sponsorEmail.message}</p>}
           </div>
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
@@ -163,44 +159,28 @@ export default function PilotRequestContent() {
         </div>
       </div>
 
-      {/* Case & scenario */}
+      {/* Case selection */}
       <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-5">AI Case & Scenario</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
-              Selected AI Case <span className="text-kpmg-accent-negative">*</span>
-            </label>
-            <p className="text-xs text-kpmg-outline font-body mb-2">The primary case this pilot will activate</p>
-            <select
-              {...register('selectedCase', { required: true })}
-              className="w-full px-3 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 transition-all font-body"
-            >
-              {AI_CASES.map(c => (
-                <option key={`pf-case-${c.id}`} value={c.id}>{c.code} — {c.title}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
-              Reference Scenario
-            </label>
-            <p className="text-xs text-kpmg-outline font-body mb-2">Value model used to size this pilot</p>
-            <select
-              {...register('selectedScenario')}
-              className="w-full px-3 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 transition-all font-body"
-            >
-              {SCENARIOS.map(s => (
-                <option key={`pf-scen-${s.id}`} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </div>
+        <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-5">AI Case</h2>
+        <div>
+          <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
+            Selected AI Case <span className="text-kpmg-accent-negative">*</span>
+          </label>
+          <p className="text-xs text-kpmg-outline font-body mb-2">The primary case this pilot will activate</p>
+          <select
+            {...register('selectedCase', { required: true })}
+            className="w-full px-3 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 transition-all font-body"
+          >
+            {AI_CASES.map(c => (
+              <option key={`pf-case-${c.id}`} value={c.id}>{c.code} — {c.title}</option>
+            ))}
+          </select>
         </div>
       </div>
 
       {/* Pilot parameters */}
       <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-5">Pilot Parameters</h2>
+        <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-5">Pilot Parameters</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
@@ -247,66 +227,55 @@ export default function PilotRequestContent() {
 
       {/* Business objective & notes */}
       <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-5">Business Context</h2>
+        <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-5">Business Context</h2>
         <div className="space-y-5">
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
-              Business Objective <span className="text-kpmg-accent-negative">*</span>
+              Business Objective
             </label>
-            <p className="text-xs text-kpmg-outline font-body mb-2">Describe the primary business problem this pilot addresses</p>
             <textarea
-              {...register('businessObjective', { required: 'Business objective is required', minLength: { value: 20, message: 'Please provide at least 20 characters' } })}
+              {...register('businessObjective')}
               rows={3}
-              placeholder="e.g. Reduce time spent on manual tax research by 60% in the UK Tax Advisory team..."
-              className="w-full px-3 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 transition-all font-body resize-none placeholder:text-kpmg-outline"
+              placeholder="Describe the primary business objective this pilot will address..."
+              className="w-full px-3 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 transition-all font-body resize-none"
             />
-            {errors.businessObjective && (
-              <p className="text-xs text-kpmg-accent-negative mt-1 font-body">{errors.businessObjective.message}</p>
-            )}
           </div>
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
               Stakeholder Notes
             </label>
-            <p className="text-xs text-kpmg-outline font-body mb-2">Any additional context, constraints, or stakeholder considerations</p>
             <textarea
               {...register('stakeholderNotes')}
               rows={3}
-              placeholder="e.g. Regional Managing Partner has approved in principle. IT security review pending..."
-              className="w-full px-3 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 transition-all font-body resize-none placeholder:text-kpmg-outline"
+              placeholder="Any additional context for the AI Innovation team..."
+              className="w-full px-3 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 transition-all font-body resize-none"
             />
           </div>
         </div>
       </div>
 
       {/* Submit */}
-      <div className="flex items-center justify-between gap-4 pb-4">
-        <p className="text-xs text-kpmg-outline font-body">
-          <span className="text-kpmg-accent-negative">*</span> Required fields
-        </p>
-        <div className="flex items-center gap-3">
-          <a href="/scenario-comparison" className="kpmg-btn-secondary text-sm">
-            Back to Comparison
-          </a>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="kpmg-btn-primary text-sm disabled:opacity-70"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Rocket size={14} />
-                Submit Pilot Request
-                <ChevronRight size={13} />
-              </>
-            )}
-          </button>
-        </div>
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="kpmg-btn-primary text-sm disabled:opacity-70"
+        >
+          {isSubmitting ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            <>
+              <Rocket size={14} />
+              Submit Pilot Request
+            </>
+          )}
+        </button>
+        <Link href="/case-library">
+          <span className="kpmg-btn-secondary text-sm cursor-pointer">Back to Case Library</span>
+        </Link>
       </div>
     </form>
   );

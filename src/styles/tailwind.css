@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+/* Fonts are loaded via next/font in layout.tsx — no @import needed */
 
 @layer base {
   :root {
@@ -23,8 +23,9 @@
     --accent-deeper: 37 89% 51%;
     --accent-positive: 162 73% 24%;
     --accent-negative: 351 59% 54%;
-    --font-display: 'Manrope', sans-serif;
-    --font-body: 'DM Sans', sans-serif;
+    /* Font variables are injected by next/font via html class attributes */
+    --font-display: var(--font-display, 'Manrope', sans-serif);
+    --font-body: var(--font-body, 'DM Sans', sans-serif);
   }
 
   * {

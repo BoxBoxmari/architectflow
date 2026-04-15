@@ -5,8 +5,8 @@ import { AI_CASES } from '@/lib/mockData';
 export default function OverviewKPIs() {
   const activeCases = AI_CASES?.filter(c => c?.status === 'Active' || c?.status === 'Scaled')?.length;
   const functionsCovered = new Set(AI_CASES.flatMap(c => c.linkedFunctions))?.size;
-  const totalAnnualValue = AI_CASES?.reduce((sum, c) => sum + c?.metrics?.annualizedReturn, 0);
-  const avgAdoption = Math.round(AI_CASES?.reduce((sum, c) => sum + c?.metrics?.adoptionRate, 0) / AI_CASES?.length);
+  const totalAnnualValue = AI_CASES?.reduce((sum, c) => sum + c?.numericMetrics?.annualizedReturn, 0);
+  const avgAdoption = Math.round(AI_CASES?.reduce((sum, c) => sum + c?.numericMetrics?.adoptionRate, 0) / AI_CASES?.length);
   const pilotCases = AI_CASES?.filter(c => c?.status === 'Pilot' || c?.status === 'In Development')?.length;
 
   const kpis = [
@@ -86,12 +86,12 @@ export default function OverviewKPIs() {
           </div>
           <div className="tabular-nums">
             {kpi?.isString ? (
-              <p className="font-display text-2xl font-800 text-kpmg-on-surface leading-none mb-1" style={{ color: kpi?.color }}>
+              <p className="font-display text-2xl font-extrabold text-kpmg-on-surface leading-none mb-1" style={{ color: kpi?.color }}>
                 {kpi?.value}
               </p>
             ) : (
-              <p className="font-display text-2xl font-800 leading-none mb-1" style={{ color: kpi?.color }}>
-                {kpi?.value}<span className="text-base font-600">{kpi?.suffix}</span>
+              <p className="font-display text-2xl font-extrabold leading-none mb-1" style={{ color: kpi?.color }}>
+                {kpi?.value}<span className="text-base font-semibold">{kpi?.suffix}</span>
               </p>
             )}
           </div>

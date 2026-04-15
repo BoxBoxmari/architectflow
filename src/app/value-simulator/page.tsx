@@ -10,7 +10,7 @@ export default function ValueSimulatorPage() {
           <p className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase mb-1 font-body" style={{ fontSize: '10px' }}>
             Strategic Modelling
           </p>
-          <h1 className="font-display text-2xl font-700 text-kpmg-on-surface leading-tight">
+          <h1 className="font-display text-2xl font-bold text-kpmg-on-surface leading-tight">
             Value Simulator
           </h1>
           <p className="text-sm text-kpmg-on-surface-variant mt-1 font-body">

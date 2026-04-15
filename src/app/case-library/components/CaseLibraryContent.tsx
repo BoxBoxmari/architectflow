@@ -1,19 +1,16 @@
 'use client';
 import React, { useState } from 'react';
 import { AI_CASES, FUNCTIONS } from '@/lib/mockData';
-import { Search, LayoutGrid, List, ArrowRight, Star } from 'lucide-react';
+import { Search, LayoutGrid, List, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-const TECHNIQUE_OPTIONS = ['LLM', 'NLP', 'ML Classification', 'RAG', 'Generative AI'];
-const MATURITY_OPTIONS = ['Experimental', 'Emerging', 'Established', 'Mature'];
-const VALUE_BAND_OPTIONS = ['< £500k', '£500k–£1M', '£1M–£2M', '> £2M'];
-
 const TECHNIQUE_COLORS: Record<string, string> = {
-  LLM: '#00205F',
-  NLP: '#006397',
-  'ML Classification': '#0F6E56',
-  RAG: '#00B8A9',
-  'Generative AI': '#F39C12',
+  'RAG + LLM Re-ranking': '#00205F',
+  'RAG-based GenAI Drafting': '#006397',
+  'Doc Parsing + LLM + Anomaly Flag': '#0F6E56',
+  'LLM Extraction + Template Gen': '#00B8A9',
+  'LLM Clause Extraction + Risk Class': '#45004F',
+  'Multi-doc Parsing + Risk Scoring': '#F39C12',
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
@@ -24,38 +21,18 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   Scaled: { bg: '#E0E7FF', text: '#00205F' },
 };
 
-const MATURITY_COLORS: Record<string, string> = {
-  Experimental: '#F59E0B',
-  Emerging: '#3B82F6',
-  Established: '#0F6E56',
-  Mature: '#00205F',
-};
-
-function getValueBand(v: number): string {
-  if (v < 500000) return '< £500k';
-  if (v < 1000000) return '£500k–£1M';
-  if (v < 2000000) return '£1M–£2M';
-  return '> £2M';
-}
-
 export default function CaseLibraryContent() {
   const [search, setSearch] = useState('');
   const [activeFunction, setActiveFunction] = useState<string | null>(null);
-  const [activeTechnique, setActiveTechnique] = useState<string | null>(null);
-  const [activeMaturity, setActiveMaturity] = useState<string | null>(null);
-  const [activeValueBand, setActiveValueBand] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const filtered = AI_CASES.filter(c => {
     const matchesSearch = !search ||
       c.title.toLowerCase().includes(search.toLowerCase()) ||
       c.code.toLowerCase().includes(search.toLowerCase()) ||
-      c.description.toLowerCase().includes(search.toLowerCase());
+      c.source.toLowerCase().includes(search.toLowerCase());
     const matchesFn = !activeFunction || c.linkedFunctions.includes(activeFunction);
-    const matchesTech = !activeTechnique || c.aiTechnique === activeTechnique;
-    const matchesMaturity = !activeMaturity || c.maturityLevel === activeMaturity;
-    const matchesValue = !activeValueBand || getValueBand(c.metrics.annualizedReturn) === activeValueBand;
-    return matchesSearch && matchesFn && matchesTech && matchesMaturity && matchesValue;
+    return matchesSearch && matchesFn;
   });
 
   return (
@@ -69,7 +46,7 @@ export default function CaseLibraryContent() {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search cases, codes, descriptions..."
+              placeholder="Search cases, codes, sources..."
               className="w-full pl-8 pr-4 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 placeholder:text-kpmg-outline transition-all font-body"
             />
           </div>
@@ -94,7 +71,7 @@ export default function CaseLibraryContent() {
           </div>
         </div>
 
-        {/* Filter chips */}
+        {/* Function filter chips */}
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-semibold text-kpmg-outline font-body mr-1">Function:</span>
           {FUNCTIONS.map(fn => (
@@ -107,38 +84,6 @@ export default function CaseLibraryContent() {
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-kpmg-outline font-body mr-1">Technique:</span>
-          {TECHNIQUE_OPTIONS.map(t => (
-            <button
-              key={`lib-tech-${t}`}
-              onClick={() => setActiveTechnique(activeTechnique === t ? null : t)}
-              className={`kpmg-filter-chip ${activeTechnique === t ? 'active' : ''}`}
-            >
-              {t}
-            </button>
-          ))}
-          <span className="text-xs font-semibold text-kpmg-outline font-body ml-2 mr-1">Maturity:</span>
-          {MATURITY_OPTIONS.map(m => (
-            <button
-              key={`lib-mat-${m}`}
-              onClick={() => setActiveMaturity(activeMaturity === m ? null : m)}
-              className={`kpmg-filter-chip ${activeMaturity === m ? 'active' : ''}`}
-            >
-              {m}
-            </button>
-          ))}
-          <span className="text-xs font-semibold text-kpmg-outline font-body ml-2 mr-1">Value:</span>
-          {VALUE_BAND_OPTIONS.map(v => (
-            <button
-              key={`lib-val-${v}`}
-              onClick={() => setActiveValueBand(activeValueBand === v ? null : v)}
-              className={`kpmg-filter-chip ${activeValueBand === v ? 'active' : ''}`}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Results */}
@@ -147,23 +92,22 @@ export default function CaseLibraryContent() {
           <div className="w-12 h-12 rounded-full bg-kpmg-surface-container flex items-center justify-center mb-4">
             <Search size={20} className="text-kpmg-outline" />
           </div>
-          <h3 className="font-display text-base font-700 text-kpmg-on-surface mb-2">No cases match your filters</h3>
+          <h3 className="font-display text-base font-bold text-kpmg-on-surface mb-2">No cases match your filters</h3>
           <p className="text-sm text-kpmg-outline font-body max-w-sm">
             Try adjusting your search query or removing one of the active filters to broaden the results.
           </p>
           <button
-            onClick={() => { setSearch(''); setActiveFunction(null); setActiveTechnique(null); setActiveMaturity(null); setActiveValueBand(null); }}
+            onClick={() => { setSearch(''); setActiveFunction(null); }}
             className="kpmg-btn-secondary mt-4 text-sm"
           >
             Clear all filters
           </button>
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map(c => {
             const statusStyle = STATUS_COLORS[c.status] || STATUS_COLORS['Concept'];
-            const techColor = TECHNIQUE_COLORS[c.aiTechnique] || '#747683';
-            const maturityColor = MATURITY_COLORS[c.maturityLevel] || '#747683';
+            const techColor = TECHNIQUE_COLORS[c.tech] || '#747683';
             const fn = FUNCTIONS.find(f => f.id === c.originatingFunction);
 
             return (
@@ -184,57 +128,38 @@ export default function CaseLibraryContent() {
                       </span>
                     </div>
                     <span
-                      className="kpmg-badge flex-shrink-0"
+                      className="kpmg-badge flex-shrink-0 text-xs"
                       style={{ backgroundColor: `${techColor}15`, color: techColor }}
                     >
-                      {c.aiTechnique}
+                      {c.tech}
                     </span>
                   </div>
-                  <h3 className="font-display text-base font-700 text-kpmg-on-surface leading-snug mb-1">{c.title}</h3>
+                  <h3 className="font-display text-base font-bold text-kpmg-on-surface leading-snug mb-1">{c.title}</h3>
                   <div className="flex items-center gap-1.5">
                     <span
                       className="w-2 h-2 rounded-full flex-shrink-0"
                       style={{ backgroundColor: fn?.color || '#747683' }}
                     />
-                    <span className="text-xs text-kpmg-outline font-body">{fn?.name}</span>
-                    <span className="text-xs text-kpmg-outline-variant font-body">·</span>
-                    <span className="text-xs font-medium font-body" style={{ color: maturityColor }}>
-                      {c.maturityLevel}
-                    </span>
+                    <span className="text-xs text-kpmg-outline font-body">{c.source}</span>
                   </div>
                 </div>
 
-                {/* Description */}
+                {/* Key metrics */}
                 <div className="px-5 py-3 flex-1">
-                  <p className="text-sm text-kpmg-on-surface-variant font-body leading-relaxed line-clamp-2">
-                    {c.description}
-                  </p>
-                </div>
-
-                {/* Metrics row */}
-                <div className="px-5 py-3 border-t border-kpmg-outline-variant/20 grid grid-cols-3 gap-2">
-                  <div>
-                    <p className="text-xs text-kpmg-outline font-body mb-0.5">Annual Value</p>
-                    <p className="font-display text-sm font-700 text-kpmg-primary tabular-nums">
-                      £{(c.metrics.annualizedReturn / 1000).toFixed(0)}k
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-kpmg-outline font-body mb-0.5">Adoption</p>
-                    <p className="font-display text-sm font-700 text-kpmg-on-surface tabular-nums">{c.metrics.adoptionRate}%</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-kpmg-outline font-body mb-0.5">Reusability</p>
-                    <div className="flex items-center gap-1">
-                      <Star size={10} className="text-kpmg-accent-deeper fill-kpmg-accent-deeper" />
-                      <p className="font-display text-sm font-700 text-kpmg-on-surface tabular-nums">{c.reusabilityScore}</p>
-                    </div>
-                  </div>
+                  <p className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-2" style={{ fontSize: '10px' }}>Key Metrics</p>
+                  <ul className="space-y-1">
+                    {c.metrics.map((m, i) => (
+                      <li key={`metric-${c.id}-${i}`} className="flex items-start gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-kpmg-primary mt-1.5 flex-shrink-0" />
+                        <span className="text-xs text-kpmg-on-surface-variant font-body">{m}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
                 {/* Actions */}
                 <div className="px-5 py-3 border-t border-kpmg-outline-variant/20 flex items-center gap-2">
-                  <Link href="/case-detail" className="flex-1">
+                  <Link href={`/cases/${c.id}`} className="flex-1">
                     <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer">
                       Open Profile
                       <ArrowRight size={12} />
@@ -258,7 +183,7 @@ export default function CaseLibraryContent() {
                   <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Case</span>
                 </th>
                 <th className="text-left px-4 py-3">
-                  <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Function</span>
+                  <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Source</span>
                 </th>
                 <th className="text-left px-4 py-3">
                   <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Technique</span>
@@ -266,11 +191,8 @@ export default function CaseLibraryContent() {
                 <th className="text-left px-4 py-3">
                   <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Status</span>
                 </th>
-                <th className="text-right px-4 py-3">
-                  <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Annual Value</span>
-                </th>
-                <th className="text-right px-4 py-3">
-                  <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Adoption</span>
+                <th className="text-left px-4 py-3">
+                  <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Key Metrics</span>
                 </th>
                 <th className="text-right px-5 py-3">
                   <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Actions</span>
@@ -280,7 +202,7 @@ export default function CaseLibraryContent() {
             <tbody>
               {filtered.map((c, idx) => {
                 const statusStyle = STATUS_COLORS[c.status] || STATUS_COLORS['Concept'];
-                const techColor = TECHNIQUE_COLORS[c.aiTechnique] || '#747683';
+                const techColor = TECHNIQUE_COLORS[c.tech] || '#747683';
                 const fn = FUNCTIONS.find(f => f.id === c.originatingFunction);
                 return (
                   <tr
@@ -289,21 +211,19 @@ export default function CaseLibraryContent() {
                   >
                     <td className="px-5 py-3">
                       <div>
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-xs font-semibold text-kpmg-outline font-body">{c.code}</span>
-                        </div>
+                        <span className="text-xs font-semibold text-kpmg-outline font-body">{c.code}</span>
                         <p className="text-sm font-semibold text-kpmg-on-surface font-body">{c.title}</p>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: fn?.color }} />
-                        <span className="text-sm text-kpmg-on-surface-variant font-body">{fn?.name}</span>
+                        <span className="text-sm text-kpmg-on-surface-variant font-body">{c.source}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <span className="kpmg-badge text-xs" style={{ backgroundColor: `${techColor}15`, color: techColor }}>
-                        {c.aiTechnique}
+                        {c.tech}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -311,16 +231,15 @@ export default function CaseLibraryContent() {
                         {c.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <span className="font-display text-sm font-700 text-kpmg-primary tabular-nums">
-                        £{(c.metrics.annualizedReturn / 1000).toFixed(0)}k
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <span className="font-display text-sm font-700 text-kpmg-on-surface tabular-nums">{c.metrics.adoptionRate}%</span>
+                    <td className="px-4 py-3">
+                      <ul className="space-y-0.5">
+                        {c.metrics.slice(0, 2).map((m, i) => (
+                          <li key={`lm-${c.id}-${i}`} className="text-xs text-kpmg-on-surface-variant font-body">• {m}</li>
+                        ))}
+                      </ul>
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <Link href="/case-detail">
+                      <Link href={`/cases/${c.id}`}>
                         <span className="kpmg-btn-secondary text-xs cursor-pointer">Open</span>
                       </Link>
                     </td>

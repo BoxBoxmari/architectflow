@@ -4,39 +4,9 @@ import { toast } from 'sonner';
 import { Save, Download, ChevronRight, Info, TrendingUp, Users, Clock, DollarSign, Zap, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import SimulatorOutputChart from './SimulatorOutputChart';
+import { calcScenarioVariants, SIM_CONSTANTS, SIM_DEFAULTS, SIM_RANGES, type SimInputs } from '@/lib/simulator/calcOutputs';
 
-const HOURLY_COST = 15;
-const WORKING_DAYS_PER_MONTH = 21;
-const WORKING_HOURS_PER_DAY = 8;
-
-interface SimInputs {
-  targetUseCaseCount: number;
-  activationRate: number;
-  targetUserCount: number;
-  adoptionRate: number;
-  tasksPerUserPerUseCasePerMonth: number;
-  avgTimeSavedMinutes: number;
-}
-
-function calcOutputs(inputs: SimInputs) {
-  const activeUseCases = Math.round(inputs.targetUseCaseCount * inputs.activationRate / 100);
-  const activeUsers = Math.round(inputs.targetUserCount * inputs.adoptionRate / 100);
-  const tasksPerMonth = activeUsers * activeUseCases * inputs.tasksPerUserPerUseCasePerMonth;
-  const minutesPerMonth = tasksPerMonth * inputs.avgTimeSavedMinutes;
-  const hoursPerMonth = minutesPerMonth / 60;
-  const monthlyCostSavings = hoursPerMonth * HOURLY_COST;
-  const annualizedReturn = monthlyCostSavings * 12;
-  const ftesFreed = hoursPerMonth / (WORKING_DAYS_PER_MONTH * WORKING_HOURS_PER_DAY);
-  const timePerUserPerMonth = activeUseCases * inputs.tasksPerUserPerUseCasePerMonth * inputs.avgTimeSavedMinutes;
-  const valuePerUserPerMonth = monthlyCostSavings / Math.max(activeUsers, 1);
-  const dailyInteractions = tasksPerMonth / WORKING_DAYS_PER_MONTH;
-  const penetration = activeUsers / Math.max(inputs.targetUserCount, 1);
-  return {
-    activeUseCases, activeUsers, tasksPerMonth, hoursPerMonth,
-    monthlyCostSavings, annualizedReturn, ftesFreed,
-    timePerUserPerMonth, valuePerUserPerMonth, dailyInteractions, penetration,
-  };
-}
+const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
 
 interface SliderRowProps {
   label: string;
@@ -66,10 +36,7 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
             </div>
           </div>
         </div>
-        <span
-          className="font-display text-base font-700 tabular-nums flex-shrink-0"
-          style={{ color: trackColor }}
-        >
+        <span className="font-display text-base font-bold tabular-nums flex-shrink-0" style={{ color: trackColor }}>
           {format(value)}
         </span>
       </div>
@@ -98,48 +65,26 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
 }
 
 export default function ValueSimulatorContent() {
-  const [inputs, setInputs] = useState<SimInputs>({
-    targetUseCaseCount: 5,
-    activationRate: 75,
-    targetUserCount: 320,
-    adoptionRate: 68,
-    tasksPerUserPerUseCasePerMonth: 12,
-    avgTimeSavedMinutes: 28,
-  });
+  const [inputs, setInputs] = useState<SimInputs>(SIM_DEFAULTS);
   const [activeScenario, setActiveScenario] = useState<'current' | 'scale2x' | 'fulladoption'>('current');
 
   const set = useCallback(<K extends keyof SimInputs>(key: K, val: SimInputs[K]) => {
     setInputs(prev => ({ ...prev, [key]: val }));
   }, []);
 
-  // Current state outputs
-  const outputs = calcOutputs(inputs);
-
-  // 2x scale-up
-  const scale2xOutputs = calcOutputs({
-    ...inputs,
-    targetUseCaseCount: Math.min(inputs.targetUseCaseCount * 2, 12),
-    targetUserCount: Math.min(inputs.targetUserCount * 2, 1000),
-  });
-
-  // Full adoption
-  const fullAdoptionOutputs = calcOutputs({
-    ...inputs,
-    activationRate: 100,
-    adoptionRate: 95,
-    targetUseCaseCount: 6,
-    targetUserCount: 500,
-  });
+  // All scenario variants from shared formula
+  const variants = calcScenarioVariants(inputs);
+  const outputs = variants.currentState.outputs;
+  const scale2xOutputs = variants.scale2x.outputs;
+  const fullAdoptionOutputs = variants.fullAdoption.outputs;
 
   const displayOutputs = activeScenario === 'current' ? outputs : activeScenario === 'scale2x' ? scale2xOutputs : fullAdoptionOutputs;
 
   function handleSave() {
-    // BACKEND INTEGRATION: POST /api/scenarios with inputs and outputs
     toast.success('Scenario saved to your workspace', { description: 'Available in Scenario Comparison' });
   }
 
   function handleExport() {
-    // BACKEND INTEGRATION: GET /api/scenarios/export for PDF generation
     toast.success('Export initiated', { description: 'Your simulation report will be ready shortly' });
   }
 
@@ -154,7 +99,7 @@ export default function ValueSimulatorContent() {
       {/* Left: Assumptions panel */}
       <div className="lg:col-span-4 xl:col-span-3 bg-white rounded-xl shadow-card p-6 space-y-6 h-fit">
         <div>
-          <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-1">Assumptions</h2>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-1">Assumptions</h2>
           <p className="text-xs text-kpmg-outline font-body">Adjust sliders to model different scenarios in real time</p>
         </div>
 
@@ -164,19 +109,23 @@ export default function ValueSimulatorContent() {
           </p>
           <div className="space-y-5">
             <SliderRow
-              label="Target Use Cases"
+              label="Target Use Case Count"
               hint="Total number of AI use cases targeted for activation in this scenario"
               value={inputs.targetUseCaseCount}
-              min={1} max={12} step={1}
+              min={SIM_RANGES.targetUseCaseCount.min}
+              max={SIM_RANGES.targetUseCaseCount.max}
+              step={SIM_RANGES.targetUseCaseCount.step}
               format={v => `${v}`}
               color="teal"
               onChange={v => set('targetUseCaseCount', v)}
             />
             <SliderRow
-              label="Activation Rate"
+              label="Use Case Activation Rate"
               hint="Percentage of targeted use cases that will be successfully activated"
               value={inputs.activationRate}
-              min={10} max={100} step={5}
+              min={SIM_RANGES.activationRate.min}
+              max={SIM_RANGES.activationRate.max}
+              step={SIM_RANGES.activationRate.step}
               format={v => `${v}%`}
               color="teal"
               onChange={v => set('activationRate', v)}
@@ -185,7 +134,9 @@ export default function ValueSimulatorContent() {
               label="Tasks / User / Use Case / Month"
               hint="Average number of tasks each active user performs per use case per month"
               value={inputs.tasksPerUserPerUseCasePerMonth}
-              min={1} max={40} step={1}
+              min={SIM_RANGES.tasksPerUserPerUseCasePerMonth.min}
+              max={SIM_RANGES.tasksPerUserPerUseCasePerMonth.max}
+              step={SIM_RANGES.tasksPerUserPerUseCasePerMonth.step}
               format={v => `${v}`}
               color="teal"
               onChange={v => set('tasksPerUserPerUseCasePerMonth', v)}
@@ -199,10 +150,12 @@ export default function ValueSimulatorContent() {
           </p>
           <div className="space-y-5">
             <SliderRow
-              label="Target Users"
+              label="Target User Count"
               hint="Total number of KPMG staff targeted to use AI tools in this scenario"
               value={inputs.targetUserCount}
-              min={10} max={1000} step={10}
+              min={SIM_RANGES.targetUserCount.min}
+              max={SIM_RANGES.targetUserCount.max}
+              step={SIM_RANGES.targetUserCount.step}
               format={v => v.toLocaleString()}
               color="amber"
               onChange={v => set('targetUserCount', v)}
@@ -211,7 +164,9 @@ export default function ValueSimulatorContent() {
               label="User Adoption Rate"
               hint="Percentage of targeted users who actively use the AI tools"
               value={inputs.adoptionRate}
-              min={5} max={100} step={5}
+              min={SIM_RANGES.adoptionRate.min}
+              max={SIM_RANGES.adoptionRate.max}
+              step={SIM_RANGES.adoptionRate.step}
               format={v => `${v}%`}
               color="amber"
               onChange={v => set('adoptionRate', v)}
@@ -220,7 +175,9 @@ export default function ValueSimulatorContent() {
               label="Avg Time Saved / Task (min)"
               hint="Average minutes saved per AI-assisted task compared to manual completion"
               value={inputs.avgTimeSavedMinutes}
-              min={2} max={120} step={2}
+              min={SIM_RANGES.avgTimeSavedMinutes.min}
+              max={SIM_RANGES.avgTimeSavedMinutes.max}
+              step={SIM_RANGES.avgTimeSavedMinutes.step}
               format={v => `${v}m`}
               color="amber"
               onChange={v => set('avgTimeSavedMinutes', v)}
@@ -266,7 +223,7 @@ export default function ValueSimulatorContent() {
           <p className="text-xs font-semibold text-white/60 uppercase tracking-widest font-body mb-1" style={{ fontSize: '10px' }}>
             Estimated Annualised Return
           </p>
-          <p className="font-display text-4xl font-800 tabular-nums mb-1">
+          <p className="font-display text-4xl font-extrabold tabular-nums mb-1">
             £{(displayOutputs.annualizedReturn / 1000000).toFixed(2)}M
           </p>
           <p className="text-sm text-white/70 font-body">
@@ -277,6 +234,22 @@ export default function ValueSimulatorContent() {
         {/* Output metrics grid */}
         <div className="grid grid-cols-2 gap-3">
           {[
+            {
+              id: 'out-active-cases',
+              icon: <Zap size={15} />,
+              label: 'Active Use Cases',
+              value: displayOutputs.activeUseCases.toString(),
+              suffix: `of ${inputs.targetUseCaseCount}`,
+              color: '#00B8A9',
+            },
+            {
+              id: 'out-active-users',
+              icon: <Users size={15} />,
+              label: 'Active Users',
+              value: displayOutputs.activeUsers.toLocaleString(),
+              suffix: `of ${inputs.targetUserCount}`,
+              color: '#006397',
+            },
             {
               id: 'out-hours',
               icon: <Clock size={15} />,
@@ -320,7 +293,7 @@ export default function ValueSimulatorContent() {
             {
               id: 'out-daily',
               icon: <BarChart3 size={15} />,
-              label: 'Daily Interactions',
+              label: 'Daily AI Interactions',
               value: Math.round(displayOutputs.dailyInteractions).toLocaleString(),
               suffix: '/day',
               color: '#006397',
@@ -329,17 +302,9 @@ export default function ValueSimulatorContent() {
               id: 'out-penetration',
               icon: <TrendingUp size={15} />,
               label: 'Programme Penetration',
-              value: `${Math.round(displayOutputs.penetration * 100)}`,
+              value: `${Math.round(displayOutputs.penetration)}`,
               suffix: '%',
               color: '#00205F',
-            },
-            {
-              id: 'out-active-cases',
-              icon: <Zap size={15} />,
-              label: 'Active Use Cases',
-              value: displayOutputs.activeUseCases.toString(),
-              suffix: `of ${inputs.targetUseCaseCount}`,
-              color: '#00B8A9',
             },
           ].map(({ id, icon, label, value, suffix, color }) => (
             <div key={id} className="bg-white rounded-xl shadow-card p-4">
@@ -348,7 +313,7 @@ export default function ValueSimulatorContent() {
                 <span className="text-xs font-semibold text-kpmg-outline font-body">{label}</span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="font-display text-xl font-800 tabular-nums" style={{ color }}>{value}</span>
+                <span className="font-display text-xl font-extrabold tabular-nums" style={{ color }}>{value}</span>
                 {suffix && <span className="text-xs text-kpmg-outline font-body">{suffix}</span>}
               </div>
             </div>
@@ -362,7 +327,7 @@ export default function ValueSimulatorContent() {
       {/* Right: Strategic summary */}
       <div className="lg:col-span-3 xl:col-span-3 space-y-5">
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-4">Scenario Summary</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Scenario Summary</h3>
           <div className="space-y-4">
             {SCENARIO_VIEWS.map(sv => {
               const svOutputs = sv.id === 'current' ? outputs : sv.id === 'scale2x' ? scale2xOutputs : fullAdoptionOutputs;
@@ -379,7 +344,7 @@ export default function ValueSimulatorContent() {
                     <span className="text-xs font-semibold font-body" style={{ color: sv.color }}>{sv.label}</span>
                     {isActive && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sv.color }} />}
                   </div>
-                  <p className="font-display text-lg font-800 tabular-nums text-kpmg-on-surface">
+                  <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface">
                     £{(svOutputs.annualizedReturn / 1000000).toFixed(2)}M
                   </p>
                   <p className="text-xs text-kpmg-outline font-body mt-0.5">
@@ -392,7 +357,7 @@ export default function ValueSimulatorContent() {
         </div>
 
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-3">Key Assumptions</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-3">Key Assumptions</h3>
           <div className="space-y-2">
             {[
               { id: 'ka-cost', label: 'Hourly cost rate', value: `£${HOURLY_COST}/hr` },

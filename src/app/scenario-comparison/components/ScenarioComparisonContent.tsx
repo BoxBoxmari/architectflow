@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import { SCENARIOS, calculateScenarioOutputs } from '@/lib/mockData';
-import { TrendingUp, TrendingDown, Minus, ChevronRight, FileText, Rocket, CheckCircle2, AlertCircle, Info } from 'lucide-react';
+import { calcScenarioVariants, SIM_DEFAULTS, type SimOutputs } from '@/lib/simulator/calcOutputs';
+import { TrendingUp, TrendingDown, Minus, ChevronRight, FileText, Rocket, Info } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -9,7 +9,13 @@ const SCENARIO_COLORS = ['#747683', '#00B8A9', '#0F6E56'];
 const SCENARIO_BG = ['#F6F3F2', 'rgba(0,184,169,0.06)', 'rgba(15,110,86,0.06)'];
 const SCENARIO_BORDER = ['#C4C6D4', '#00B8A9', '#0F6E56'];
 
-function DeltaBadge({ value, unit, baseline }: { value: number; unit: string; baseline: number }) {
+const SCENARIOS = [
+  { id: 'current', label: 'Current State',  tag: 'Baseline',    badge: null },
+  { id: 'scale2x', label: '2X Scale-Up',    tag: 'Recommended', badge: 'Preferred' },
+  { id: 'full',    label: 'Full Adoption',  tag: 'Optimised',   badge: 'High effort' },
+] as const;
+
+function DeltaBadge({ value, baseline }: { value: number; baseline: number }) {
   if (baseline === 0) return null;
   const delta = ((value - baseline) / baseline) * 100;
   if (Math.abs(delta) < 0.5) {
@@ -38,11 +44,16 @@ function DeltaBadge({ value, unit, baseline }: { value: number; unit: string; ba
 export default function ScenarioComparisonContent() {
   const [highlightedMetric, setHighlightedMetric] = useState<string | null>(null);
 
-  const outputs = SCENARIOS.map(s => calculateScenarioOutputs(s));
-  const baselineOutputs = outputs[0];
+  // Use default inputs to compute all three canonical scenarios
+  const variants = calcScenarioVariants(SIM_DEFAULTS);
+  const allOutputs: SimOutputs[] = [
+    variants.currentState.outputs,
+    variants.scale2x.outputs,
+    variants.fullAdoption.outputs,
+  ];
+  const baselineOutputs = allOutputs[0];
 
   function handleExport() {
-    // BACKEND INTEGRATION: POST /api/reports/export with comparison data
     toast.success('Comparison report exported', { description: 'Sent to your KPMG email as PDF' });
   }
 
@@ -52,7 +63,7 @@ export default function ScenarioComparisonContent() {
       label: 'Annualised Return',
       icon: <TrendingUp size={14} />,
       format: (v: number) => `£${(v / 1000000).toFixed(2)}M`,
-      getValue: (o: ReturnType<typeof calculateScenarioOutputs>) => o.annualizedReturn,
+      getValue: (o: SimOutputs) => o.annualizedReturn,
       highlight: true,
     },
     {
@@ -60,7 +71,7 @@ export default function ScenarioComparisonContent() {
       label: 'Monthly Cost Savings',
       icon: <TrendingUp size={14} />,
       format: (v: number) => `£${Math.round(v).toLocaleString()}`,
-      getValue: (o: ReturnType<typeof calculateScenarioOutputs>) => o.monthlyCostSavings,
+      getValue: (o: SimOutputs) => o.monthlyCostSavings,
       highlight: false,
     },
     {
@@ -68,7 +79,7 @@ export default function ScenarioComparisonContent() {
       label: 'Hours Recovered / Month',
       icon: <Info size={14} />,
       format: (v: number) => `${Math.round(v).toLocaleString()} hrs`,
-      getValue: (o: ReturnType<typeof calculateScenarioOutputs>) => o.hoursPerMonth,
+      getValue: (o: SimOutputs) => o.hoursPerMonth,
       highlight: false,
     },
     {
@@ -76,7 +87,7 @@ export default function ScenarioComparisonContent() {
       label: 'FTEs Freed / Month',
       icon: <Info size={14} />,
       format: (v: number) => `${v.toFixed(1)}`,
-      getValue: (o: ReturnType<typeof calculateScenarioOutputs>) => o.ftesFreed,
+      getValue: (o: SimOutputs) => o.ftesFreed,
       highlight: false,
     },
     {
@@ -84,7 +95,7 @@ export default function ScenarioComparisonContent() {
       label: 'AI-Assisted Tasks / Month',
       icon: <Info size={14} />,
       format: (v: number) => `${Math.round(v).toLocaleString()}`,
-      getValue: (o: ReturnType<typeof calculateScenarioOutputs>) => o.tasksPerMonth,
+      getValue: (o: SimOutputs) => o.tasksPerMonth,
       highlight: false,
     },
     {
@@ -92,15 +103,15 @@ export default function ScenarioComparisonContent() {
       label: 'Active Users',
       icon: <Info size={14} />,
       format: (v: number) => `${Math.round(v).toLocaleString()}`,
-      getValue: (o: ReturnType<typeof calculateScenarioOutputs>) => o.activeUsers,
+      getValue: (o: SimOutputs) => o.activeUsers,
       highlight: false,
     },
     {
       id: 'metric-penetration',
       label: 'Programme Penetration',
       icon: <Info size={14} />,
-      format: (v: number) => `${Math.round(v * 100)}%`,
-      getValue: (o: ReturnType<typeof calculateScenarioOutputs>) => o.penetration,
+      format: (v: number) => `${Math.round(v)}%`,
+      getValue: (o: SimOutputs) => o.penetration,
       highlight: false,
     },
     {
@@ -108,15 +119,15 @@ export default function ScenarioComparisonContent() {
       label: 'Value / User / Month',
       icon: <Info size={14} />,
       format: (v: number) => `£${Math.round(v)}`,
-      getValue: (o: ReturnType<typeof calculateScenarioOutputs>) => o.valuePerUserPerMonth,
+      getValue: (o: SimOutputs) => o.valuePerUserPerMonth,
       highlight: false,
     },
     {
       id: 'metric-daily',
-      label: 'Daily Interactions',
+      label: 'Daily AI Interactions',
       icon: <Info size={14} />,
       format: (v: number) => `${Math.round(v).toLocaleString()}/day`,
-      getValue: (o: ReturnType<typeof calculateScenarioOutputs>) => o.dailyInteractions,
+      getValue: (o: SimOutputs) => o.dailyInteractions,
       highlight: false,
     },
   ];
@@ -125,32 +136,40 @@ export default function ScenarioComparisonContent() {
     {
       id: 'assump-cases',
       label: 'Target Use Cases',
-      values: SCENARIOS.map(s => `${s.useCaseCount}`),
+      values: [
+        `${SIM_DEFAULTS.targetUseCaseCount}`,
+        `${Math.min(variants.currentState.activeUseCases * 2, 120)}`,
+        `${SIM_DEFAULTS.targetUseCaseCount}`,
+      ],
     },
     {
       id: 'assump-activation',
       label: 'Activation Rate',
-      values: SCENARIOS.map(s => `${s.activationRate}%`),
+      values: [`${SIM_DEFAULTS.activationRate}%`, '100%', '100%'],
     },
     {
       id: 'assump-users',
       label: 'Target Users',
-      values: SCENARIOS.map(s => s.targetUsers.toLocaleString()),
+      values: [
+        `${SIM_DEFAULTS.targetUserCount}`,
+        `${Math.min(variants.currentState.activeUsers * 2, 1800)}`,
+        `${SIM_DEFAULTS.targetUserCount}`,
+      ],
     },
     {
       id: 'assump-adoption',
       label: 'Adoption Rate',
-      values: SCENARIOS.map(s => `${s.adoptionRate}%`),
+      values: [`${SIM_DEFAULTS.adoptionRate}%`, '100%', '100%'],
     },
     {
       id: 'assump-tasks',
       label: 'Tasks / User / Use Case / Month',
-      values: SCENARIOS.map(s => `${s.tasksPerUserPerUseCasePerMonth}`),
+      values: Array(3).fill(`${SIM_DEFAULTS.tasksPerUserPerUseCasePerMonth}`),
     },
     {
       id: 'assump-time',
       label: 'Avg Time Saved / Task',
-      values: SCENARIOS.map(s => `${s.avgTimeSavedMinutes} min`),
+      values: Array(3).fill(`${SIM_DEFAULTS.avgTimeSavedMinutes} min`),
     },
   ];
 
@@ -159,10 +178,11 @@ export default function ScenarioComparisonContent() {
       {/* Scenario header cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {SCENARIOS.map((s, idx) => {
-          const o = outputs[idx];
+          const o = allOutputs[idx];
           const color = SCENARIO_COLORS[idx];
           const bg = SCENARIO_BG[idx];
           const border = SCENARIO_BORDER[idx];
+          const variant = idx === 0 ? variants.currentState : idx === 1 ? variants.scale2x : variants.fullAdoption;
           return (
             <div
               key={`scen-card-${s.id}`}
@@ -175,31 +195,29 @@ export default function ScenarioComparisonContent() {
                     className="text-xs font-semibold uppercase tracking-widest font-body"
                     style={{ fontSize: '10px', color }}
                   >
-                    {idx === 0 ? 'Baseline' : idx === 1 ? 'Recommended' : 'Optimised'}
+                    {s.tag}
                   </span>
-                  <h3 className="font-display text-base font-700 text-kpmg-on-surface mt-0.5">{s.name}</h3>
+                  <h3 className="font-display text-base font-bold text-kpmg-on-surface mt-0.5">{s.label}</h3>
                 </div>
-                {idx === 1 && (
-                  <span className="kpmg-badge bg-kpmg-accent-faster/15 text-kpmg-accent-faster text-xs">
-                    <CheckCircle2 size={10} className="mr-0.5" />
-                    Preferred
-                  </span>
+                {s.badge === 'Preferred' && (
+                  <span className="kpmg-badge bg-kpmg-accent-faster/15 text-kpmg-accent-faster text-xs">Preferred</span>
                 )}
-                {idx === 2 && (
-                  <span className="kpmg-badge bg-kpmg-accent-deeper/15 text-kpmg-accent-deeper text-xs">
-                    <AlertCircle size={10} className="mr-0.5" />
-                    High effort
-                  </span>
+                {s.badge === 'High effort' && (
+                  <span className="kpmg-badge bg-kpmg-accent-deeper/15 text-kpmg-accent-deeper text-xs">High effort</span>
                 )}
               </div>
-              <p className="text-xs text-kpmg-on-surface-variant font-body mb-4 leading-relaxed">{s.description}</p>
+              <p className="text-xs text-kpmg-on-surface-variant font-body mb-4 leading-relaxed">
+                {idx === 0 && `${variant.activeUsers} active users · ${variant.activeUseCases} active use cases`}
+                {idx === 1 && `${variant.activeUsers} active users · ${variant.activeUseCases} active use cases (2× scale)`}
+                {idx === 2 && `${variant.activeUsers} users · ${variant.activeUseCases} use cases (full activation)`}
+              </p>
               <div>
                 <p className="text-xs text-kpmg-outline font-body mb-1">Annualised Return</p>
-                <p className="font-display text-2xl font-800 tabular-nums" style={{ color }}>
+                <p className="font-display text-2xl font-extrabold tabular-nums" style={{ color }}>
                   £{(o.annualizedReturn / 1000000).toFixed(2)}M
                 </p>
                 {idx > 0 && (
-                  <DeltaBadge value={o.annualizedReturn} unit="£" baseline={baselineOutputs.annualizedReturn} />
+                  <DeltaBadge value={o.annualizedReturn} baseline={baselineOutputs.annualizedReturn} />
                 )}
               </div>
             </div>
@@ -210,8 +228,8 @@ export default function ScenarioComparisonContent() {
       {/* Metrics comparison table */}
       <div className="bg-white rounded-xl shadow-card overflow-hidden">
         <div className="px-6 py-4 border-b border-kpmg-outline-variant/30">
-          <h2 className="font-display text-base font-700 text-kpmg-on-surface">Output Metrics Comparison</h2>
-          <p className="text-xs text-kpmg-outline mt-0.5 font-body">Delta values shown vs Status Quo baseline</p>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface">Output Metrics Comparison</h2>
+          <p className="text-xs text-kpmg-outline mt-0.5 font-body">Delta values shown vs Current State baseline</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -222,12 +240,7 @@ export default function ScenarioComparisonContent() {
                 </th>
                 {SCENARIOS.map((s, idx) => (
                   <th key={`th-scen-${s.id}`} className="px-4 py-3 text-center">
-                    <span
-                      className="text-xs font-semibold font-body"
-                      style={{ color: SCENARIO_COLORS[idx] }}
-                    >
-                      {s.name}
-                    </span>
+                    <span className="text-xs font-semibold font-body" style={{ color: SCENARIO_COLORS[idx] }}>{s.label}</span>
                   </th>
                 ))}
               </tr>
@@ -245,26 +258,22 @@ export default function ScenarioComparisonContent() {
                   <td className="px-6 py-3.5">
                     <div className="flex items-center gap-2">
                       <span className="text-kpmg-outline">{metric.icon}</span>
-                      <span className={`text-sm font-body ${metric.highlight ? 'font-700 text-kpmg-on-surface' : 'font-medium text-kpmg-on-surface-variant'}`}>
+                      <span className={`text-sm font-body ${metric.highlight ? 'font-bold text-kpmg-on-surface' : 'font-medium text-kpmg-on-surface-variant'}`}>
                         {metric.label}
                       </span>
                     </div>
                   </td>
-                  {outputs.map((o, idx) => {
+                  {allOutputs.map((o, idx) => {
                     const val = metric.getValue(o);
                     const baseVal = metric.getValue(baselineOutputs);
                     return (
-                      <td key={`cell-${metric.id}-${SCENARIOS[idx].id}`} className="px-4 py-3.5 text-center">
+                      <td key={`cell-${metric.id}-${idx}`} className="px-4 py-3.5 text-center">
                         <div className="flex flex-col items-center gap-1">
-                          <span className={`font-display tabular-nums ${metric.highlight ? 'text-lg font-800' : 'text-sm font-700'}`} style={{ color: SCENARIO_COLORS[idx] }}>
+                          <span className={`font-display tabular-nums ${metric.highlight ? 'text-lg font-extrabold' : 'text-sm font-bold'}`} style={{ color: SCENARIO_COLORS[idx] }}>
                             {metric.format(val)}
                           </span>
-                          {idx > 0 && (
-                            <DeltaBadge value={val} unit="" baseline={baseVal} />
-                          )}
-                          {idx === 0 && (
-                            <span className="text-xs text-kpmg-outline font-body">—</span>
-                          )}
+                          {idx > 0 && <DeltaBadge value={val} baseline={baseVal} />}
+                          {idx === 0 && <span className="text-xs text-kpmg-outline font-body">—</span>}
                         </div>
                       </td>
                     );
@@ -279,7 +288,7 @@ export default function ScenarioComparisonContent() {
       {/* Assumptions comparison */}
       <div className="bg-white rounded-xl shadow-card overflow-hidden">
         <div className="px-6 py-4 border-b border-kpmg-outline-variant/30">
-          <h2 className="font-display text-base font-700 text-kpmg-on-surface">Assumption Differences</h2>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface">Assumption Differences</h2>
           <p className="text-xs text-kpmg-outline mt-0.5 font-body">Input parameters that drive each scenario</p>
         </div>
         <div className="overflow-x-auto">
@@ -291,7 +300,7 @@ export default function ScenarioComparisonContent() {
                 </th>
                 {SCENARIOS.map((s, idx) => (
                   <th key={`assump-th-${s.id}`} className="px-4 py-3 text-center">
-                    <span className="text-xs font-semibold font-body" style={{ color: SCENARIO_COLORS[idx] }}>{s.name}</span>
+                    <span className="text-xs font-semibold font-body" style={{ color: SCENARIO_COLORS[idx] }}>{s.label}</span>
                   </th>
                 ))}
               </tr>
@@ -307,12 +316,7 @@ export default function ScenarioComparisonContent() {
                   </td>
                   {row.values.map((v, vIdx) => (
                     <td key={`assump-val-${row.id}-${vIdx}`} className="px-4 py-3 text-center">
-                      <span
-                        className="font-display text-sm font-700 tabular-nums"
-                        style={{ color: SCENARIO_COLORS[vIdx] }}
-                      >
-                        {v}
-                      </span>
+                      <span className="font-display text-sm font-bold tabular-nums" style={{ color: SCENARIO_COLORS[vIdx] }}>{v}</span>
                     </td>
                   ))}
                 </tr>
@@ -332,27 +336,27 @@ export default function ScenarioComparisonContent() {
             <p className="text-xs font-semibold text-white/60 uppercase tracking-widest font-body mb-2" style={{ fontSize: '10px' }}>
               Recommendation Synthesis
             </p>
-            <h2 className="font-display text-xl font-800 text-white mb-3 leading-tight">
-              Accelerated Flow is the preferred strategic path
+            <h2 className="font-display text-xl font-extrabold text-white mb-3 leading-tight">
+              2X Scale-Up is the preferred strategic path
             </h2>
             <p className="text-sm text-white/80 font-body leading-relaxed max-w-2xl">
-              The Accelerated Flow scenario delivers a{' '}
+              The 2X Scale-Up scenario delivers a{' '}
               <span className="font-semibold text-kpmg-accent-faster">
-                £{((outputs[1].annualizedReturn - outputs[0].annualizedReturn) / 1000000).toFixed(2)}M
+                £{((allOutputs[1].annualizedReturn - allOutputs[0].annualizedReturn) / 1000000).toFixed(2)}M
               </span>{' '}
-              uplift over Status Quo with a targeted investment in change management and enablement across 5 use cases.
-              Full Adoption offers higher ceiling value but requires phased governance and 500-user rollout — recommended
-              as a 12-month horizon target after Accelerated Flow is stabilised.
+              uplift over Current State by doubling active users and use cases within firm-wide capacity limits.
+              Full Adoption offers the highest ceiling but requires 100% activation across all targeted users — recommended
+              as a 12-month horizon target after 2X Scale-Up is stabilised.
             </p>
             <div className="mt-4 grid grid-cols-3 gap-4">
               {[
-                { id: 'syn-roi', label: 'ROI Uplift vs Baseline', value: `+${(((outputs[1].annualizedReturn - outputs[0].annualizedReturn) / outputs[0].annualizedReturn) * 100).toFixed(0)}%` },
-                { id: 'syn-ftes', label: 'Additional FTEs Freed', value: `+${(outputs[1].ftesFreed - outputs[0].ftesFreed).toFixed(1)}` },
-                { id: 'syn-users', label: 'Additional Active Users', value: `+${outputs[1].activeUsers - outputs[0].activeUsers}` },
+                { id: 'syn-roi', label: 'ROI Uplift vs Baseline', value: `+${(((allOutputs[1].annualizedReturn - allOutputs[0].annualizedReturn) / Math.max(allOutputs[0].annualizedReturn, 1)) * 100).toFixed(0)}%` },
+                { id: 'syn-ftes', label: 'Additional FTEs Freed', value: `+${(allOutputs[1].ftesFreed - allOutputs[0].ftesFreed).toFixed(1)}` },
+                { id: 'syn-users', label: 'Additional Active Users', value: `+${allOutputs[1].activeUsers - allOutputs[0].activeUsers}` },
               ].map(({ id, label, value }) => (
                 <div key={id}>
                   <p className="text-xs text-white/50 font-body mb-1">{label}</p>
-                  <p className="font-display text-xl font-800 text-kpmg-accent-faster tabular-nums">{value}</p>
+                  <p className="font-display text-xl font-extrabold text-kpmg-accent-faster tabular-nums">{value}</p>
                 </div>
               ))}
             </div>

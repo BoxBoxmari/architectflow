@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import { AI_CASES, SCENARIOS, calculateScenarioOutputs } from '@/lib/mockData';
+import { AI_CASES } from '@/lib/mockData';
+import { calcScenarioVariants, SIM_DEFAULTS } from '@/lib/simulator/calcOutputs';
 import { toast } from 'sonner';
 import { Download, Share2, Eye, ChevronUp, ChevronDown, ToggleLeft, ToggleRight, FileText, CheckCircle2 } from 'lucide-react';
 
@@ -13,20 +14,27 @@ interface ReportSection {
 }
 
 const DEFAULT_SECTIONS: ReportSection[] = [
-  { id: 'sec-exec', title: 'Executive Summary', description: 'Portfolio health overview and key findings for Partner review', included: true, order: 1 },
-  { id: 'sec-portfolio', title: 'AI Portfolio Overview', description: 'Active cases, functions covered, and maturity distribution', included: true, order: 2 },
-  { id: 'sec-cases', title: 'Priority Case Profiles', description: 'Deep-dive on selected high-value AI cases', included: true, order: 3 },
-  { id: 'sec-simulator', title: 'Value Simulation Results', description: 'ROI modelling outputs and scenario analysis', included: true, order: 4 },
-  { id: 'sec-comparison', title: 'Scenario Comparison', description: 'Side-by-side comparison of Status Quo, Accelerated Flow, and Optimised Guardrail', included: true, order: 5 },
-  { id: 'sec-architecture', title: 'Architecture Overview', description: 'AI Case to Function to Service relationship map', included: false, order: 6 },
-  { id: 'sec-governance', title: 'Governance & Risk Notes', description: 'Compliance status and review history for included cases', included: false, order: 7 },
-  { id: 'sec-pilot', title: 'Pilot Recommendations', description: 'Suggested next steps and pilot request summary', included: true, order: 8 },
+  { id: 'sec-exec',        title: 'Executive Summary',        description: 'Portfolio health overview and key findings for Partner review',                    included: true,  order: 1 },
+  { id: 'sec-portfolio',   title: 'AI Portfolio Overview',    description: 'Active cases, functions covered, and maturity distribution',                       included: true,  order: 2 },
+  { id: 'sec-cases',       title: 'Priority Case Profiles',   description: 'Deep-dive on selected high-value AI cases',                                        included: true,  order: 3 },
+  { id: 'sec-simulator',   title: 'Value Simulation Results', description: 'ROI modelling outputs and scenario analysis',                                       included: true,  order: 4 },
+  { id: 'sec-comparison',  title: 'Scenario Comparison',      description: 'Side-by-side comparison of Current State, 2X Scale-Up, and Full Adoption',         included: true,  order: 5 },
+  { id: 'sec-architecture',title: 'Architecture Overview',    description: 'AI Case to Function to Service relationship map',                                   included: false, order: 6 },
+  { id: 'sec-governance',  title: 'Governance & Risk Notes',  description: 'Compliance status and review history for included cases',                           included: false, order: 7 },
+  { id: 'sec-pilot',       title: 'Pilot Recommendations',    description: 'Suggested next steps and pilot request summary',                                    included: true,  order: 8 },
 ];
+
+// Scenario options for the report
+const SCENARIO_OPTIONS = [
+  { id: 'current', label: 'Current State' },
+  { id: 'scale2x', label: '2X Scale-Up' },
+  { id: 'full',    label: 'Full Adoption' },
+] as const;
 
 export default function ReportBuilderContent() {
   const [sections, setSections] = useState<ReportSection[]>(DEFAULT_SECTIONS);
-  const [selectedCases, setSelectedCases] = useState<string[]>(['case-001', 'case-002', 'case-005']);
-  const [selectedScenario, setSelectedScenario] = useState('scen-002');
+  const [selectedCases, setSelectedCases] = useState<string[]>(['TAX-001', 'TAX-002', 'LAW-001']);
+  const [selectedScenario, setSelectedScenario] = useState<'current' | 'scale2x' | 'full'>('scale2x');
   const [reportTitle, setReportTitle] = useState('KPMG AI Portfolio Review — Q2 2026');
   const [exporting, setExporting] = useState(false);
 
@@ -54,7 +62,6 @@ export default function ReportBuilderContent() {
   }
 
   async function handleExport() {
-    // BACKEND INTEGRATION: POST /api/reports/export with { sections, selectedCases, selectedScenario, reportTitle }
     setExporting(true);
     await new Promise(r => setTimeout(r, 1500));
     setExporting(false);
@@ -62,12 +69,16 @@ export default function ReportBuilderContent() {
   }
 
   function handleShare() {
-    // BACKEND INTEGRATION: POST /api/reports/share to generate a share link
     toast.success('Share link copied', { description: 'Link expires in 7 days' });
   }
 
-  const scenario = SCENARIOS.find(s => s.id === selectedScenario);
-  const scenarioOutputs = scenario ? calculateScenarioOutputs(scenario) : null;
+  // Compute scenario outputs from shared formula
+  const variants = calcScenarioVariants(SIM_DEFAULTS);
+  const scenarioOutputs =
+    selectedScenario === 'current' ? variants.currentState.outputs :
+    selectedScenario === 'scale2x' ? variants.scale2x.outputs :
+    variants.fullAdoption.outputs;
+
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
   const includedSections = sortedSections.filter(s => s.included);
   const selectedCaseObjects = AI_CASES.filter(c => selectedCases.includes(c.id));
@@ -91,7 +102,7 @@ export default function ReportBuilderContent() {
 
         {/* Sections */}
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-4">Report Sections</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Report Sections</h3>
           <div className="space-y-2">
             {sortedSections.map((section, idx) => (
               <div
@@ -101,20 +112,10 @@ export default function ReportBuilderContent() {
                 }`}
               >
                 <div className="flex flex-col gap-0.5 flex-shrink-0">
-                  <button
-                    onClick={() => moveSection(section.id, 'up')}
-                    disabled={idx === 0}
-                    className="p-0.5 rounded hover:bg-kpmg-surface-container-high transition-colors disabled:opacity-30"
-                    aria-label="Move section up"
-                  >
+                  <button onClick={() => moveSection(section.id, 'up')} disabled={idx === 0} className="p-0.5 rounded hover:bg-kpmg-surface-container-high transition-colors disabled:opacity-30" aria-label="Move section up">
                     <ChevronUp size={12} className="text-kpmg-outline" />
                   </button>
-                  <button
-                    onClick={() => moveSection(section.id, 'down')}
-                    disabled={idx === sortedSections.length - 1}
-                    className="p-0.5 rounded hover:bg-kpmg-surface-container-high transition-colors disabled:opacity-30"
-                    aria-label="Move section down"
-                  >
+                  <button onClick={() => moveSection(section.id, 'down')} disabled={idx === sortedSections.length - 1} className="p-0.5 rounded hover:bg-kpmg-surface-container-high transition-colors disabled:opacity-30" aria-label="Move section down">
                     <ChevronDown size={12} className="text-kpmg-outline" />
                   </button>
                 </div>
@@ -122,11 +123,7 @@ export default function ReportBuilderContent() {
                   <p className="text-sm font-semibold text-kpmg-on-surface font-body truncate">{section.title}</p>
                   <p className="text-xs text-kpmg-outline font-body truncate">{section.description}</p>
                 </div>
-                <button
-                  onClick={() => toggleSection(section.id)}
-                  className="flex-shrink-0 transition-colors"
-                  aria-label={section.included ? 'Exclude section' : 'Include section'}
-                >
+                <button onClick={() => toggleSection(section.id)} className="flex-shrink-0 transition-colors" aria-label={section.included ? 'Exclude section' : 'Include section'}>
                   {section.included
                     ? <ToggleRight size={20} className="text-kpmg-primary" />
                     : <ToggleLeft size={20} className="text-kpmg-outline" />
@@ -139,13 +136,10 @@ export default function ReportBuilderContent() {
 
         {/* Case selection */}
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-4">Include Cases</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Include Cases</h3>
           <div className="space-y-2">
             {AI_CASES.map(c => (
-              <label
-                key={`report-case-${c.id}`}
-                className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-kpmg-surface-container-low cursor-pointer transition-colors"
-              >
+              <label key={`report-case-${c.id}`} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-kpmg-surface-container-low cursor-pointer transition-colors">
                 <input
                   type="checkbox"
                   checked={selectedCases.includes(c.id)}
@@ -174,24 +168,20 @@ export default function ReportBuilderContent() {
 
         {/* Scenario selection */}
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-3">Include Scenario</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-3">Include Scenario</h3>
           <div className="space-y-2">
-            {SCENARIOS.map(s => (
-              <label
-                key={`report-scen-${s.id}`}
-                className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-kpmg-surface-container-low cursor-pointer transition-colors"
-              >
+            {SCENARIO_OPTIONS.map(s => (
+              <label key={`report-scen-${s.id}`} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-kpmg-surface-container-low cursor-pointer transition-colors">
                 <input
                   type="radio"
                   name="scenario"
                   value={s.id}
                   checked={selectedScenario === s.id}
-                  onChange={() => setSelectedScenario(s.id)}
+                  onChange={() => setSelectedScenario(s.id as typeof selectedScenario)}
                   className="w-4 h-4 accent-kpmg-primary"
                 />
                 <div>
-                  <p className="text-sm font-semibold text-kpmg-on-surface font-body">{s.name}</p>
-                  <p className="text-xs text-kpmg-outline font-body">{s.description}</p>
+                  <p className="text-sm font-semibold text-kpmg-on-surface font-body">{s.label}</p>
                 </div>
               </label>
             ))}
@@ -200,11 +190,7 @@ export default function ReportBuilderContent() {
 
         {/* Export actions */}
         <div className="space-y-2">
-          <button
-            onClick={handleExport}
-            disabled={exporting}
-            className="kpmg-btn-primary w-full justify-center text-sm disabled:opacity-70"
-          >
+          <button onClick={handleExport} disabled={exporting} className="kpmg-btn-primary w-full justify-center text-sm disabled:opacity-70">
             {exporting ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -242,11 +228,11 @@ export default function ReportBuilderContent() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 rounded bg-kpmg-primary flex items-center justify-center">
-                    <span className="text-white font-display text-xs font-800">K</span>
+                    <span className="text-white font-display text-xs font-extrabold">K</span>
                   </div>
-                  <span className="font-display text-sm font-700 text-kpmg-primary tracking-tight">KPMG</span>
+                  <span className="font-display text-sm font-bold text-kpmg-primary tracking-tight">KPMG</span>
                 </div>
-                <h1 className="font-display text-xl font-800 text-kpmg-on-surface leading-tight mb-1">{reportTitle}</h1>
+                <h1 className="font-display text-xl font-extrabold text-kpmg-on-surface leading-tight mb-1">{reportTitle}</h1>
                 <p className="text-xs text-kpmg-outline font-body">Prepared by Sarah Reynolds, Partner · 15 April 2026</p>
                 <p className="text-xs text-kpmg-outline font-body">CONFIDENTIAL — Internal Use Only</p>
               </div>
@@ -260,17 +246,16 @@ export default function ReportBuilderContent() {
             {includedSections.map((section, idx) => (
               <div key={`preview-${section.id}`} className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="font-display text-xs font-700 text-kpmg-outline tabular-nums">0{idx + 1}</span>
-                  <h2 className="font-display text-base font-700 text-kpmg-on-surface">{section.title}</h2>
+                  <span className="font-display text-xs font-bold text-kpmg-outline tabular-nums">0{idx + 1}</span>
+                  <h2 className="font-display text-base font-bold text-kpmg-on-surface">{section.title}</h2>
                 </div>
 
                 {section.id === 'sec-exec' && (
                   <div className="p-4 rounded-lg bg-kpmg-surface-container-low">
                     <p className="text-sm text-kpmg-on-surface-variant font-body leading-relaxed">
                       This report summarises the KPMG AI portfolio status as of Q2 2026. The portfolio comprises{' '}
-                      {AI_CASES.length} active cases across {new Set(AI_CASES.flatMap(c => c.linkedFunctions)).size} functions,
-                      with an estimated annualised return of £{(AI_CASES.reduce((s, c) => s + c.metrics.annualizedReturn, 0) / 1000000).toFixed(1)}M.
-                      The Tax Research Assistant (AF-002) has achieved scaled status with 89% adoption — the portfolio flagship.
+                      {AI_CASES.length} AI cases across {new Set(AI_CASES.flatMap(c => c.linkedFunctions)).size} functions.
+                      The Tax Research Assistant (TAX-002) has achieved scaled status with 244 active users — the portfolio flagship.
                     </p>
                   </div>
                 )}
@@ -278,12 +263,12 @@ export default function ReportBuilderContent() {
                 {section.id === 'sec-portfolio' && (
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { id: 'prev-cases', label: 'Active Cases', value: `${AI_CASES.filter(c => ['Active','Scaled'].includes(c.status)).length}` },
+                      { id: 'prev-cases', label: 'Total Cases', value: `${AI_CASES.length}` },
                       { id: 'prev-fns', label: 'Functions', value: `${new Set(AI_CASES.flatMap(c => c.linkedFunctions)).size}` },
-                      { id: 'prev-value', label: 'Est. Annual Value', value: `£${(AI_CASES.reduce((s,c)=>s+c.metrics.annualizedReturn,0)/1000000).toFixed(1)}M` },
+                      { id: 'prev-active', label: 'Active / Scaled', value: `${AI_CASES.filter(c => ['Active','Scaled'].includes(c.status)).length}` },
                     ].map(({ id, label, value }) => (
                       <div key={id} className="p-3 rounded-lg bg-kpmg-primary/5 text-center">
-                        <p className="font-display text-lg font-800 text-kpmg-primary tabular-nums">{value}</p>
+                        <p className="font-display text-lg font-extrabold text-kpmg-primary tabular-nums">{value}</p>
                         <p className="text-xs text-kpmg-outline font-body">{label}</p>
                       </div>
                     ))}
@@ -293,30 +278,33 @@ export default function ReportBuilderContent() {
                 {section.id === 'sec-cases' && selectedCaseObjects.length > 0 && (
                   <div className="space-y-2">
                     {selectedCaseObjects.map(c => (
-                      <div key={`prev-case-${c.id}`} className="flex items-center gap-3 p-3 rounded-lg bg-kpmg-surface-container-low">
-                        <span className="text-xs font-semibold text-kpmg-outline font-body w-14 flex-shrink-0">{c.code}</span>
+                      <div key={`prev-case-${c.id}`} className="flex items-start gap-3 p-3 rounded-lg bg-kpmg-surface-container-low">
+                        <span className="text-xs font-semibold text-kpmg-outline font-body w-20 flex-shrink-0 pt-0.5">{c.code}</span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-kpmg-on-surface font-body truncate">{c.title}</p>
+                          <p className="text-sm font-semibold text-kpmg-on-surface font-body">{c.title}</p>
+                          <p className="text-xs text-kpmg-outline font-body">{c.source} · {c.tech}</p>
+                          <ul className="mt-1 space-y-0.5">
+                            {c.metrics.map((m, i) => (
+                              <li key={`pm-${c.id}-${i}`} className="text-xs text-kpmg-on-surface-variant font-body">• {m}</li>
+                            ))}
+                          </ul>
                         </div>
-                        <span className="font-display text-sm font-700 text-kpmg-primary tabular-nums flex-shrink-0">
-                          £{(c.metrics.annualizedReturn / 1000).toFixed(0)}k pa
-                        </span>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {section.id === 'sec-simulator' && scenarioOutputs && (
+                {section.id === 'sec-simulator' && (
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       { id: 'sim-annual', label: 'Annualised Return', value: `£${(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M` },
-                      { id: 'sim-ftes', label: 'FTEs Freed', value: `${scenarioOutputs.ftesFreed.toFixed(1)}` },
-                      { id: 'sim-hours', label: 'Hours / Month', value: `${Math.round(scenarioOutputs.hoursPerMonth).toLocaleString()}` },
+                      { id: 'sim-ftes', label: 'FTEs Freed / Month', value: `${scenarioOutputs.ftesFreed.toFixed(1)}` },
+                      { id: 'sim-hours', label: 'Hours Recovered / Month', value: `${Math.round(scenarioOutputs.hoursPerMonth).toLocaleString()}` },
                       { id: 'sim-users', label: 'Active Users', value: `${scenarioOutputs.activeUsers}` },
                     ].map(({ id, label, value }) => (
                       <div key={id} className="p-3 rounded-lg bg-kpmg-surface-container-low">
                         <p className="text-xs text-kpmg-outline font-body mb-0.5">{label}</p>
-                        <p className="font-display text-base font-700 text-kpmg-on-surface tabular-nums">{value}</p>
+                        <p className="font-display text-base font-bold text-kpmg-on-surface tabular-nums">{value}</p>
                       </div>
                     ))}
                   </div>
@@ -329,8 +317,8 @@ export default function ReportBuilderContent() {
                       <p className="text-sm font-semibold text-kpmg-on-surface font-body">Recommended Next Step</p>
                     </div>
                     <p className="text-sm text-kpmg-on-surface-variant font-body leading-relaxed">
-                      Initiate a formal pilot request for the Accelerated Flow scenario, targeting Tax and Consulting functions
-                      as the primary activation cohort. Estimated 90-day pilot with 80 users and 3 active use cases.
+                      Initiate a formal pilot request for the 2X Scale-Up scenario, targeting Tax and Consulting functions
+                      as the primary activation cohort. Estimated 90-day pilot with active use cases from the selected portfolio.
                     </p>
                   </div>
                 )}
