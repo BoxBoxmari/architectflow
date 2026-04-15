@@ -128,11 +128,23 @@
     stroke-width: 2;
   }
   .node-card-hover {
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    transition: box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1), transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.15s ease, background-color 0.15s ease;
   }
   .node-card-hover:hover {
     box-shadow: 0 4px 16px rgba(0, 32, 95, 0.12);
     transform: translateY(-1px);
+  }
+  .node-card-selected {
+    animation: caseSelect 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .fn-node-active {
+    transition: opacity 0.25s ease-out, border-color 0.25s ease-out, background-color 0.25s ease-out, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fn-node-inactive {
+    transition: opacity 0.25s ease-out, border-color 0.25s ease-out, background-color 0.25s ease-out;
+  }
+  .svc-node-active {
+    transition: opacity 0.2s ease-out, border-color 0.2s ease-out, background-color 0.2s ease-out;
   }
 }
 

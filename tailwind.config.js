@@ -46,9 +46,10 @@ module.exports = {
       },
       animation: {
         'fade-in': 'fadeIn 0.2s ease-out',
-        'slide-in-right': 'slideInRight 0.25s ease-out',
+        'slide-in-right': 'slideInRight 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
         'slide-up': 'slideUp 0.2s ease-out',
         'pulse-highlight': 'pulseHighlight 0.6s ease-out',
+        'case-select': 'caseSelect 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
       },
       keyframes: {
         fadeIn: {
@@ -56,7 +57,7 @@ module.exports = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         slideInRight: {
-          '0%': { opacity: '0', transform: 'translateX(16px)' },
+          '0%': { opacity: '0', transform: 'translateX(24px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         slideUp: {
@@ -66,6 +67,11 @@ module.exports = {
         pulseHighlight: {
           '0%': { backgroundColor: 'rgba(0, 184, 169, 0.15)' },
           '100%': { backgroundColor: 'transparent' },
+        },
+        caseSelect: {
+          '0%': { boxShadow: '0 0 0 0 rgba(0, 184, 169, 0.4)' },
+          '60%': { boxShadow: '0 0 0 6px rgba(0, 184, 169, 0)' },
+          '100%': { boxShadow: '0 4px 16px rgba(0, 32, 95, 0.10)' },
         },
       },
     },

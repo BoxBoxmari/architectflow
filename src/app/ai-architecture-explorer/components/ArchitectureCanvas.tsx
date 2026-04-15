@@ -28,6 +28,7 @@ export default function ArchitectureCanvas() {
   const [hoveredCase, setHoveredCase] = useState<string | null>(null);
   const [activeFunction, setActiveFunction] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectingId, setSelectingId] = useState<string | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const filteredCases = AI_CASES.filter((c) => {
@@ -51,11 +52,25 @@ export default function ArchitectureCanvas() {
     ? new Set(activeCase.linkedServices)
     : new Set(filteredCases.flatMap((c) => c.linkedServices));
 
+  function handleSelectCase(c: (typeof AI_CASES)[0]) {
+    const isSelected = selectedCase?.id === c.id;
+    if (isSelected) {
+      setSelectedCase(null);
+      setSelectingId(null);
+    } else {
+      setSelectingId(c.id);
+      setSelectedCase(c);
+      // clear the glow class after animation completes
+      setTimeout(() => setSelectingId(null), 400);
+    }
+  }
+
   function reset() {
     setSelectedCase(null);
     setHoveredCase(null);
     setActiveFunction(null);
     setSearchQuery('');
+    setSelectingId(null);
   }
 
   return (
@@ -138,23 +153,25 @@ export default function ArchitectureCanvas() {
                 {filteredCases.map((c) => {
                   const isSelected = selectedCase?.id === c.id;
                   const isHovered = hoveredCase === c.id;
+                  const isSelecting = selectingId === c.id;
                   const techColor = TECHNIQUE_COLORS[c.tech] || '#747683';
                   return (
                     <button
                       key={`case-node-${c.id}`}
-                      onClick={() => setSelectedCase(isSelected ? null : c)}
+                      onClick={() => handleSelectCase(c)}
                       onMouseEnter={() => setHoveredCase(c.id)}
                       onMouseLeave={() => setHoveredCase(null)}
-                      className={`
-                        text-left p-3 rounded-xl border-2 transition-all duration-150 node-card-hover w-full
-                        ${
-                          isSelected
-                            ? 'border-kpmg-accent-faster bg-kpmg-accent-faster/5 shadow-card-hover'
-                            : isHovered
-                              ? 'border-kpmg-outline-variant bg-kpmg-surface-container-low shadow-card'
-                              : 'border-transparent bg-kpmg-surface-container-low hover:border-kpmg-outline-variant'
-                        }
-                      `}
+                      className={[
+                        'text-left p-3 rounded-xl border-2 w-full node-card-hover',
+                        isSelecting ? 'node-card-selected' : '',
+                        isSelected
+                          ? 'border-kpmg-accent-faster bg-kpmg-accent-faster/5 shadow-card-hover'
+                          : isHovered
+                            ? 'border-kpmg-outline-variant bg-kpmg-surface-container-low shadow-card'
+                            : 'border-transparent bg-kpmg-surface-container-low',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
                     >
                       <div className="flex items-start justify-between gap-2 mb-1.5">
                         <span className="text-xs font-semibold text-kpmg-outline font-body">
@@ -194,13 +211,11 @@ export default function ArchitectureCanvas() {
                     return (
                       <div
                         key={`fn-node-${fn.id}`}
-                        className={`
-                          p-3 rounded-xl border-2 transition-all duration-150
-                          ${
-                            isActive
-                              ? 'border-kpmg-primary bg-kpmg-primary/5' :'border-transparent bg-kpmg-surface-container opacity-40'
-                          }
-                        `}
+                        className={[
+                          'p-3 rounded-xl border-2 fn-node-active',
+                          isActive
+                            ? 'border-kpmg-primary bg-kpmg-primary/5 opacity-100' :'border-transparent bg-kpmg-surface-container opacity-35',
+                        ].join(' ')}
                       >
                         <div
                           className="w-2 h-2 rounded-full mb-2"
@@ -235,14 +250,12 @@ export default function ArchitectureCanvas() {
                     return (
                       <div
                         key={`svc-node-${svc.id}`}
-                        className={`
-                          px-3 py-2 rounded-lg border transition-all duration-150
-                          ${
-                            isActive
-                              ? 'border-kpmg-outline-variant bg-white'
-                              : 'border-transparent bg-kpmg-surface-container opacity-30'
-                          }
-                        `}
+                        className={[
+                          'px-3 py-2 rounded-lg border svc-node-active',
+                          isActive
+                            ? 'border-kpmg-outline-variant bg-white opacity-100'
+                            : 'border-transparent bg-kpmg-surface-container opacity-25',
+                        ].join(' ')}
                       >
                         <p className="text-xs font-medium text-kpmg-on-surface font-body">
                           {svc.name}
@@ -273,6 +286,7 @@ export default function ArchitectureCanvas() {
         {/* Detail Drawer */}
         {selectedCase && (
           <div
+            key={selectedCase.id}
             ref={drawerRef}
             className="w-80 flex-shrink-0 bg-white rounded-xl shadow-drawer overflow-y-auto scrollbar-thin animate-slide-in-right"
             style={{ maxHeight: 'calc(100vh - 160px)' }}
