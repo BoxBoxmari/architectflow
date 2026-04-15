@@ -13,7 +13,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 export default function ActivityStrip() {
   return (
     <div className="bg-white rounded-xl shadow-card p-5">
-      <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-4">Recent Activity</h3>
+      <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Recent Activity</h3>
       <div className="space-y-3">
         {ACTIVITY_FEED.map((item) => (
           <div key={item.id} className="flex items-start gap-3">

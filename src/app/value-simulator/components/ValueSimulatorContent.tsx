@@ -4,39 +4,9 @@ import { toast } from 'sonner';
 import { Save, Download, ChevronRight, Info, TrendingUp, Users, Clock, DollarSign, Zap, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import SimulatorOutputChart from './SimulatorOutputChart';
+import { calcOutputs, SIM_CONSTANTS, type SimInputs } from '@/lib/simulator/calcOutputs';
 
-const HOURLY_COST = 15;
-const WORKING_DAYS_PER_MONTH = 21;
-const WORKING_HOURS_PER_DAY = 8;
-
-interface SimInputs {
-  targetUseCaseCount: number;
-  activationRate: number;
-  targetUserCount: number;
-  adoptionRate: number;
-  tasksPerUserPerUseCasePerMonth: number;
-  avgTimeSavedMinutes: number;
-}
-
-function calcOutputs(inputs: SimInputs) {
-  const activeUseCases = Math.round(inputs.targetUseCaseCount * inputs.activationRate / 100);
-  const activeUsers = Math.round(inputs.targetUserCount * inputs.adoptionRate / 100);
-  const tasksPerMonth = activeUsers * activeUseCases * inputs.tasksPerUserPerUseCasePerMonth;
-  const minutesPerMonth = tasksPerMonth * inputs.avgTimeSavedMinutes;
-  const hoursPerMonth = minutesPerMonth / 60;
-  const monthlyCostSavings = hoursPerMonth * HOURLY_COST;
-  const annualizedReturn = monthlyCostSavings * 12;
-  const ftesFreed = hoursPerMonth / (WORKING_DAYS_PER_MONTH * WORKING_HOURS_PER_DAY);
-  const timePerUserPerMonth = activeUseCases * inputs.tasksPerUserPerUseCasePerMonth * inputs.avgTimeSavedMinutes;
-  const valuePerUserPerMonth = monthlyCostSavings / Math.max(activeUsers, 1);
-  const dailyInteractions = tasksPerMonth / WORKING_DAYS_PER_MONTH;
-  const penetration = activeUsers / Math.max(inputs.targetUserCount, 1);
-  return {
-    activeUseCases, activeUsers, tasksPerMonth, hoursPerMonth,
-    monthlyCostSavings, annualizedReturn, ftesFreed,
-    timePerUserPerMonth, valuePerUserPerMonth, dailyInteractions, penetration,
-  };
-}
+const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
 
 interface SliderRowProps {
   label: string;
@@ -67,7 +37,7 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
           </div>
         </div>
         <span
-          className="font-display text-base font-700 tabular-nums flex-shrink-0"
+          className="font-display text-base font-bold tabular-nums flex-shrink-0"
           style={{ color: trackColor }}
         >
           {format(value)}
@@ -154,7 +124,7 @@ export default function ValueSimulatorContent() {
       {/* Left: Assumptions panel */}
       <div className="lg:col-span-4 xl:col-span-3 bg-white rounded-xl shadow-card p-6 space-y-6 h-fit">
         <div>
-          <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-1">Assumptions</h2>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-1">Assumptions</h2>
           <p className="text-xs text-kpmg-outline font-body">Adjust sliders to model different scenarios in real time</p>
         </div>
 
@@ -266,7 +236,7 @@ export default function ValueSimulatorContent() {
           <p className="text-xs font-semibold text-white/60 uppercase tracking-widest font-body mb-1" style={{ fontSize: '10px' }}>
             Estimated Annualised Return
           </p>
-          <p className="font-display text-4xl font-800 tabular-nums mb-1">
+          <p className="font-display text-4xl font-extrabold tabular-nums mb-1">
             £{(displayOutputs.annualizedReturn / 1000000).toFixed(2)}M
           </p>
           <p className="text-sm text-white/70 font-body">
@@ -348,7 +318,7 @@ export default function ValueSimulatorContent() {
                 <span className="text-xs font-semibold text-kpmg-outline font-body">{label}</span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="font-display text-xl font-800 tabular-nums" style={{ color }}>{value}</span>
+                <span className="font-display text-xl font-extrabold tabular-nums" style={{ color }}>{value}</span>
                 {suffix && <span className="text-xs text-kpmg-outline font-body">{suffix}</span>}
               </div>
             </div>
@@ -362,7 +332,7 @@ export default function ValueSimulatorContent() {
       {/* Right: Strategic summary */}
       <div className="lg:col-span-3 xl:col-span-3 space-y-5">
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-4">Scenario Summary</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Scenario Summary</h3>
           <div className="space-y-4">
             {SCENARIO_VIEWS.map(sv => {
               const svOutputs = sv.id === 'current' ? outputs : sv.id === 'scale2x' ? scale2xOutputs : fullAdoptionOutputs;
@@ -379,7 +349,7 @@ export default function ValueSimulatorContent() {
                     <span className="text-xs font-semibold font-body" style={{ color: sv.color }}>{sv.label}</span>
                     {isActive && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sv.color }} />}
                   </div>
-                  <p className="font-display text-lg font-800 tabular-nums text-kpmg-on-surface">
+                  <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface">
                     £{(svOutputs.annualizedReturn / 1000000).toFixed(2)}M
                   </p>
                   <p className="text-xs text-kpmg-outline font-body mt-0.5">
@@ -392,7 +362,7 @@ export default function ValueSimulatorContent() {
         </div>
 
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-3">Key Assumptions</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-3">Key Assumptions</h3>
           <div className="space-y-2">
             {[
               { id: 'ka-cost', label: 'Hourly cost rate', value: `£${HOURLY_COST}/hr` },

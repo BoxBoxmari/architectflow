@@ -23,7 +23,7 @@ export default function FunctionHeatmap() {
     <div className="bg-white rounded-xl shadow-card p-6">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="font-display text-base font-700 text-kpmg-on-surface">Portfolio Coverage Matrix</h2>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface">Portfolio Coverage Matrix</h2>
           <p className="text-xs text-kpmg-outline mt-0.5 font-body">AI cases by function and maturity level</p>
         </div>
         <div className="flex items-center gap-3">
@@ -105,7 +105,7 @@ export default function FunctionHeatmap() {
                         >
                           {count > 0 ? (
                             <>
-                              <span className="font-display text-lg font-800 tabular-nums leading-none">{count}</span>
+                              <span className="font-display text-lg font-extrabold tabular-nums leading-none">{count}</span>
                               <span className="text-xs mt-0.5 opacity-80 font-body">{count === 1 ? 'case' : 'cases'}</span>
                             </>
                           ) : (
@@ -116,7 +116,7 @@ export default function FunctionHeatmap() {
                     );
                   })}
                   <td className="pl-4 py-2 text-right">
-                    <span className="font-display text-lg font-700 text-kpmg-primary tabular-nums">{total}</span>
+                    <span className="font-display text-lg font-bold text-kpmg-primary tabular-nums">{total}</span>
                   </td>
                 </tr>
               );
@@ -139,12 +139,12 @@ export default function FunctionHeatmap() {
                 }, 0);
                 return (
                   <td key={`total-${m}`} className="pt-3 px-2 text-center">
-                    <span className="font-display text-base font-700 text-kpmg-on-surface tabular-nums">{total}</span>
+                    <span className="font-display text-base font-bold text-kpmg-on-surface tabular-nums">{total}</span>
                   </td>
                 );
               })}
               <td className="pt-3 pl-4 text-right">
-                <span className="font-display text-base font-700 text-kpmg-primary tabular-nums">
+                <span className="font-display text-base font-bold text-kpmg-primary tabular-nums">
                   {AI_CASES.length}
                 </span>
               </td>

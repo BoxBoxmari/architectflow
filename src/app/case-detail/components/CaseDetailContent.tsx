@@ -16,9 +16,6 @@ import {
   Link2,
   Cpu,
 } from 'lucide-react';
-import { useParams } from 'react-router-dom';
-
-
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   Concept: { bg: '#F0EDEC', text: '#747683', border: '#C4C6D4' },
@@ -43,11 +40,16 @@ const TECHNIQUE_COLORS: Record<string, string> = {
   'Generative AI': '#F39C12',
 };
 
-export default function CaseDetailContent() {
+interface CaseDetailContentProps {
+  /** Route-driven case id (e.g. "case-002"). Falls back to AI_CASES[1] when not provided for the legacy /case-detail route. */
+  caseId?: string;
+}
+
+export default function CaseDetailContent({ caseId }: CaseDetailContentProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'architecture' | 'governance'>('overview');
-  // Using AF-002 as the default detail view — backend would use route param
-  // BACKEND INTEGRATION: Replace with dynamic case lookup using route params: const { id } = useParams()
-  const c = AI_CASES[1]; // AF-002 Tax Research Assistant
+
+  // Resolve case: prefer explicit caseId prop, fall back to AF-002 for legacy /case-detail route
+  const c = (caseId ? AI_CASES.find(ac => ac.id === caseId) : undefined) ?? AI_CASES[1];
 
   const fn = FUNCTIONS.find(f => f.id === c.originatingFunction);
   const linkedFns = FUNCTIONS.filter(f => c.linkedFunctions.includes(f.id));
@@ -101,7 +103,7 @@ export default function CaseDetailContent() {
                 {c.aiTechnique}
               </span>
             </div>
-            <h1 className="font-display text-2xl font-800 text-kpmg-on-surface leading-tight mb-2">{c.title}</h1>
+            <h1 className="font-display text-2xl font-bold text-kpmg-on-surface leading-tight mb-2">{c.title}</h1>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: fn?.color || '#747683' }} />
               <span className="text-sm text-kpmg-on-surface-variant font-body">Originating: {fn?.name}</span>
@@ -117,7 +119,7 @@ export default function CaseDetailContent() {
             ].map(({ label, value, color }) => (
               <div key={`score-${label}`} className="flex flex-col items-center gap-1">
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center border-2 font-display text-base font-800 tabular-nums"
+                  className="w-12 h-12 rounded-full flex items-center justify-center border-2 font-display text-base font-extrabold tabular-nums"
                   style={{ borderColor: color, color }}
                 >
                   {value}
@@ -164,7 +166,7 @@ export default function CaseDetailContent() {
               <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>{label}</span>
               <span style={{ color }}>{icon}</span>
             </div>
-            <p className="font-display text-2xl font-800 tabular-nums leading-none mb-1" style={{ color }}>{value}</p>
+            <p className="font-display text-2xl font-extrabold tabular-nums leading-none mb-1" style={{ color }}>{value}</p>
             <p className="text-xs text-kpmg-outline font-body">{sub}</p>
           </div>
         ))}
@@ -178,7 +180,7 @@ export default function CaseDetailContent() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2.5 text-sm font-semibold transition-all duration-150 border-b-2 -mb-px font-body ${
               activeTab === tab.id
-                ? 'border-kpmg-primary text-kpmg-primary' :'border-transparent text-kpmg-outline hover:text-kpmg-on-surface'
+                ? 'border-kpmg-primary text-kpmg-primary' : 'border-transparent text-kpmg-outline hover:text-kpmg-on-surface'
             }`}
           >
             {tab.label}
@@ -194,7 +196,7 @@ export default function CaseDetailContent() {
             <div className="bg-white rounded-xl shadow-card p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Lightbulb size={16} className="text-kpmg-primary" />
-                <h2 className="font-display text-base font-700 text-kpmg-on-surface">Executive Summary</h2>
+                <h2 className="font-display text-base font-bold text-kpmg-on-surface">Executive Summary</h2>
               </div>
               <p className="text-sm text-kpmg-on-surface-variant font-body leading-relaxed">{c.executiveSummary}</p>
             </div>
@@ -203,7 +205,7 @@ export default function CaseDetailContent() {
             <div className="bg-white rounded-xl shadow-card p-6">
               <div className="flex items-center gap-2 mb-4">
                 <AlertCircle size={16} className="text-kpmg-accent-deeper" />
-                <h2 className="font-display text-base font-700 text-kpmg-on-surface">Problem Statement</h2>
+                <h2 className="font-display text-base font-bold text-kpmg-on-surface">Problem Statement</h2>
               </div>
               <p className="text-sm text-kpmg-on-surface-variant font-body leading-relaxed">{c.problemStatement}</p>
             </div>
@@ -212,7 +214,7 @@ export default function CaseDetailContent() {
             <div className="bg-white rounded-xl shadow-card p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Link2 size={16} className="text-kpmg-secondary" />
-                <h2 className="font-display text-base font-700 text-kpmg-on-surface">Linked Functions & Services</h2>
+                <h2 className="font-display text-base font-bold text-kpmg-on-surface">Linked Functions & Services</h2>
               </div>
               <div className="space-y-4">
                 <div>
@@ -263,7 +265,7 @@ export default function CaseDetailContent() {
 
             {/* Case metadata */}
             <div className="bg-white rounded-xl shadow-card p-5">
-              <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-4">Case Details</h3>
+              <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Case Details</h3>
               <div className="space-y-3">
                 {[
                   { label: 'Case Code', value: c.code },
@@ -284,7 +286,7 @@ export default function CaseDetailContent() {
 
             {/* Quick actions */}
             <div className="bg-white rounded-xl shadow-card p-5">
-              <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-3">Quick Actions</h3>
+              <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-3">Quick Actions</h3>
               <div className="space-y-2">
                 <Link href="/value-simulator">
                   <span className="kpmg-btn-primary w-full justify-between text-xs cursor-pointer">
@@ -315,7 +317,7 @@ export default function CaseDetailContent() {
           <div className="bg-white rounded-xl shadow-card p-6">
             <div className="flex items-center gap-2 mb-4">
               <Cpu size={16} className="text-kpmg-primary" />
-              <h2 className="font-display text-base font-700 text-kpmg-on-surface">Architecture Lineage</h2>
+              <h2 className="font-display text-base font-bold text-kpmg-on-surface">Architecture Lineage</h2>
             </div>
             <p className="text-sm text-kpmg-on-surface-variant font-body leading-relaxed mb-5">{c.architectureLineage}</p>
 
@@ -341,7 +343,7 @@ export default function CaseDetailContent() {
           <div className="bg-white rounded-xl shadow-card p-6">
             <div className="flex items-center gap-2 mb-4">
               <Link2 size={16} className="text-kpmg-secondary" />
-              <h2 className="font-display text-base font-700 text-kpmg-on-surface">Dependencies & Integrations</h2>
+              <h2 className="font-display text-base font-bold text-kpmg-on-surface">Dependencies & Integrations</h2>
             </div>
             <div className="space-y-3">
               {[
@@ -377,7 +379,7 @@ export default function CaseDetailContent() {
           <div className="bg-white rounded-xl shadow-card p-6">
             <div className="flex items-center gap-2 mb-4">
               <Shield size={16} className="text-kpmg-primary" />
-              <h2 className="font-display text-base font-700 text-kpmg-on-surface">Governance Notes</h2>
+              <h2 className="font-display text-base font-bold text-kpmg-on-surface">Governance Notes</h2>
             </div>
             <p className="text-sm text-kpmg-on-surface-variant font-body leading-relaxed mb-5">{c.governanceNotes}</p>
             <div className="space-y-2">
@@ -397,7 +399,7 @@ export default function CaseDetailContent() {
           </div>
 
           <div className="bg-white rounded-xl shadow-card p-6">
-            <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-4">Review History</h2>
+            <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-4">Review History</h2>
             <div className="space-y-4">
               {[
                 { id: 'rev-001', date: 'Q4 2025', reviewer: 'KPMG Legal & Risk', outcome: 'Approved', notes: 'Full deployment approved with standard data handling controls.' },

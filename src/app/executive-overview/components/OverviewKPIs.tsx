@@ -86,12 +86,12 @@ export default function OverviewKPIs() {
           </div>
           <div className="tabular-nums">
             {kpi?.isString ? (
-              <p className="font-display text-2xl font-800 text-kpmg-on-surface leading-none mb-1" style={{ color: kpi?.color }}>
+              <p className="font-display text-2xl font-extrabold text-kpmg-on-surface leading-none mb-1" style={{ color: kpi?.color }}>
                 {kpi?.value}
               </p>
             ) : (
-              <p className="font-display text-2xl font-800 leading-none mb-1" style={{ color: kpi?.color }}>
-                {kpi?.value}<span className="text-base font-600">{kpi?.suffix}</span>
+              <p className="font-display text-2xl font-extrabold leading-none mb-1" style={{ color: kpi?.color }}>
+                {kpi?.value}<span className="text-base font-semibold">{kpi?.suffix}</span>
               </p>
             )}
           </div>

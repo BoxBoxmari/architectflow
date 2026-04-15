@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { AI_CASES, SCENARIOS, FUNCTIONS } from '@/lib/mockData';
 import { CheckCircle2, Rocket, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 
 interface PilotFormData {
   sponsorName: string;
@@ -61,7 +62,7 @@ export default function PilotRequestContent() {
         <div className="w-16 h-16 rounded-full bg-kpmg-accent-positive/10 flex items-center justify-center mb-5">
           <CheckCircle2 size={32} className="text-kpmg-accent-positive" />
         </div>
-        <h2 className="font-display text-xl font-800 text-kpmg-on-surface mb-2">Pilot Request Submitted</h2>
+        <h2 className="font-display text-xl font-extrabold text-kpmg-on-surface mb-2">Pilot Request Submitted</h2>
         <p className="text-sm text-kpmg-on-surface-variant font-body max-w-sm leading-relaxed mb-2">
           Your request has been received by the KPMG AI Innovation team. Reference: <span className="font-semibold text-kpmg-primary">PR-2026-0047</span>
         </p>
@@ -85,10 +86,10 @@ export default function PilotRequestContent() {
           >
             Submit Another Request
           </button>
-          <a href="/executive-overview" className="kpmg-btn-primary text-sm">
+          <Link href="/executive-overview" className="kpmg-btn-primary text-sm">
             Back to Overview
             <ChevronRight size={13} />
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -106,7 +107,7 @@ export default function PilotRequestContent() {
             <p className="text-xs font-semibold text-kpmg-primary uppercase tracking-widest font-body mb-0.5" style={{ fontSize: '10px' }}>
               Selected Case
             </p>
-            <p className="text-sm font-700 text-kpmg-on-surface font-display">{selectedCase.code} — {selectedCase.title}</p>
+            <p className="text-sm font-extrabold text-kpmg-on-surface font-display">{selectedCase.code} — {selectedCase.title}</p>
             <p className="text-xs text-kpmg-on-surface-variant font-body mt-0.5">
               Est. value £{(selectedCase.metrics.annualizedReturn / 1000).toFixed(0)}k pa · {selectedCase.metrics.adoptionRate}% adoption · {selectedCase.status}
             </p>
@@ -116,7 +117,7 @@ export default function PilotRequestContent() {
 
       {/* Sponsor details */}
       <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-5">Sponsor Details</h2>
+        <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-5">Sponsor Details</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
@@ -165,7 +166,7 @@ export default function PilotRequestContent() {
 
       {/* Case & scenario */}
       <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-5">AI Case & Scenario</h2>
+        <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-5">AI Case & Scenario</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
@@ -200,7 +201,7 @@ export default function PilotRequestContent() {
 
       {/* Pilot parameters */}
       <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-5">Pilot Parameters</h2>
+        <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-5">Pilot Parameters</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
@@ -247,7 +248,7 @@ export default function PilotRequestContent() {
 
       {/* Business objective & notes */}
       <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="font-display text-base font-700 text-kpmg-on-surface mb-5">Business Context</h2>
+        <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-5">Business Context</h2>
         <div className="space-y-5">
           <div>
             <label className="block text-xs font-semibold text-kpmg-on-surface uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
@@ -285,9 +286,9 @@ export default function PilotRequestContent() {
           <span className="text-kpmg-accent-negative">*</span> Required fields
         </p>
         <div className="flex items-center gap-3">
-          <a href="/scenario-comparison" className="kpmg-btn-secondary text-sm">
+          <Link href="/scenario-comparison" className="kpmg-btn-secondary text-sm">
             Back to Comparison
-          </a>
+          </Link>
           <button
             type="submit"
             disabled={isSubmitting}

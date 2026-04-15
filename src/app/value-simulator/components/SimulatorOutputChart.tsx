@@ -37,7 +37,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   return (
     <div className="bg-white rounded-xl shadow-elevated border border-kpmg-outline-variant/40 p-3">
       <p className="text-xs font-semibold text-kpmg-on-surface-variant mb-1 font-body">{label}</p>
-      <p className="font-display text-base font-700 text-kpmg-primary tabular-nums">
+      <p className="font-display text-base font-bold text-kpmg-primary tabular-nums">
         £{(payload[0].value / 1000).toFixed(0)}k
       </p>
     </div>
@@ -71,7 +71,7 @@ export default function SimulatorOutputChart({ inputs }: { inputs: SimInputs }) 
   return (
     <div className="bg-white rounded-xl shadow-card p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-display text-sm font-700 text-kpmg-on-surface">Scenario Value Comparison</h3>
+        <h3 className="font-display text-sm font-bold text-kpmg-on-surface">Scenario Value Comparison</h3>
         <span className="text-xs text-kpmg-outline font-body">Annualised return (£)</span>
       </div>
       <ResponsiveContainer width="100%" height={160}>

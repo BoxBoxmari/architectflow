@@ -91,7 +91,7 @@ export default function ReportBuilderContent() {
 
         {/* Sections */}
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-4">Report Sections</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Report Sections</h3>
           <div className="space-y-2">
             {sortedSections.map((section, idx) => (
               <div
@@ -139,7 +139,7 @@ export default function ReportBuilderContent() {
 
         {/* Case selection */}
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-4">Include Cases</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Include Cases</h3>
           <div className="space-y-2">
             {AI_CASES.map(c => (
               <label
@@ -174,7 +174,7 @@ export default function ReportBuilderContent() {
 
         {/* Scenario selection */}
         <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-700 text-kpmg-on-surface mb-3">Include Scenario</h3>
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-3">Include Scenario</h3>
           <div className="space-y-2">
             {SCENARIOS.map(s => (
               <label
@@ -242,11 +242,11 @@ export default function ReportBuilderContent() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 rounded bg-kpmg-primary flex items-center justify-center">
-                    <span className="text-white font-display text-xs font-800">K</span>
+                    <span className="text-white font-display text-xs font-extrabold">K</span>
                   </div>
-                  <span className="font-display text-sm font-700 text-kpmg-primary tracking-tight">KPMG</span>
+                  <span className="font-display text-sm font-bold text-kpmg-primary tracking-tight">KPMG</span>
                 </div>
-                <h1 className="font-display text-xl font-800 text-kpmg-on-surface leading-tight mb-1">{reportTitle}</h1>
+                <h1 className="font-display text-xl font-extrabold text-kpmg-on-surface leading-tight mb-1">{reportTitle}</h1>
                 <p className="text-xs text-kpmg-outline font-body">Prepared by Sarah Reynolds, Partner · 15 April 2026</p>
                 <p className="text-xs text-kpmg-outline font-body">CONFIDENTIAL — Internal Use Only</p>
               </div>
@@ -260,8 +260,8 @@ export default function ReportBuilderContent() {
             {includedSections.map((section, idx) => (
               <div key={`preview-${section.id}`} className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="font-display text-xs font-700 text-kpmg-outline tabular-nums">0{idx + 1}</span>
-                  <h2 className="font-display text-base font-700 text-kpmg-on-surface">{section.title}</h2>
+                  <span className="font-display text-xs font-bold text-kpmg-outline tabular-nums">0{idx + 1}</span>
+                  <h2 className="font-display text-base font-bold text-kpmg-on-surface">{section.title}</h2>
                 </div>
 
                 {section.id === 'sec-exec' && (
@@ -283,7 +283,7 @@ export default function ReportBuilderContent() {
                       { id: 'prev-value', label: 'Est. Annual Value', value: `£${(AI_CASES.reduce((s,c)=>s+c.metrics.annualizedReturn,0)/1000000).toFixed(1)}M` },
                     ].map(({ id, label, value }) => (
                       <div key={id} className="p-3 rounded-lg bg-kpmg-primary/5 text-center">
-                        <p className="font-display text-lg font-800 text-kpmg-primary tabular-nums">{value}</p>
+                        <p className="font-display text-lg font-extrabold text-kpmg-primary tabular-nums">{value}</p>
                         <p className="text-xs text-kpmg-outline font-body">{label}</p>
                       </div>
                     ))}
@@ -298,7 +298,7 @@ export default function ReportBuilderContent() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-kpmg-on-surface font-body truncate">{c.title}</p>
                         </div>
-                        <span className="font-display text-sm font-700 text-kpmg-primary tabular-nums flex-shrink-0">
+                        <span className="font-display text-sm font-bold text-kpmg-primary tabular-nums flex-shrink-0">
                           £{(c.metrics.annualizedReturn / 1000).toFixed(0)}k pa
                         </span>
                       </div>
@@ -316,7 +316,7 @@ export default function ReportBuilderContent() {
                     ].map(({ id, label, value }) => (
                       <div key={id} className="p-3 rounded-lg bg-kpmg-surface-container-low">
                         <p className="text-xs text-kpmg-outline font-body mb-0.5">{label}</p>
-                        <p className="font-display text-base font-700 text-kpmg-on-surface tabular-nums">{value}</p>
+                        <p className="font-display text-base font-bold text-kpmg-on-surface tabular-nums">{value}</p>
                       </div>
                     ))}
                   </div>

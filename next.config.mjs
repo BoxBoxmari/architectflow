@@ -5,10 +5,9 @@ const nextConfig = {
   productionBrowserSourceMaps: true,
   distDir: process.env.DIST_DIR || '.next',
   typescript: {
+    // TODO: Remove once existing TS errors in the codebase are resolved.
+    // Kept as a temporary blocker to unblock the build while correctness fixes land.
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   images: {
     remotePatterns: imageHosts,

@@ -147,7 +147,7 @@ export default function CaseLibraryContent() {
           <div className="w-12 h-12 rounded-full bg-kpmg-surface-container flex items-center justify-center mb-4">
             <Search size={20} className="text-kpmg-outline" />
           </div>
-          <h3 className="font-display text-base font-700 text-kpmg-on-surface mb-2">No cases match your filters</h3>
+          <h3 className="font-display text-base font-bold text-kpmg-on-surface mb-2">No cases match your filters</h3>
           <p className="text-sm text-kpmg-outline font-body max-w-sm">
             Try adjusting your search query or removing one of the active filters to broaden the results.
           </p>
@@ -190,7 +190,7 @@ export default function CaseLibraryContent() {
                       {c.aiTechnique}
                     </span>
                   </div>
-                  <h3 className="font-display text-base font-700 text-kpmg-on-surface leading-snug mb-1">{c.title}</h3>
+                  <h3 className="font-display text-base font-bold text-kpmg-on-surface leading-snug mb-1">{c.title}</h3>
                   <div className="flex items-center gap-1.5">
                     <span
                       className="w-2 h-2 rounded-full flex-shrink-0"
@@ -215,26 +215,26 @@ export default function CaseLibraryContent() {
                 <div className="px-5 py-3 border-t border-kpmg-outline-variant/20 grid grid-cols-3 gap-2">
                   <div>
                     <p className="text-xs text-kpmg-outline font-body mb-0.5">Annual Value</p>
-                    <p className="font-display text-sm font-700 text-kpmg-primary tabular-nums">
+                    <p className="font-display text-sm font-bold text-kpmg-primary tabular-nums">
                       £{(c.metrics.annualizedReturn / 1000).toFixed(0)}k
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-kpmg-outline font-body mb-0.5">Adoption</p>
-                    <p className="font-display text-sm font-700 text-kpmg-on-surface tabular-nums">{c.metrics.adoptionRate}%</p>
+                    <p className="font-display text-sm font-bold text-kpmg-on-surface tabular-nums">{c.metrics.adoptionRate}%</p>
                   </div>
                   <div>
                     <p className="text-xs text-kpmg-outline font-body mb-0.5">Reusability</p>
                     <div className="flex items-center gap-1">
                       <Star size={10} className="text-kpmg-accent-deeper fill-kpmg-accent-deeper" />
-                      <p className="font-display text-sm font-700 text-kpmg-on-surface tabular-nums">{c.reusabilityScore}</p>
+                      <p className="font-display text-sm font-bold text-kpmg-on-surface tabular-nums">{c.reusabilityScore}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="px-5 py-3 border-t border-kpmg-outline-variant/20 flex items-center gap-2">
-                  <Link href="/case-detail" className="flex-1">
+                  <Link href={`/cases/${c.id}`} className="flex-1">
                     <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer">
                       Open Profile
                       <ArrowRight size={12} />
@@ -312,15 +312,15 @@ export default function CaseLibraryContent() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <span className="font-display text-sm font-700 text-kpmg-primary tabular-nums">
+                      <span className="font-display text-sm font-bold text-kpmg-primary tabular-nums">
                         £{(c.metrics.annualizedReturn / 1000).toFixed(0)}k
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <span className="font-display text-sm font-700 text-kpmg-on-surface tabular-nums">{c.metrics.adoptionRate}%</span>
+                      <span className="font-display text-sm font-bold text-kpmg-on-surface tabular-nums">{c.metrics.adoptionRate}%</span>
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <Link href="/case-detail">
+                      <Link href={`/cases/${c.id}`}>
                         <span className="kpmg-btn-secondary text-xs cursor-pointer">Open</span>
                       </Link>
                     </td>

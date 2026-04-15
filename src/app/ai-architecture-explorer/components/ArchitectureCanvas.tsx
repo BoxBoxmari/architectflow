@@ -242,7 +242,7 @@ export default function ArchitectureCanvas() {
             <div className="sticky top-0 bg-white border-b border-kpmg-outline-variant/30 px-5 py-4 flex items-start justify-between z-10">
               <div>
                 <span className="text-xs font-semibold text-kpmg-outline font-body">{selectedCase.code}</span>
-                <h3 className="font-display text-base font-700 text-kpmg-on-surface mt-0.5 leading-snug">{selectedCase.title}</h3>
+                <h3 className="font-display text-base font-bold text-kpmg-on-surface mt-0.5 leading-snug">{selectedCase.title}</h3>
               </div>
               <button
                 onClick={() => setSelectedCase(null)}
@@ -289,7 +289,7 @@ export default function ArchitectureCanvas() {
                 ].map(({ label, value }) => (
                   <div key={`drawer-metric-${label}`} className="kpmg-metric-tile">
                     <p className="text-xs text-kpmg-outline font-body mb-1">{label}</p>
-                    <p className="font-display text-base font-700 text-kpmg-on-surface tabular-nums">{value}</p>
+                    <p className="font-display text-base font-bold text-kpmg-on-surface tabular-nums">{value}</p>
                   </div>
                 ))}
               </div>
@@ -336,7 +336,7 @@ export default function ArchitectureCanvas() {
 
               {/* CTAs */}
               <div className="space-y-2 pt-2">
-                <Link href="/case-detail">
+                <Link href={`/cases/${selectedCase.id}`}>
                   <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer">
                     Open Full Profile
                     <ChevronRight size={13} />

@@ -1,3 +1,5 @@
+import { calcOutputs } from '@/lib/simulator/calcOutputs';
+
 export const FUNCTIONS = [
   { id: 'fn-audit', name: 'Audit', color: '#006397' },
   { id: 'fn-law', name: 'KPMG Law', color: '#45004F' },
@@ -247,37 +249,16 @@ export const SCENARIOS = [
   },
 ];
 
+// Re-export centralized calc logic. Maps SCENARIOS shape → SimInputs and delegates to the single source of truth.
 export function calculateScenarioOutputs(scenario: typeof SCENARIOS[0]) {
-  const HOURLY_COST = 15;
-  const WORKING_DAYS_PER_MONTH = 21;
-  const WORKING_HOURS_PER_DAY = 8;
-
-  const activeUseCases = Math.round(scenario.useCaseCount * scenario.activationRate / 100);
-  const activeUsers = Math.round(scenario.targetUsers * scenario.adoptionRate / 100);
-  const tasksPerMonth = activeUsers * activeUseCases * scenario.tasksPerUserPerUseCasePerMonth;
-  const minutesPerMonth = tasksPerMonth * scenario.avgTimeSavedMinutes;
-  const hoursPerMonth = minutesPerMonth / 60;
-  const monthlyCostSavings = hoursPerMonth * HOURLY_COST;
-  const annualizedReturn = monthlyCostSavings * 12;
-  const ftesFreed = hoursPerMonth / (WORKING_DAYS_PER_MONTH * WORKING_HOURS_PER_DAY);
-  const timePerUserPerMonth = activeUseCases * scenario.tasksPerUserPerUseCasePerMonth * scenario.avgTimeSavedMinutes;
-  const valuePerUserPerMonth = monthlyCostSavings / Math.max(activeUsers, 1);
-  const dailyInteractions = tasksPerMonth / WORKING_DAYS_PER_MONTH;
-  const penetration = activeUsers / Math.max(scenario.targetUsers, 1);
-
-  return {
-    activeUseCases,
-    activeUsers,
-    tasksPerMonth,
-    hoursPerMonth,
-    monthlyCostSavings,
-    annualizedReturn,
-    ftesFreed,
-    timePerUserPerMonth,
-    valuePerUserPerMonth,
-    dailyInteractions,
-    penetration,
-  };
+  return calcOutputs({
+    targetUseCaseCount: scenario.useCaseCount,
+    activationRate: scenario.activationRate,
+    targetUserCount: scenario.targetUsers,
+    adoptionRate: scenario.adoptionRate,
+    tasksPerUserPerUseCasePerMonth: scenario.tasksPerUserPerUseCasePerMonth,
+    avgTimeSavedMinutes: scenario.avgTimeSavedMinutes,
+  });
 }
 
 export const ACTIVITY_FEED = [

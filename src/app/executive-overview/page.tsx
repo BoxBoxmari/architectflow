@@ -18,7 +18,7 @@ export default function ExecutiveOverviewPage() {
             <p className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase mb-1 font-body" style={{ fontSize: '10px' }}>
               KPMG AI Intelligence Hub
             </p>
-            <h1 className="font-display text-2xl font-700 text-kpmg-on-surface leading-tight">
+            <h1 className="font-display text-2xl font-bold text-kpmg-on-surface leading-tight">
               Executive Overview
             </h1>
             <p className="text-sm text-kpmg-on-surface-variant mt-1 font-body">

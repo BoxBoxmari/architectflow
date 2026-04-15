@@ -18,7 +18,7 @@ export default function PriorityInitiatives() {
     <div className="bg-white rounded-xl shadow-card p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="font-display text-base font-700 text-kpmg-on-surface">Priority Initiatives</h2>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface">Priority Initiatives</h2>
           <p className="text-xs text-kpmg-outline mt-0.5 font-body">Ranked by value score</p>
         </div>
         <Link href="/case-library">
@@ -32,9 +32,9 @@ export default function PriorityInitiatives() {
         {sorted.map((c, idx) => {
           const statusStyle = STATUS_COLORS[c.status] || STATUS_COLORS['Concept'];
           return (
-            <Link key={`priority-${c.id}`} href="/case-detail">
+            <Link key={`priority-${c.id}`} href={`/cases/${c.id}`}>
               <div className="group flex items-center gap-3 p-3 rounded-lg hover:bg-kpmg-surface-container-low transition-all duration-150 cursor-pointer">
-                <span className="font-display text-lg font-800 text-kpmg-outline-variant tabular-nums w-6 text-center flex-shrink-0">
+                <span className="font-display text-lg font-extrabold text-kpmg-outline-variant tabular-nums w-6 text-center flex-shrink-0">
                   {idx + 1}
                 </span>
                 <div className="flex-1 min-w-0">

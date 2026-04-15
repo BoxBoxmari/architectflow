@@ -177,7 +177,7 @@ export default function ScenarioComparisonContent() {
                   >
                     {idx === 0 ? 'Baseline' : idx === 1 ? 'Recommended' : 'Optimised'}
                   </span>
-                  <h3 className="font-display text-base font-700 text-kpmg-on-surface mt-0.5">{s.name}</h3>
+                  <h3 className="font-display text-base font-bold text-kpmg-on-surface mt-0.5">{s.name}</h3>
                 </div>
                 {idx === 1 && (
                   <span className="kpmg-badge bg-kpmg-accent-faster/15 text-kpmg-accent-faster text-xs">
@@ -195,7 +195,7 @@ export default function ScenarioComparisonContent() {
               <p className="text-xs text-kpmg-on-surface-variant font-body mb-4 leading-relaxed">{s.description}</p>
               <div>
                 <p className="text-xs text-kpmg-outline font-body mb-1">Annualised Return</p>
-                <p className="font-display text-2xl font-800 tabular-nums" style={{ color }}>
+                <p className="font-display text-2xl font-extrabold tabular-nums" style={{ color }}>
                   £{(o.annualizedReturn / 1000000).toFixed(2)}M
                 </p>
                 {idx > 0 && (
@@ -210,7 +210,7 @@ export default function ScenarioComparisonContent() {
       {/* Metrics comparison table */}
       <div className="bg-white rounded-xl shadow-card overflow-hidden">
         <div className="px-6 py-4 border-b border-kpmg-outline-variant/30">
-          <h2 className="font-display text-base font-700 text-kpmg-on-surface">Output Metrics Comparison</h2>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface">Output Metrics Comparison</h2>
           <p className="text-xs text-kpmg-outline mt-0.5 font-body">Delta values shown vs Status Quo baseline</p>
         </div>
         <div className="overflow-x-auto">
@@ -245,7 +245,7 @@ export default function ScenarioComparisonContent() {
                   <td className="px-6 py-3.5">
                     <div className="flex items-center gap-2">
                       <span className="text-kpmg-outline">{metric.icon}</span>
-                      <span className={`text-sm font-body ${metric.highlight ? 'font-700 text-kpmg-on-surface' : 'font-medium text-kpmg-on-surface-variant'}`}>
+                      <span className={`text-sm font-body ${metric.highlight ? 'font-bold text-kpmg-on-surface' : 'font-medium text-kpmg-on-surface-variant'}`}>
                         {metric.label}
                       </span>
                     </div>
@@ -256,7 +256,7 @@ export default function ScenarioComparisonContent() {
                     return (
                       <td key={`cell-${metric.id}-${SCENARIOS[idx].id}`} className="px-4 py-3.5 text-center">
                         <div className="flex flex-col items-center gap-1">
-                          <span className={`font-display tabular-nums ${metric.highlight ? 'text-lg font-800' : 'text-sm font-700'}`} style={{ color: SCENARIO_COLORS[idx] }}>
+                          <span className={`font-display tabular-nums ${metric.highlight ? 'text-lg font-extrabold' : 'text-sm font-bold'}`} style={{ color: SCENARIO_COLORS[idx] }}>
                             {metric.format(val)}
                           </span>
                           {idx > 0 && (
@@ -279,7 +279,7 @@ export default function ScenarioComparisonContent() {
       {/* Assumptions comparison */}
       <div className="bg-white rounded-xl shadow-card overflow-hidden">
         <div className="px-6 py-4 border-b border-kpmg-outline-variant/30">
-          <h2 className="font-display text-base font-700 text-kpmg-on-surface">Assumption Differences</h2>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface">Assumption Differences</h2>
           <p className="text-xs text-kpmg-outline mt-0.5 font-body">Input parameters that drive each scenario</p>
         </div>
         <div className="overflow-x-auto">
@@ -308,7 +308,7 @@ export default function ScenarioComparisonContent() {
                   {row.values.map((v, vIdx) => (
                     <td key={`assump-val-${row.id}-${vIdx}`} className="px-4 py-3 text-center">
                       <span
-                        className="font-display text-sm font-700 tabular-nums"
+                        className="font-display text-sm font-bold tabular-nums"
                         style={{ color: SCENARIO_COLORS[vIdx] }}
                       >
                         {v}
@@ -332,7 +332,7 @@ export default function ScenarioComparisonContent() {
             <p className="text-xs font-semibold text-white/60 uppercase tracking-widest font-body mb-2" style={{ fontSize: '10px' }}>
               Recommendation Synthesis
             </p>
-            <h2 className="font-display text-xl font-800 text-white mb-3 leading-tight">
+            <h2 className="font-display text-xl font-extrabold text-white mb-3 leading-tight">
               Accelerated Flow is the preferred strategic path
             </h2>
             <p className="text-sm text-white/80 font-body leading-relaxed max-w-2xl">
@@ -352,7 +352,7 @@ export default function ScenarioComparisonContent() {
               ].map(({ id, label, value }) => (
                 <div key={id}>
                   <p className="text-xs text-white/50 font-body mb-1">{label}</p>
-                  <p className="font-display text-xl font-800 text-kpmg-accent-faster tabular-nums">{value}</p>
+                  <p className="font-display text-xl font-extrabold text-kpmg-accent-faster tabular-nums">{value}</p>
                 </div>
               ))}
             </div>

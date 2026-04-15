@@ -15,7 +15,7 @@ export default function InsightBlock() {
           <p className="text-xs font-semibold text-white/60 tracking-widest uppercase font-body" style={{ fontSize: '10px' }}>
             Partner Insight
           </p>
-          <p className="text-sm font-700 text-white font-display mt-0.5">Portfolio Momentum Signal</p>
+          <p className="text-sm font-bold text-white font-display mt-0.5">Portfolio Momentum Signal</p>
         </div>
       </div>
       <p className="text-sm text-white/80 font-body leading-relaxed">
