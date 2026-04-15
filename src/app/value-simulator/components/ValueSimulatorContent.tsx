@@ -375,15 +375,9 @@ export default function ValueSimulatorContent() {
         </div>
 
         <div className="space-y-2">
-          <Link href="/scenario-comparison">
+          <Link href="/ai-architecture-explorer">
             <span className="kpmg-btn-primary w-full justify-between text-sm cursor-pointer">
-              Compare Scenarios
-              <ChevronRight size={14} />
-            </span>
-          </Link>
-          <Link href="/pilot-request">
-            <span className="kpmg-btn-secondary w-full justify-between text-sm cursor-pointer mt-2 block">
-              Request Pilot
+              Explore Architecture
               <ChevronRight size={14} />
             </span>
           </Link>

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef } from 'react';
 import { AI_CASES, FUNCTIONS, SERVICES } from '@/lib/mockData';
-import { X, ExternalLink, ChevronRight, RotateCcw, Search } from 'lucide-react';
+import { X, ChevronRight, RotateCcw, Search } from 'lucide-react';
 import Link from 'next/link';
 
 type SelectedCase = (typeof AI_CASES)[0] | null;
@@ -398,18 +398,14 @@ export default function ArchitectureCanvas() {
                 </p>
               </div>
 
-              {/* CTAs */}
-              <div className="space-y-2 pt-2">
-                <Link href={`/cases/${selectedCase.id}`}>
+              {/* CTA — navigate to Value Simulator */}
+              <div className="pt-2">
+                <Link href="/value-simulator">
                   <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer">
-                    Open Full Profile
+                    Model the Value
                     <ChevronRight size={13} />
                   </span>
                 </Link>
-                <button className="kpmg-btn-secondary w-full justify-center text-xs">
-                  <ExternalLink size={13} />
-                  Contact AI Innovation
-                </button>
               </div>
             </div>
           </div>

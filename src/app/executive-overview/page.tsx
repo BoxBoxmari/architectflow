@@ -1,56 +1,87 @@
 import React from 'react';
 import AppLayout from '@/components/AppLayout';
+import Link from 'next/link';
+import { Network, Calculator } from 'lucide-react';
 import OverviewKPIs from './components/OverviewKPIs';
 import FunctionHeatmap from './components/FunctionHeatmap';
-import PriorityInitiatives from './components/PriorityInitiatives';
 import InsightBlock from './components/InsightBlock';
-import ActivityStrip from './components/ActivityStrip';
-import OverviewCTAs from './components/OverviewCTAs';
-import AdoptionChart from './components/AdoptionChart';
 
 export default function ExecutiveOverviewPage() {
   return (
     <AppLayout activeRoute="/executive-overview">
-      <div className="space-y-8 animate-fade-in">
-        {/* Page header */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase mb-1 font-body" style={{ fontSize: '10px' }}>
-              KPMG AI Intelligence Hub
-            </p>
-            <h1 className="font-display text-2xl font-bold text-kpmg-on-surface leading-tight">
-              Executive Overview
-            </h1>
-            <p className="text-sm text-kpmg-on-surface-variant mt-1 font-body">
-              Portfolio health as of 15 April 2026 · Updated 2 hours ago
-            </p>
-          </div>
-          <OverviewCTAs />
+      <div className="space-y-10 animate-fade-in">
+        {/* Page header — honest executive framing */}
+        <div className="max-w-3xl">
+          <p className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase mb-2 font-body" style={{ fontSize: '10px' }}>
+            KPMG Vietnam &amp; Cambodia · Partner Briefing
+          </p>
+          <h1 className="font-display text-3xl font-extrabold text-kpmg-on-surface leading-tight mb-3">
+            AI Foundation Portfolio
+          </h1>
+          <p className="text-base text-kpmg-on-surface-variant font-body leading-relaxed">
+            A curated set of six AI cases built on a shared foundation — each reusable across functions and services.
+            The value case compounds through two levers: <strong className="text-kpmg-on-surface font-semibold">Faster</strong> (more use cases activated) and{' '}
+            <strong className="text-kpmg-on-surface font-semibold">Deeper</strong> (more users adopting them).
+          </p>
         </div>
 
-        {/* KPI row */}
-        <OverviewKPIs />
+        {/* Navigation CTAs — the two core stories */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+          <Link href="/ai-architecture-explorer">
+            <div className="group p-5 rounded-xl border-2 border-kpmg-outline-variant/40 hover:border-kpmg-primary bg-white hover:shadow-card-hover transition-all duration-200 cursor-pointer">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-lg bg-kpmg-primary/8 flex items-center justify-center">
+                  <Network size={18} className="text-kpmg-primary" />
+                </div>
+                <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>
+                  Story 1
+                </span>
+              </div>
+              <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-1 group-hover:text-kpmg-primary transition-colors">
+                AI Architecture Explorer
+              </h2>
+              <p className="text-sm text-kpmg-on-surface-variant font-body leading-snug">
+                How one shared foundation powers multiple cases across every function and service.
+              </p>
+            </div>
+          </Link>
 
-        {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-6">
-          {/* Heatmap — 2 cols */}
+          <Link href="/value-simulator">
+            <div className="group p-5 rounded-xl border-2 border-kpmg-outline-variant/40 hover:border-kpmg-accent-faster bg-white hover:shadow-card-hover transition-all duration-200 cursor-pointer">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-lg bg-kpmg-accent-faster/10 flex items-center justify-center">
+                  <Calculator size={18} className="text-kpmg-accent-faster" />
+                </div>
+                <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>
+                  Story 2
+                </span>
+              </div>
+              <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-1 group-hover:text-kpmg-accent-faster transition-colors">
+                AI Value Simulator
+              </h2>
+              <p className="text-sm text-kpmg-on-surface-variant font-body leading-snug">
+                Why the economic case compounds through Faster × Deeper — modelled transparently.
+              </p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Portfolio snapshot */}
+        <div>
+          <div className="mb-4">
+            <h2 className="font-display text-lg font-bold text-kpmg-on-surface">Portfolio Snapshot</h2>
+            <p className="text-xs text-kpmg-outline mt-0.5 font-body">Illustrative executive view · Curated sample portfolio</p>
+          </div>
+          <OverviewKPIs />
+        </div>
+
+        {/* Coverage matrix + insight */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <FunctionHeatmap />
           </div>
-          {/* Priority initiatives — 1 col */}
           <div className="lg:col-span-1">
-            <PriorityInitiatives />
-          </div>
-        </div>
-
-        {/* Bottom row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <AdoptionChart />
-          </div>
-          <div className="lg:col-span-1 flex flex-col gap-6">
             <InsightBlock />
-            <ActivityStrip />
           </div>
         </div>
       </div>
