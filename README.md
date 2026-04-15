@@ -1,4 +1,4 @@
-Host: https://architectflow-9g3y675.public.builtwithrocket.new/executive-overview
+Host: https://architectflow-9g3y675.public.builtwithrocket.new
 
 # Next.js
 
