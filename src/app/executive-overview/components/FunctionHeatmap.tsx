@@ -31,8 +31,8 @@ export default function FunctionHeatmap() {
     <div className="bg-white rounded-xl shadow-card p-6">
       <div className="flex items-start justify-between mb-5">
         <div>
-          <h2 className="font-display text-base font-bold text-kpmg-on-surface">Cross-Function Reach</h2>
-          <p className="text-xs text-kpmg-outline mt-0.5 font-body">AI cases reaching each function · curated sample portfolio</p>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface">AI Cases by Function</h2>
+          <p className="text-xs text-kpmg-outline mt-0.5 font-body">Cases reaching each function — click Architecture Explorer to trace the full flow</p>
         </div>
         <span className="text-xs text-kpmg-outline font-body italic">6 cases · 5 functions</span>
       </div>
