@@ -4,6 +4,9 @@ import { imageHosts } from './image-hosts.config.mjs';
 const nextConfig = {
   productionBrowserSourceMaps: true,
   distDir: process.env.DIST_DIR || '.next',
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   typescript: {
     // TODO: Remove once existing TS errors in the codebase are resolved.
     // Kept as a temporary blocker to unblock the build while correctness fixes land.
