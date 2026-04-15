@@ -112,12 +112,16 @@ export default function ArchitectureCanvas() {
             <div className="flex-1 h-px bg-kpmg-outline-variant/30" />
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-kpmg-primary" />
-              <span className="text-xs font-semibold text-kpmg-on-surface-variant font-body">Functions</span>
+              <span className="text-xs font-semibold text-kpmg-on-surface-variant font-body">
+                Functions
+              </span>
             </div>
             <div className="flex-1 h-px bg-kpmg-outline-variant/30" />
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-kpmg-outline-variant" />
-              <span className="text-xs font-semibold text-kpmg-on-surface-variant font-body">Services</span>
+              <span className="text-xs font-semibold text-kpmg-on-surface-variant font-body">
+                Services
+              </span>
             </div>
           </div>
 
@@ -153,7 +157,9 @@ export default function ArchitectureCanvas() {
                       `}
                     >
                       <div className="flex items-start justify-between gap-2 mb-1.5">
-                        <span className="text-xs font-semibold text-kpmg-outline font-body">{c.code}</span>
+                        <span className="text-xs font-semibold text-kpmg-outline font-body">
+                          {c.code}
+                        </span>
                         <span
                           className="kpmg-badge text-xs flex-shrink-0"
                           style={{ backgroundColor: `${techColor}15`, color: techColor }}
@@ -161,7 +167,9 @@ export default function ArchitectureCanvas() {
                           {c.tech}
                         </span>
                       </div>
-                      <p className="text-sm font-semibold text-kpmg-on-surface font-body leading-snug">{c.title}</p>
+                      <p className="text-sm font-semibold text-kpmg-on-surface font-body leading-snug">
+                        {c.title}
+                      </p>
                     </button>
                   );
                 })}
@@ -194,8 +202,13 @@ export default function ArchitectureCanvas() {
                           }
                         `}
                       >
-                        <div className="w-2 h-2 rounded-full mb-2" style={{ backgroundColor: fn.color }} />
-                        <p className="text-sm font-semibold text-kpmg-on-surface font-body">{fn.name}</p>
+                        <div
+                          className="w-2 h-2 rounded-full mb-2"
+                          style={{ backgroundColor: fn.color }}
+                        />
+                        <p className="text-sm font-semibold text-kpmg-on-surface font-body">
+                          {fn.name}
+                        </p>
                         <p className="text-xs text-kpmg-outline font-body mt-0.5">
                           {AI_CASES.filter((c) => c.linkedFunctions.includes(fn.id)).length} cases
                         </p>
