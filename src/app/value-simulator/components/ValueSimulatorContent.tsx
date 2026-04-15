@@ -1,10 +1,11 @@
 'use client';
 import React, { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { Save, Download, ChevronRight, Info, TrendingUp, Users, Clock, DollarSign, Zap, BarChart3 } from 'lucide-react';
+import { Save, Download, ChevronRight, Info, TrendingUp, Users, Clock, DollarSign, Zap, BarChart3, FileText } from 'lucide-react';
 import Link from 'next/link';
 import SimulatorOutputChart from './SimulatorOutputChart';
 import { calcScenarioVariants, SIM_CONSTANTS, SIM_DEFAULTS, SIM_RANGES, type SimInputs } from '@/lib/simulator/calcOutputs';
+import { downloadFile, buildCSV } from '@/lib/exportUtils';
 
 const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
 
@@ -81,11 +82,148 @@ export default function ValueSimulatorContent() {
   const displayOutputs = activeScenario === 'current' ? outputs : activeScenario === 'scale2x' ? scale2xOutputs : fullAdoptionOutputs;
 
   function handleSave() {
-    toast.success('Scenario saved to your workspace', { description: 'Available in Scenario Comparison' });
+    // Persist scenario to localStorage so Scenario Comparison can read it
+    const saved = {
+      timestamp: new Date().toISOString(),
+      inputs,
+      outputs: {
+        current: variants.currentState.outputs,
+        scale2x: variants.scale2x.outputs,
+        fullAdoption: variants.fullAdoption.outputs,
+      },
+    };
+    try {
+      const existing: unknown[] = JSON.parse(localStorage.getItem('savedScenarios') || '[]');
+      existing.unshift(saved);
+      localStorage.setItem('savedScenarios', JSON.stringify(existing.slice(0, 10)));
+      toast.success('Scenario saved', { description: 'Stored locally — available in Scenario Comparison' });
+    } catch {
+      toast.error('Could not save scenario');
+    }
   }
 
-  function handleExport() {
-    toast.success('Export initiated', { description: 'Your simulation report will be ready shortly' });
+  function handleExportCSV() {
+    const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
+    const rows: (string | number)[][] = [
+      ['KPMG AI Value Simulator — Scenario Export'],
+      ['Generated', new Date().toLocaleString()],
+      [],
+      ['--- INPUTS ---'],
+      ['Parameter', 'Value'],
+      ['Target Use Case Count', inputs.targetUseCaseCount],
+      ['Use Case Activation Rate (%)', inputs.activationRate],
+      ['Target User Count', inputs.targetUserCount],
+      ['User Adoption Rate (%)', inputs.adoptionRate],
+      ['Tasks / User / Use Case / Month', inputs.tasksPerUserPerUseCasePerMonth],
+      ['Avg Time Saved / Task (min)', inputs.avgTimeSavedMinutes],
+      [],
+      ['--- KEY ASSUMPTIONS ---'],
+      ['Hourly Cost Rate (£/hr)', HOURLY_COST],
+      ['Working Days / Month', WORKING_DAYS_PER_MONTH],
+      ['Working Hours / Day', WORKING_HOURS_PER_DAY],
+      [],
+      ['--- OUTPUTS (ALL SCENARIOS) ---'],
+      ['Metric', 'Current State', '2× Scale-Up', 'Full Adoption'],
+      ['Active Use Cases', outputs.activeUseCases, scale2xOutputs.activeUseCases, fullAdoptionOutputs.activeUseCases],
+      ['Active Users', outputs.activeUsers, scale2xOutputs.activeUsers, fullAdoptionOutputs.activeUsers],
+      ['AI-Assisted Tasks / Month', outputs.tasksPerMonth, scale2xOutputs.tasksPerMonth, fullAdoptionOutputs.tasksPerMonth],
+      ['Hours Recovered / Month', Math.round(outputs.hoursPerMonth), Math.round(scale2xOutputs.hoursPerMonth), Math.round(fullAdoptionOutputs.hoursPerMonth)],
+      ['Monthly Cost Savings (£)', Math.round(outputs.monthlyCostSavings), Math.round(scale2xOutputs.monthlyCostSavings), Math.round(fullAdoptionOutputs.monthlyCostSavings)],
+      ['Annualised Return (£)', Math.round(outputs.annualizedReturn), Math.round(scale2xOutputs.annualizedReturn), Math.round(fullAdoptionOutputs.annualizedReturn)],
+      ['FTEs Freed / Month', outputs.ftesFreed.toFixed(1), scale2xOutputs.ftesFreed.toFixed(1), fullAdoptionOutputs.ftesFreed.toFixed(1)],
+      ['Time Freed / User / Month (min)', Math.round(outputs.timePerUserPerMonth), Math.round(scale2xOutputs.timePerUserPerMonth), Math.round(fullAdoptionOutputs.timePerUserPerMonth)],
+      ['Value / User / Month (£)', Math.round(outputs.valuePerUserPerMonth), Math.round(scale2xOutputs.valuePerUserPerMonth), Math.round(fullAdoptionOutputs.valuePerUserPerMonth)],
+      ['Daily AI Interactions', outputs.dailyInteractions, scale2xOutputs.dailyInteractions, fullAdoptionOutputs.dailyInteractions],
+      ['Programme Penetration (%)', Math.round(outputs.penetration), Math.round(scale2xOutputs.penetration), Math.round(fullAdoptionOutputs.penetration)],
+    ];
+    const csv = buildCSV(rows);
+    const dateStr = new Date().toISOString().slice(0, 10);
+    downloadFile(csv, `kpmg-ai-value-simulator-${dateStr}.csv`, 'text/csv;charset=utf-8;');
+    toast.success('CSV downloaded', { description: 'All three scenario variants included' });
+  }
+
+  function handleExportPDF() {
+    // Build a self-contained HTML string and open it in a new tab for printing
+    const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
+    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const scenarioRows = [
+      ['Active Use Cases', outputs.activeUseCases, scale2xOutputs.activeUseCases, fullAdoptionOutputs.activeUseCases],
+      ['Active Users', outputs.activeUsers, scale2xOutputs.activeUsers, fullAdoptionOutputs.activeUsers],
+      ['Tasks / Month', outputs.tasksPerMonth.toLocaleString(), scale2xOutputs.tasksPerMonth.toLocaleString(), fullAdoptionOutputs.tasksPerMonth.toLocaleString()],
+      ['Hours Recovered / Month', Math.round(outputs.hoursPerMonth).toLocaleString(), Math.round(scale2xOutputs.hoursPerMonth).toLocaleString(), Math.round(fullAdoptionOutputs.hoursPerMonth).toLocaleString()],
+      ['Monthly Cost Savings', `£${Math.round(outputs.monthlyCostSavings).toLocaleString()}`, `£${Math.round(scale2xOutputs.monthlyCostSavings).toLocaleString()}`, `£${Math.round(fullAdoptionOutputs.monthlyCostSavings).toLocaleString()}`],
+      ['Annualised Return', `£${(outputs.annualizedReturn / 1000000).toFixed(2)}M`, `£${(scale2xOutputs.annualizedReturn / 1000000).toFixed(2)}M`, `£${(fullAdoptionOutputs.annualizedReturn / 1000000).toFixed(2)}M`],
+      ['FTEs Freed / Month', outputs.ftesFreed.toFixed(1), scale2xOutputs.ftesFreed.toFixed(1), fullAdoptionOutputs.ftesFreed.toFixed(1)],
+      ['Programme Penetration', `${Math.round(outputs.penetration)}%`, `${Math.round(scale2xOutputs.penetration)}%`, `${Math.round(fullAdoptionOutputs.penetration)}%`],
+    ];
+
+    const tableRows = scenarioRows.map(([label, cur, s2x, full]) =>
+      `<tr><td>${label}</td><td>${cur}</td><td>${s2x}</td><td>${full}</td></tr>`
+    ).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>KPMG AI Value Simulator — ${dateStr}</title>
+<style>
+  body { font-family: Arial, sans-serif; color: #1a1a2e; margin: 40px; font-size: 13px; }
+  h1 { color: #00205F; font-size: 20px; margin-bottom: 4px; }
+  .subtitle { color: #666; font-size: 12px; margin-bottom: 24px; }
+  h2 { color: #006397; font-size: 14px; margin: 20px 0 8px; border-bottom: 1px solid #e0e0e0; padding-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  th { background: #00205F; color: white; padding: 8px 10px; text-align: left; font-size: 12px; }
+  td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; }
+  tr:nth-child(even) td { background: #f8f8f8; }
+  .highlight { background: #e8f4f8 !important; font-weight: bold; }
+  .footer { margin-top: 32px; font-size: 11px; color: #999; border-top: 1px solid #e0e0e0; padding-top: 12px; }
+  @media print { body { margin: 20px; } }
+</style>
+</head>
+<body>
+<h1>KPMG AI Value Simulator</h1>
+<div class="subtitle">Scenario Export — Generated ${dateStr}</div>
+
+<h2>Inputs</h2>
+<table>
+  <tr><th>Parameter</th><th>Value</th></tr>
+  <tr><td>Target Use Case Count</td><td>${inputs.targetUseCaseCount}</td></tr>
+  <tr><td>Use Case Activation Rate</td><td>${inputs.activationRate}%</td></tr>
+  <tr><td>Target User Count</td><td>${inputs.targetUserCount.toLocaleString()}</td></tr>
+  <tr><td>User Adoption Rate</td><td>${inputs.adoptionRate}%</td></tr>
+  <tr><td>Tasks / User / Use Case / Month</td><td>${inputs.tasksPerUserPerUseCasePerMonth}</td></tr>
+  <tr><td>Avg Time Saved / Task</td><td>${inputs.avgTimeSavedMinutes} min</td></tr>
+</table>
+
+<h2>Key Assumptions</h2>
+<table>
+  <tr><th>Assumption</th><th>Value</th></tr>
+  <tr><td>Hourly cost rate</td><td>£${HOURLY_COST}/hr</td></tr>
+  <tr><td>Working days / month</td><td>${WORKING_DAYS_PER_MONTH}</td></tr>
+  <tr><td>Working hours / day</td><td>${WORKING_HOURS_PER_DAY}</td></tr>
+</table>
+
+<h2>Scenario Outputs</h2>
+<table>
+  <tr><th>Metric</th><th>Current State</th><th>2× Scale-Up</th><th>Full Adoption</th></tr>
+  ${tableRows}
+</table>
+
+<div class="footer">KPMG AI Architecture — Confidential. For internal use only.</div>
+<script>window.onload = function(){ window.print(); }</script>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, '_blank');
+    if (!win) {
+      toast.error('Pop-up blocked', { description: 'Please allow pop-ups to export PDF' });
+    } else {
+      toast.success('PDF ready', { description: 'Print dialog opened — save as PDF' });
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
 
   const SCENARIO_VIEWS = [
@@ -190,10 +328,17 @@ export default function ValueSimulatorContent() {
             <Save size={14} />
             Save Scenario
           </button>
-          <button onClick={handleExport} className="kpmg-btn-secondary w-full justify-center text-sm">
-            <Download size={14} />
-            Export Report
-          </button>
+          {/* Export split buttons */}
+          <div className="flex gap-2">
+            <button onClick={handleExportCSV} className="kpmg-btn-secondary flex-1 justify-center text-sm">
+              <Download size={14} />
+              CSV
+            </button>
+            <button onClick={handleExportPDF} className="kpmg-btn-secondary flex-1 justify-center text-sm">
+              <FileText size={14} />
+              PDF
+            </button>
+          </div>
         </div>
       </div>
 
@@ -360,9 +505,9 @@ export default function ValueSimulatorContent() {
           <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-3">Key Assumptions</h3>
           <div className="space-y-2">
             {[
-              { id: 'ka-cost', label: 'Hourly cost rate', value: `£${HOURLY_COST}/hr` },
-              { id: 'ka-days', label: 'Working days/month', value: `${WORKING_DAYS_PER_MONTH}` },
-              { id: 'ka-hrs', label: 'Working hours/day', value: `${WORKING_HOURS_PER_DAY}` },
+              { id: 'ka-cost', label: 'Hourly cost rate', value: `£${SIM_CONSTANTS.HOURLY_COST}/hr` },
+              { id: 'ka-days', label: 'Working days/month', value: `${SIM_CONSTANTS.WORKING_DAYS_PER_MONTH}` },
+              { id: 'ka-hrs', label: 'Working hours/day', value: `${SIM_CONSTANTS.WORKING_HOURS_PER_DAY}` },
               { id: 'ka-cases', label: 'Active use cases', value: `${outputs.activeUseCases} of ${inputs.targetUseCaseCount}` },
               { id: 'ka-users', label: 'Active users', value: `${outputs.activeUsers} of ${inputs.targetUserCount}` },
             ].map(({ id, label, value }) => (
@@ -375,15 +520,9 @@ export default function ValueSimulatorContent() {
         </div>
 
         <div className="space-y-2">
-          <Link href="/scenario-comparison">
+          <Link href="/ai-architecture-explorer">
             <span className="kpmg-btn-primary w-full justify-between text-sm cursor-pointer">
-              Compare Scenarios
-              <ChevronRight size={14} />
-            </span>
-          </Link>
-          <Link href="/pilot-request">
-            <span className="kpmg-btn-secondary w-full justify-between text-sm cursor-pointer mt-2 block">
-              Request Pilot
+              Explore Architecture
               <ChevronRight size={14} />
             </span>
           </Link>

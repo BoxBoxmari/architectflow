@@ -4,6 +4,7 @@ import { calcScenarioVariants, SIM_DEFAULTS, type SimOutputs } from '@/lib/simul
 import { TrendingUp, TrendingDown, Minus, ChevronRight, FileText, Rocket, Info } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { downloadFile, buildCSV } from '@/lib/exportUtils';
 
 const SCENARIO_COLORS = ['#747683', '#00B8A9', '#0F6E56'];
 const SCENARIO_BG = ['#F6F3F2', 'rgba(0,184,169,0.06)', 'rgba(15,110,86,0.06)'];
@@ -54,7 +55,35 @@ export default function ScenarioComparisonContent() {
   const baselineOutputs = allOutputs[0];
 
   function handleExport() {
-    toast.success('Comparison report exported', { description: 'Sent to your KPMG email as PDF' });
+    const [cur, s2x, full] = allOutputs;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const rows: (string | number)[][] = [
+      ['KPMG AI Scenario Comparison — Export'],
+      ['Generated', new Date().toLocaleString()],
+      [],
+      ['Metric', 'Current State', '2× Scale-Up', 'Full Adoption'],
+      ['Annualised Return (£)', Math.round(cur.annualizedReturn), Math.round(s2x.annualizedReturn), Math.round(full.annualizedReturn)],
+      ['Monthly Cost Savings (£)', Math.round(cur.monthlyCostSavings), Math.round(s2x.monthlyCostSavings), Math.round(full.monthlyCostSavings)],
+      ['Hours Recovered / Month', Math.round(cur.hoursPerMonth), Math.round(s2x.hoursPerMonth), Math.round(full.hoursPerMonth)],
+      ['FTEs Freed / Month', cur.ftesFreed.toFixed(1), s2x.ftesFreed.toFixed(1), full.ftesFreed.toFixed(1)],
+      ['AI-Assisted Tasks / Month', Math.round(cur.tasksPerMonth), Math.round(s2x.tasksPerMonth), Math.round(full.tasksPerMonth)],
+      ['Active Users', cur.activeUsers, s2x.activeUsers, full.activeUsers],
+      ['Active Use Cases', cur.activeUseCases, s2x.activeUseCases, full.activeUseCases],
+      ['Programme Penetration (%)', Math.round(cur.penetration), Math.round(s2x.penetration), Math.round(full.penetration)],
+      ['Value / User / Month (£)', Math.round(cur.valuePerUserPerMonth), Math.round(s2x.valuePerUserPerMonth), Math.round(full.valuePerUserPerMonth)],
+      ['Daily AI Interactions', Math.round(cur.dailyInteractions), Math.round(s2x.dailyInteractions), Math.round(full.dailyInteractions)],
+      [],
+      ['--- ASSUMPTIONS ---'],
+      ['Input', 'Current State', '2× Scale-Up', 'Full Adoption'],
+      ['Target Use Cases', SIM_DEFAULTS.targetUseCaseCount, Math.min(variants.currentState.activeUseCases * 2, 120), SIM_DEFAULTS.targetUseCaseCount],
+      ['Activation Rate (%)', SIM_DEFAULTS.activationRate, 100, 100],
+      ['Target Users', SIM_DEFAULTS.targetUserCount, Math.min(variants.currentState.activeUsers * 2, 1800), SIM_DEFAULTS.targetUserCount],
+      ['Adoption Rate (%)', SIM_DEFAULTS.adoptionRate, 100, 100],
+      ['Tasks / User / Use Case / Month', SIM_DEFAULTS.tasksPerUserPerUseCasePerMonth, SIM_DEFAULTS.tasksPerUserPerUseCasePerMonth, SIM_DEFAULTS.tasksPerUserPerUseCasePerMonth],
+      ['Avg Time Saved / Task (min)', SIM_DEFAULTS.avgTimeSavedMinutes, SIM_DEFAULTS.avgTimeSavedMinutes, SIM_DEFAULTS.avgTimeSavedMinutes],
+    ];
+    downloadFile(buildCSV(rows), `kpmg-scenario-comparison-${dateStr}.csv`, 'text/csv;charset=utf-8;');
+    toast.success('Comparison exported', { description: 'CSV downloaded with all three scenario variants' });
   }
 
   const METRICS = [

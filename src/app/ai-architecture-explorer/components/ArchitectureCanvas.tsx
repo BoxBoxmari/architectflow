@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef } from 'react';
 import { AI_CASES, FUNCTIONS, SERVICES } from '@/lib/mockData';
-import { X, ExternalLink, ChevronRight, RotateCcw, Search } from 'lucide-react';
+import { X, ChevronRight, RotateCcw, Search } from 'lucide-react';
 import Link from 'next/link';
 
 type SelectedCase = (typeof AI_CASES)[0] | null;
@@ -28,6 +28,7 @@ export default function ArchitectureCanvas() {
   const [hoveredCase, setHoveredCase] = useState<string | null>(null);
   const [activeFunction, setActiveFunction] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectingId, setSelectingId] = useState<string | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const filteredCases = AI_CASES.filter((c) => {
@@ -51,18 +52,32 @@ export default function ArchitectureCanvas() {
     ? new Set(activeCase.linkedServices)
     : new Set(filteredCases.flatMap((c) => c.linkedServices));
 
+  function handleSelectCase(c: (typeof AI_CASES)[0]) {
+    const isSelected = selectedCase?.id === c.id;
+    if (isSelected) {
+      setSelectedCase(null);
+      setSelectingId(null);
+    } else {
+      setSelectingId(c.id);
+      setSelectedCase(c);
+      // clear the glow class after animation completes
+      setTimeout(() => setSelectingId(null), 400);
+    }
+  }
+
   function reset() {
     setSelectedCase(null);
     setHoveredCase(null);
     setActiveFunction(null);
     setSearchQuery('');
+    setSelectingId(null);
   }
 
   return (
     <div className="flex flex-col gap-4">
       {/* Filter bar */}
-      <div className="bg-white rounded-xl shadow-card px-5 py-3 flex items-center gap-4 flex-wrap">
-        <div className="relative flex-1 min-w-48 max-w-64">
+      <div className="bg-white rounded-xl shadow-card px-5 py-3 flex items-center gap-3 flex-wrap">
+        <div className="relative w-full sm:flex-1 sm:min-w-40 sm:max-w-56">
           <Search
             size={13}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-kpmg-outline pointer-events-none"
@@ -99,9 +114,9 @@ export default function ArchitectureCanvas() {
       </div>
 
       {/* Canvas + Drawer */}
-      <div className="flex gap-4 min-h-0">
+      <div className="flex flex-col lg:flex-row gap-4 min-h-0">
         {/* Canvas */}
-        <div className="flex-1 bg-white rounded-xl shadow-card overflow-hidden transition-all duration-300">
+        <div className="flex-1 min-w-0 bg-white rounded-xl shadow-card overflow-hidden transition-all duration-300">
           <div className="p-5 border-b border-kpmg-outline-variant/30 flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-kpmg-accent-faster" />
@@ -125,10 +140,10 @@ export default function ArchitectureCanvas() {
             </div>
           </div>
 
-          <div className="p-5 overflow-x-auto">
-            <div className="flex gap-6 min-w-max">
+          <div className="p-4 overflow-x-auto">
+            <div className="flex gap-4 min-w-max">
               {/* Cases column */}
-              <div className="flex flex-col gap-3 w-52">
+              <div className="flex flex-col gap-3 w-44">
                 <p
                   className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-1"
                   style={{ fontSize: '10px' }}
@@ -138,31 +153,34 @@ export default function ArchitectureCanvas() {
                 {filteredCases.map((c) => {
                   const isSelected = selectedCase?.id === c.id;
                   const isHovered = hoveredCase === c.id;
+                  const isSelecting = selectingId === c.id;
                   const techColor = TECHNIQUE_COLORS[c.tech] || '#747683';
                   return (
                     <button
                       key={`case-node-${c.id}`}
-                      onClick={() => setSelectedCase(isSelected ? null : c)}
+                      onClick={() => handleSelectCase(c)}
                       onMouseEnter={() => setHoveredCase(c.id)}
                       onMouseLeave={() => setHoveredCase(null)}
-                      className={`
-                        text-left p-3 rounded-xl border-2 transition-all duration-150 node-card-hover w-full
-                        ${
-                          isSelected
-                            ? 'border-kpmg-accent-faster bg-kpmg-accent-faster/5 shadow-card-hover'
-                            : isHovered
-                              ? 'border-kpmg-outline-variant bg-kpmg-surface-container-low shadow-card'
-                              : 'border-transparent bg-kpmg-surface-container-low hover:border-kpmg-outline-variant'
-                        }
-                      `}
+                      className={[
+                        'text-left p-3 rounded-xl border-2 w-full node-card-hover',
+                        isSelecting ? 'node-card-selected' : '',
+                        isSelected
+                          ? 'border-kpmg-accent-faster bg-kpmg-accent-faster/5 shadow-card-hover'
+                          : isHovered
+                            ? 'border-kpmg-outline-variant bg-kpmg-surface-container-low shadow-card'
+                            : 'border-transparent bg-kpmg-surface-container-low',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
                     >
                       <div className="flex items-start justify-between gap-2 mb-1.5">
-                        <span className="text-xs font-semibold text-kpmg-outline font-body">
+                        <span className="text-xs font-semibold text-kpmg-outline font-body flex-shrink-0">
                           {c.code}
                         </span>
                         <span
-                          className="kpmg-badge text-xs flex-shrink-0"
+                          className="kpmg-badge text-xs flex-shrink-0 max-w-[100px] truncate"
                           style={{ backgroundColor: `${techColor}15`, color: techColor }}
+                          title={c.tech}
                         >
                           {c.tech}
                         </span>
@@ -176,13 +194,13 @@ export default function ArchitectureCanvas() {
               </div>
 
               {/* Connector */}
-              <div className="flex gap-6 items-start">
-                <div className="relative w-12 flex items-center justify-center">
+              <div className="flex gap-4 items-start">
+                <div className="relative w-8 flex items-center justify-center">
                   <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
                 </div>
 
                 {/* Functions column */}
-                <div className="flex flex-col gap-3 w-44">
+                <div className="flex flex-col gap-3 w-36">
                   <p
                     className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-1"
                     style={{ fontSize: '10px' }}
@@ -194,19 +212,17 @@ export default function ArchitectureCanvas() {
                     return (
                       <div
                         key={`fn-node-${fn.id}`}
-                        className={`
-                          p-3 rounded-xl border-2 transition-all duration-150
-                          ${
-                            isActive
-                              ? 'border-kpmg-primary bg-kpmg-primary/5' :'border-transparent bg-kpmg-surface-container opacity-40'
-                          }
-                        `}
+                        className={[
+                          'p-3 rounded-xl border-2 fn-node-active',
+                          isActive
+                            ? 'border-kpmg-primary bg-kpmg-primary/5 opacity-100' :'border-transparent bg-kpmg-surface-container opacity-35',
+                        ].join(' ')}
                       >
                         <div
                           className="w-2 h-2 rounded-full mb-2"
                           style={{ backgroundColor: fn.color ?? '#747683' }}
                         />
-                        <p className="text-sm font-semibold text-kpmg-on-surface font-body">
+                        <p className="text-sm font-semibold text-kpmg-on-surface font-body break-words">
                           {fn.name}
                         </p>
                         <p className="text-xs text-kpmg-outline font-body mt-0.5">
@@ -218,12 +234,12 @@ export default function ArchitectureCanvas() {
                 </div>
 
                 {/* Connector */}
-                <div className="relative w-12 flex items-center justify-center">
+                <div className="relative w-8 flex items-center justify-center">
                   <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
                 </div>
 
                 {/* Services column */}
-                <div className="flex flex-col gap-2 w-56">
+                <div className="flex flex-col gap-2 w-44">
                   <p
                     className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-1"
                     style={{ fontSize: '10px' }}
@@ -235,14 +251,12 @@ export default function ArchitectureCanvas() {
                     return (
                       <div
                         key={`svc-node-${svc.id}`}
-                        className={`
-                          px-3 py-2 rounded-lg border transition-all duration-150
-                          ${
-                            isActive
-                              ? 'border-kpmg-outline-variant bg-white'
-                              : 'border-transparent bg-kpmg-surface-container opacity-30'
-                          }
-                        `}
+                        className={[
+                          'px-3 py-2 rounded-lg border svc-node-active',
+                          isActive
+                            ? 'border-kpmg-outline-variant bg-white opacity-100'
+                            : 'border-transparent bg-kpmg-surface-container opacity-25',
+                        ].join(' ')}
                       >
                         <p className="text-xs font-medium text-kpmg-on-surface font-body">
                           {svc.name}
@@ -256,8 +270,8 @@ export default function ArchitectureCanvas() {
           </div>
 
           {/* Legend */}
-          <div className="px-5 py-3 border-t border-kpmg-outline-variant/30 flex items-center gap-4 flex-wrap">
-            <span className="text-xs text-kpmg-outline font-body">AI Technique:</span>
+          <div className="px-5 py-3 border-t border-kpmg-outline-variant/30 flex items-center gap-3 flex-wrap">
+            <span className="text-xs text-kpmg-outline font-body flex-shrink-0">AI Technique:</span>
             {Object.entries(TECHNIQUE_COLORS).map(([tech, color]) => (
               <div key={`legend-tech-${tech}`} className="flex items-center gap-1.5">
                 <span
@@ -273,8 +287,9 @@ export default function ArchitectureCanvas() {
         {/* Detail Drawer */}
         {selectedCase && (
           <div
+            key={selectedCase.id}
             ref={drawerRef}
-            className="w-80 flex-shrink-0 bg-white rounded-xl shadow-drawer overflow-y-auto scrollbar-thin animate-slide-in-right"
+            className="w-full lg:w-80 lg:flex-shrink-0 bg-white rounded-xl shadow-drawer overflow-y-auto scrollbar-thin animate-slide-in-right"
             style={{ maxHeight: 'calc(100vh - 160px)' }}
           >
             <div className="sticky top-0 bg-white border-b border-kpmg-outline-variant/30 px-5 py-4 flex items-start justify-between z-10">
@@ -398,18 +413,14 @@ export default function ArchitectureCanvas() {
                 </p>
               </div>
 
-              {/* CTAs */}
-              <div className="space-y-2 pt-2">
-                <Link href={`/cases/${selectedCase.id}`}>
+              {/* CTA — navigate to Value Simulator */}
+              <div className="pt-2">
+                <Link href="/value-simulator">
                   <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer">
-                    Open Full Profile
+                    Model the Value
                     <ChevronRight size={13} />
                   </span>
                 </Link>
-                <button className="kpmg-btn-secondary w-full justify-center text-xs">
-                  <ExternalLink size={13} />
-                  Contact AI Innovation
-                </button>
               </div>
             </div>
           </div>

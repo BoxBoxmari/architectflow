@@ -36,11 +36,7 @@ export default function AdoptionChart() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h2 className="font-display text-base font-bold text-kpmg-on-surface">Adoption Trajectory</h2>
-          <p className="text-xs text-kpmg-outline mt-0.5 font-body">Monthly adoption rate by function (Oct 2025 – Apr 2026)</p>
-        </div>
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-kpmg-surface-container">
-          <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster" />
-          <span className="text-xs font-semibold text-kpmg-on-surface-variant font-body">Live</span>
+          <p className="text-xs text-kpmg-outline mt-0.5 font-body">Illustrative monthly adoption by function (Oct 2025 – Apr 2026)</p>
         </div>
       </div>
       <ResponsiveContainer width="100%" height={220}>

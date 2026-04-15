@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { AI_CASES } from '@/lib/mockData';
-import { calcScenarioVariants, SIM_DEFAULTS } from '@/lib/simulator/calcOutputs';
+import { calcScenarioVariants, SIM_DEFAULTS, SIM_CONSTANTS } from '@/lib/simulator/calcOutputs';
 import { toast } from 'sonner';
 import { Download, Share2, Eye, ChevronUp, ChevronDown, ToggleLeft, ToggleRight, FileText, CheckCircle2 } from 'lucide-react';
 
@@ -61,15 +61,108 @@ export default function ReportBuilderContent() {
     setSelectedCases(prev => prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]);
   }
 
-  async function handleExport() {
+  function handleExport() {
     setExporting(true);
-    await new Promise(r => setTimeout(r, 1500));
+
+    const variants = calcScenarioVariants(SIM_DEFAULTS);
+    const scenarioOutputs =
+      selectedScenario === 'current' ? variants.currentState.outputs :
+      selectedScenario === 'scale2x' ? variants.scale2x.outputs :
+      variants.fullAdoption.outputs;
+    const scenarioLabel =
+      selectedScenario === 'current' ? 'Current State' :
+      selectedScenario === 'scale2x' ? '2× Scale-Up' : 'Full Adoption';
+
+    const sortedSections = [...sections].sort((a, b) => a.order - b.order).filter(s => s.included);
+    const selectedCaseObjects = AI_CASES.filter(c => selectedCases.includes(c.id));
+    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const sectionHTML = sortedSections.map((section, idx) => {
+      let content = `<p style="color:#666;font-size:12px;font-style:italic;">${section.description}</p>`;
+
+      if (section.id === 'sec-exec') {
+        content = `<p>This report summarises the KPMG AI portfolio status as of Q2 2026. The portfolio comprises ${AI_CASES.length} AI cases across ${new Set(AI_CASES.flatMap(c => c.linkedFunctions)).size} functions. The Tax Research Assistant (TAX-002) has achieved scaled status with 244 active users — the portfolio flagship.</p>`;
+      } else if (section.id === 'sec-portfolio') {
+        content = `<table><tr><th>Metric</th><th>Value</th></tr>
+          <tr><td>Total Cases</td><td>${AI_CASES.length}</td></tr>
+          <tr><td>Functions Covered</td><td>${new Set(AI_CASES.flatMap(c => c.linkedFunctions)).size}</td></tr>
+          <tr><td>Active / Scaled</td><td>${AI_CASES.filter(c => ['Active','Scaled'].includes(c.status)).length}</td></tr>
+        </table>`;
+      } else if (section.id === 'sec-cases') {
+        content = selectedCaseObjects.map(c =>
+          `<div style="margin-bottom:12px;padding:10px;background:#f8f8f8;border-radius:6px;">
+            <strong>${c.code} — ${c.title}</strong><br/>
+            <span style="color:#666;font-size:11px;">${c.source} · ${c.tech}</span>
+            <ul style="margin:6px 0 0;padding-left:16px;">${c.metrics.map(m => `<li style="font-size:12px;">${m}</li>`).join('')}</ul>
+          </div>`
+        ).join('');
+      } else if (section.id === 'sec-simulator') {
+        content = `<table><tr><th>Metric</th><th>${scenarioLabel}</th></tr>
+          <tr><td>Annualised Return</td><td>£${(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M</td></tr>
+          <tr><td>Monthly Cost Savings</td><td>£${Math.round(scenarioOutputs.monthlyCostSavings).toLocaleString()}</td></tr>
+          <tr><td>Hours Recovered / Month</td><td>${Math.round(scenarioOutputs.hoursPerMonth).toLocaleString()} hrs</td></tr>
+          <tr><td>FTEs Freed / Month</td><td>${scenarioOutputs.ftesFreed.toFixed(1)}</td></tr>
+          <tr><td>Active Users</td><td>${scenarioOutputs.activeUsers}</td></tr>
+          <tr><td>Active Use Cases</td><td>${scenarioOutputs.activeUseCases}</td></tr>
+          <tr><td>Hourly Cost Rate</td><td>£${SIM_CONSTANTS.HOURLY_COST}/hr</td></tr>
+        </table>`;
+      } else if (section.id === 'sec-pilot') {
+        content = `<p>Initiate a formal pilot request for the 2X Scale-Up scenario, targeting Tax and Consulting functions as the primary activation cohort. Estimated 90-day pilot with active use cases from the selected portfolio.</p>`;
+      }
+
+      return `<div style="margin-bottom:24px;">
+        <h2 style="color:#006397;font-size:14px;border-bottom:1px solid #e0e0e0;padding-bottom:4px;margin-bottom:10px;">
+          <span style="color:#999;margin-right:8px;">0${idx + 1}</span>${section.title}
+        </h2>
+        ${content}
+      </div>`;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>${reportTitle}</title>
+<style>
+  body { font-family: Arial, sans-serif; color: #1a1a2e; margin: 40px; font-size: 13px; line-height: 1.5; }
+  h1 { color: #00205F; font-size: 20px; margin-bottom: 4px; }
+  .subtitle { color: #666; font-size: 12px; margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  th { background: #00205F; color: white; padding: 7px 10px; text-align: left; font-size: 12px; }
+  td { padding: 6px 10px; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
+  tr:nth-child(even) td { background: #f8f8f8; }
+  .footer { margin-top: 32px; font-size: 11px; color: #999; border-top: 1px solid #e0e0e0; padding-top: 12px; }
+  @media print { body { margin: 20px; } }
+</style>
+</head>
+<body>
+<h1>${reportTitle}</h1>
+<div class="subtitle">Prepared by Sarah Reynolds, Partner · ${dateStr} · CONFIDENTIAL — Internal Use Only</div>
+${sectionHTML}
+<div class="footer">© 2026 KPMG International. All rights reserved. · ArchitectFlow AI Intelligence Hub</div>
+<script>window.onload = function(){ window.print(); }</script>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, '_blank');
     setExporting(false);
-    toast.success('Report exported successfully', { description: 'PDF sent to sarah.reynolds@kpmg.com' });
+    if (!win) {
+      toast.error('Pop-up blocked', { description: 'Please allow pop-ups to export PDF' });
+    } else {
+      toast.success('PDF ready', { description: 'Print dialog opened — save as PDF' });
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
 
   function handleShare() {
-    toast.success('Share link copied', { description: 'Link expires in 7 days' });
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Link copied to clipboard', { description: url });
+    }).catch(() => {
+      toast.error('Could not copy link');
+    });
   }
 
   // Compute scenario outputs from shared formula
