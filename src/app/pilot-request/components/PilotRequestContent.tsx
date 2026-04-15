@@ -21,6 +21,7 @@ interface PilotFormData {
 export default function PilotRequestContent() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionId, setSubmissionId] = useState('');
 
   const {
     register,
@@ -46,11 +47,24 @@ export default function PilotRequestContent() {
 
   async function onSubmit(data: PilotFormData) {
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1600));
-    setIsSubmitting(false);
-    setSubmitted(true);
-    toast.success('Pilot request submitted', { description: 'The AI Innovation team will be in touch within 2 business days' });
-    console.log('Pilot request data:', data);
+    try {
+      const refId = `PR-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+      const submission = {
+        id: refId,
+        timestamp: new Date().toISOString(),
+        ...data,
+      };
+      const existing: unknown[] = JSON.parse(localStorage.getItem('pilotRequests') || '[]');
+      existing.unshift(submission);
+      localStorage.setItem('pilotRequests', JSON.stringify(existing.slice(0, 20)));
+      setSubmissionId(refId);
+      toast.success('Pilot request submitted', { description: 'The AI Innovation team will be in touch within 2 business days' });
+      setSubmitted(true);
+    } catch {
+      toast.error('Could not save pilot request');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -61,7 +75,7 @@ export default function PilotRequestContent() {
         </div>
         <h2 className="font-display text-xl font-extrabold text-kpmg-on-surface mb-2">Pilot Request Submitted</h2>
         <p className="text-sm text-kpmg-on-surface-variant font-body max-w-sm leading-relaxed mb-2">
-          Your request has been received by the KPMG AI Innovation team. Reference: <span className="font-semibold text-kpmg-primary">PR-2026-0047</span>
+          Your request has been received by the KPMG AI Innovation team. Reference: <span className="font-semibold text-kpmg-primary">{submissionId}</span>
         </p>
         <p className="text-sm text-kpmg-outline font-body mb-8">Expected response within 2 business days.</p>
         <div className="grid grid-cols-3 gap-4 w-full max-w-sm mb-8">
