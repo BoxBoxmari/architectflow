@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --primary: 210 100% 19%;
+    --primary-container: 213 100% 27%;
+    --background: 20 33% 98%;
+    --surface-container: 20 10% 94%;
+    --surface-container-high: 20 8% 92%;
+    --surface-container-low: 20 14% 96%;
+    --surface-container-lowest: 0 0% 100%;
+    --outline: 237 4% 45%;
+    --outline-variant: 231 12% 80%;
+    --on-surface: 0 2% 11%;
+    --on-surface-variant: 234 9% 27%;
+    --secondary: 202 100% 30%;
+    --tertiary: 295 100% 15%;
+    --accent-faster: 176 100% 36%;
+    --accent-deeper: 37 89% 51%;
+    --accent-positive: 162 73% 24%;
+    --accent-negative: 351 59% 54%;
+    --font-display: 'Manrope', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-body);
+    background-color: #FCF9F8;
+    color: #1C1B1B;
+  }
+
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-body {
+    font-family: var(--font-body);
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+  .text-primary-kpmg {
+    color: #00205F;
+  }
+  .bg-primary-kpmg {
+    background-color: #00205F;
+  }
+  .border-primary-kpmg {
+    border-color: #00205F;
+  }
+  .text-secondary-kpmg {
+    color: #006397;
+  }
+  .bg-secondary-kpmg {
+    background-color: #006397;
+  }
+  .text-accent-faster {
+    color: #00B8A9;
+  }
+  .bg-accent-faster {
+    background-color: #00B8A9;
+  }
+  .text-accent-deeper {
+    color: #F39C12;
+  }
+  .bg-accent-deeper {
+    background-color: #F39C12;
+  }
+  .text-accent-positive {
+    color: #0F6E56;
+  }
+  .bg-accent-positive {
+    background-color: #0F6E56;
+  }
+  .text-accent-negative {
+    color: #C84B5A;
+  }
+  .bg-accent-negative {
+    background-color: #C84B5A;
+  }
+  .surface-card {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+  }
+  .surface-container {
+    background-color: #F0EDEC;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #C4C6D4 transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #C4C6D4;
+    border-radius: 2px;
+  }
+  .connector-line {
+    stroke: #C4C6D4;
+    stroke-width: 1.5;
+    fill: none;
+    transition: stroke 0.2s ease, stroke-width 0.2s ease;
+  }
+  .connector-line-active {
+    stroke: #00B8A9;
+    stroke-width: 2;
+  }
+  .node-card-hover {
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .node-card-hover:hover {
+    box-shadow: 0 4px 16px rgba(0, 32, 95, 0.12);
+    transform: translateY(-1px);
+  }
+}
+
+@layer components {
+  .kpmg-sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer;
+    color: #444652;
+    font-family: var(--font-body);
+  }
+  .kpmg-sidebar-item:hover {
+    background-color: #F0EDEC;
+    color: #1C1B1B;
+  }
+  .kpmg-sidebar-item.active {
+    background-color: rgba(0, 32, 95, 0.08);
+    color: #00205F;
+    font-weight: 600;
+  }
+  .kpmg-btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 active:scale-95;
+    background-color: #00205F;
+    color: #FFFFFF;
+    font-family: var(--font-body);
+  }
+  .kpmg-btn-primary:hover {
+    background-color: #00338D;
+  }
+  .kpmg-btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 active:scale-95;
+    background-color: #F0EDEC;
+    color: #00205F;
+    border: 1px solid #C4C6D4;
+    font-family: var(--font-body);
+  }
+  .kpmg-btn-secondary:hover {
+    background-color: #EBE7E7;
+  }
+  .kpmg-filter-chip {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer border;
+    border-color: #C4C6D4;
+    color: #444652;
+    background-color: #FFFFFF;
+    font-family: var(--font-body);
+  }
+  .kpmg-filter-chip:hover {
+    border-color: #00205F;
+    color: #00205F;
+  }
+  .kpmg-filter-chip.active {
+    background-color: #00205F;
+    border-color: #00205F;
+    color: #FFFFFF;
+  }
+  .kpmg-metric-tile {
+    @apply rounded-xl p-4;
+    background-color: #F6F3F2;
+  }
+  .kpmg-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold;
+    font-family: var(--font-body);
+  }
+  .slider-track {
+    @apply w-full h-1.5 rounded-full appearance-none cursor-pointer;
+    background: linear-gradient(to right, #00B8A9 0%, #00B8A9 var(--val, 50%), #EBE7E7 var(--val, 50%), #EBE7E7 100%);
+    outline: none;
+  }
+  .slider-track::-webkit-slider-thumb {
+    @apply appearance-none w-4 h-4 rounded-full cursor-pointer;
+    background-color: #00205F;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .slider-track-amber {
+    background: linear-gradient(to right, #F39C12 0%, #F39C12 var(--val, 50%), #EBE7E7 var(--val, 50%), #EBE7E7 100%);
+  }
+}
