@@ -9,6 +9,10 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  BookOpen,
+  BarChart2,
+  FileText,
+  Rocket,
 } from 'lucide-react';
 
 interface NavItem {
@@ -21,7 +25,11 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: 'nav-overview', label: 'Executive Overview', icon: <LayoutDashboard size={18} />, route: '/executive-overview' },
   { id: 'nav-architecture', label: 'AI Architecture', icon: <Network size={18} />, route: '/ai-architecture-explorer' },
+  { id: 'nav-cases', label: 'Case Library', icon: <BookOpen size={18} />, route: '/case-library' },
   { id: 'nav-simulator', label: 'Value Simulator', icon: <Calculator size={18} />, route: '/value-simulator' },
+  { id: 'nav-comparison', label: 'Scenario Comparison', icon: <BarChart2 size={18} />, route: '/scenario-comparison' },
+  { id: 'nav-reports', label: 'Report Builder', icon: <FileText size={18} />, route: '/reports' },
+  { id: 'nav-pilot', label: 'Pilot Request', icon: <Rocket size={18} />, route: '/pilot-request' },
 ];
 
 interface SidebarProps {
