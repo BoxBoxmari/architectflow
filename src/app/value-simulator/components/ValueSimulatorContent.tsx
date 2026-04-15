@@ -37,11 +37,11 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
             </div>
           </div>
         </div>
-        <span className="font-display text-base font-bold tabular-nums flex-shrink-0" style={{ color: trackColor }}>
+        <span className="font-display text-xl sm:text-base font-bold tabular-nums flex-shrink-0" style={{ color: trackColor }}>
           {format(value)}
         </span>
       </div>
-      <div className="relative">
+      <div className="relative w-full">
         <input
           type="range"
           min={min}
@@ -234,8 +234,8 @@ export default function ValueSimulatorContent() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Left: Assumptions panel */}
-      <div className="lg:col-span-4 xl:col-span-3 bg-white rounded-xl shadow-card p-6 space-y-6 h-fit">
+      {/* Left: Assumptions panel — order-1 on mobile so it appears above outputs */}
+      <div className="order-1 lg:order-none lg:col-span-4 xl:col-span-3 bg-white rounded-xl shadow-card p-6 space-y-6 h-fit">
         <div>
           <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-1">Assumptions</h2>
           <p className="text-xs text-kpmg-outline font-body">Adjust sliders to model different scenarios in real time</p>
@@ -342,8 +342,8 @@ export default function ValueSimulatorContent() {
         </div>
       </div>
 
-      {/* Center: Outputs panel */}
-      <div className="lg:col-span-5 xl:col-span-6 space-y-5">
+      {/* Center: Outputs panel — order-2 on mobile */}
+      <div className="order-2 lg:order-none lg:col-span-5 xl:col-span-6 space-y-5">
         {/* Scenario selector */}
         <div className="bg-white rounded-xl shadow-card p-2 flex gap-1">
           {SCENARIO_VIEWS.map(sv => (
@@ -458,7 +458,7 @@ export default function ValueSimulatorContent() {
                 <span className="text-xs font-semibold text-kpmg-outline font-body">{label}</span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="font-display text-xl font-extrabold tabular-nums" style={{ color }}>{value}</span>
+                <span className="font-display text-2xl sm:text-xl font-extrabold tabular-nums" style={{ color }}>{value}</span>
                 {suffix && <span className="text-xs text-kpmg-outline font-body">{suffix}</span>}
               </div>
             </div>
@@ -469,8 +469,8 @@ export default function ValueSimulatorContent() {
         <SimulatorOutputChart inputs={inputs} />
       </div>
 
-      {/* Right: Strategic summary */}
-      <div className="lg:col-span-3 xl:col-span-3 space-y-5">
+      {/* Right: Strategic summary — order-3 on mobile */}
+      <div className="order-3 lg:order-none lg:col-span-3 xl:col-span-3 space-y-5">
         <div className="bg-white rounded-xl shadow-card p-5">
           <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Scenario Summary</h3>
           <div className="space-y-4">
