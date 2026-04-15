@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { AI_CASES, FUNCTIONS, SERVICES } from '@/lib/mockData';
 import { X, ExternalLink, ChevronRight, RotateCcw, Search } from 'lucide-react';
 import Link from 'next/link';
@@ -7,12 +7,12 @@ import Link from 'next/link';
 type SelectedCase = typeof AI_CASES[0] | null;
 
 const TECHNIQUE_COLORS: Record<string, string> = {
-  LLM: '#00205F',
-  NLP: '#006397',
-  'ML Classification': '#0F6E56',
-  'Computer Vision': '#45004F',
-  RAG: '#00B8A9',
-  'Generative AI': '#F39C12',
+  'RAG + LLM Re-ranking': '#00205F',
+  'RAG-based GenAI Drafting': '#006397',
+  'Doc Parsing + LLM + Anomaly Flag': '#0F6E56',
+  'LLM Extraction + Template Gen': '#00B8A9',
+  'LLM Clause Extraction + Risk Class': '#45004F',
+  'Multi-doc Parsing + Risk Scoring': '#F39C12',
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
@@ -34,12 +34,11 @@ export default function ArchitectureCanvas() {
     const matchesSearch = !searchQuery ||
       c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.aiTechnique.toLowerCase().includes(searchQuery.toLowerCase());
+      c.tech.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFunction = !activeFunction || c.linkedFunctions.includes(activeFunction);
     return matchesSearch && matchesFunction;
   });
 
-  const activeCaseIds = new Set(filteredCases.map(c => c.id));
   const activeCase = selectedCase || (hoveredCase ? AI_CASES.find(c => c.id === hoveredCase) : null);
 
   const activeFunctionIds = activeCase
@@ -97,7 +96,7 @@ export default function ArchitectureCanvas() {
       {/* Canvas + Drawer */}
       <div className="flex gap-4 min-h-0">
         {/* Canvas */}
-        <div className={`flex-1 bg-white rounded-xl shadow-card overflow-hidden transition-all duration-300 ${selectedCase ? 'mr-0' : ''}`}>
+        <div className="flex-1 bg-white rounded-xl shadow-card overflow-hidden transition-all duration-300">
           <div className="p-5 border-b border-kpmg-outline-variant/30 flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-kpmg-accent-faster" />
@@ -123,7 +122,7 @@ export default function ArchitectureCanvas() {
                 {filteredCases.map(c => {
                   const isSelected = selectedCase?.id === c.id;
                   const isHovered = hoveredCase === c.id;
-                  const techColor = TECHNIQUE_COLORS[c.aiTechnique] || '#747683';
+                  const techColor = TECHNIQUE_COLORS[c.tech] || '#747683';
                   return (
                     <button
                       key={`case-node-${c.id}`}
@@ -146,7 +145,7 @@ export default function ArchitectureCanvas() {
                           className="kpmg-badge text-xs flex-shrink-0"
                           style={{ backgroundColor: `${techColor}15`, color: techColor }}
                         >
-                          {c.aiTechnique}
+                          {c.tech}
                         </span>
                       </div>
                       <p className="text-sm font-semibold text-kpmg-on-surface font-body leading-snug">{c.title}</p>
@@ -155,9 +154,8 @@ export default function ArchitectureCanvas() {
                 })}
               </div>
 
-              {/* SVG Connectors + Functions */}
+              {/* Connector */}
               <div className="flex gap-6 items-start">
-                {/* SVG lines — simplified visual connectors */}
                 <div className="relative w-12 flex items-center justify-center">
                   <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
                 </div>
@@ -177,10 +175,7 @@ export default function ArchitectureCanvas() {
                           }
                         `}
                       >
-                        <div
-                          className="w-2 h-2 rounded-full mb-2"
-                          style={{ backgroundColor: fn.color }}
-                        />
+                        <div className="w-2 h-2 rounded-full mb-2" style={{ backgroundColor: fn.color }} />
                         <p className="text-sm font-semibold text-kpmg-on-surface font-body">{fn.name}</p>
                         <p className="text-xs text-kpmg-outline font-body mt-0.5">
                           {AI_CASES.filter(c => c.linkedFunctions.includes(fn.id)).length} cases
@@ -190,13 +185,13 @@ export default function ArchitectureCanvas() {
                   })}
                 </div>
 
-                {/* SVG lines */}
+                {/* Connector */}
                 <div className="relative w-12 flex items-center justify-center">
                   <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
                 </div>
 
                 {/* Services column */}
-                <div className="flex flex-col gap-2 w-52">
+                <div className="flex flex-col gap-2 w-56">
                   <p className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-1" style={{ fontSize: '10px' }}>Services</p>
                   {SERVICES.map(svc => {
                     const isActive = activeServiceIds.has(svc.id);
@@ -254,62 +249,65 @@ export default function ArchitectureCanvas() {
             </div>
 
             <div className="p-5 space-y-5">
-              {/* Status + Technique */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <span
-                  className="kpmg-badge"
-                  style={{
-                    backgroundColor: STATUS_COLORS[selectedCase.status]?.bg || '#F0EDEC',
-                    color: STATUS_COLORS[selectedCase.status]?.text || '#747683',
-                  }}
-                >
-                  {selectedCase.status}
-                </span>
-                <span
-                  className="kpmg-badge"
-                  style={{
-                    backgroundColor: `${TECHNIQUE_COLORS[selectedCase.aiTechnique] || '#747683'}15`,
-                    color: TECHNIQUE_COLORS[selectedCase.aiTechnique] || '#747683',
-                  }}
-                >
-                  {selectedCase.aiTechnique}
-                </span>
-                <span className="kpmg-badge bg-kpmg-surface-container text-kpmg-on-surface-variant">
-                  {selectedCase.maturityLevel}
-                </span>
+              {/* Source + Technique */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span
+                    className="kpmg-badge"
+                    style={{
+                      backgroundColor: STATUS_COLORS[selectedCase.status]?.bg || '#F0EDEC',
+                      color: STATUS_COLORS[selectedCase.status]?.text || '#747683',
+                    }}
+                  >
+                    {selectedCase.status}
+                  </span>
+                  <span
+                    className="kpmg-badge"
+                    style={{
+                      backgroundColor: `${TECHNIQUE_COLORS[selectedCase.tech] || '#747683'}15`,
+                      color: TECHNIQUE_COLORS[selectedCase.tech] || '#747683',
+                    }}
+                  >
+                    {selectedCase.tech}
+                  </span>
+                </div>
+                <p className="text-xs text-kpmg-outline font-body mt-1">{selectedCase.source}</p>
               </div>
 
-              {/* Value metrics */}
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: 'Annual Value', value: `£${(selectedCase.metrics.annualizedReturn / 1000).toFixed(0)}k` },
-                  { label: 'Adoption', value: `${selectedCase.metrics.adoptionRate}%` },
-                  { label: 'FTEs Freed', value: `${selectedCase.metrics.ftesFreed.toFixed(1)}` },
-                  { label: 'Value Score', value: `${selectedCase.valueScore}/100` },
-                ].map(({ label, value }) => (
-                  <div key={`drawer-metric-${label}`} className="kpmg-metric-tile">
-                    <p className="text-xs text-kpmg-outline font-body mb-1">{label}</p>
-                    <p className="font-display text-base font-bold text-kpmg-on-surface tabular-nums">{value}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Linked services */}
+              {/* Key value metrics */}
               <div>
                 <p className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-2" style={{ fontSize: '10px' }}>
-                  Linked Services
+                  Key Value Metrics
                 </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedCase.linkedServices.map(svcId => {
-                    const svc = SERVICES.find(s => s.id === svcId);
-                    return svc ? (
-                      <span
-                        key={`drawer-svc-${svcId}`}
-                        className="inline-flex items-center px-2 py-1 rounded-md bg-kpmg-surface-container text-xs font-medium text-kpmg-on-surface-variant font-body"
-                      >
-                        {svc.name}
-                      </span>
-                    ) : null;
+                <ul className="space-y-1.5">
+                  {selectedCase.metrics.map((m, i) => (
+                    <li key={`dm-${selectedCase.id}-${i}`} className="flex items-start gap-1.5">
+                      <span className="w-1 h-1 rounded-full bg-kpmg-primary mt-1.5 flex-shrink-0" />
+                      <span className="text-xs text-kpmg-on-surface-variant font-body">{m}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Linked functions grouped with services */}
+              <div>
+                <p className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-2" style={{ fontSize: '10px' }}>
+                  Reaches
+                </p>
+                <div className="space-y-2">
+                  {FUNCTIONS.filter(fn => selectedCase.linkedFunctions.includes(fn.id)).map(fn => {
+                    const fnSvcs = SERVICES.filter(s => s.functionId === fn.id && selectedCase.linkedServices.includes(s.id));
+                    return (
+                      <div key={`reach-fn-${fn.id}`} className="p-2 rounded-lg bg-kpmg-surface-container-low">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: fn.color }} />
+                          <span className="text-xs font-semibold text-kpmg-on-surface font-body">{fn.name}</span>
+                        </div>
+                        {fnSvcs.map(svc => (
+                          <p key={`reach-svc-${svc.id}`} className="text-xs text-kpmg-outline font-body ml-3">→ {svc.name}</p>
+                        ))}
+                      </div>
+                    );
                   })}
                 </div>
               </div>
@@ -320,17 +318,7 @@ export default function ArchitectureCanvas() {
                   Partner Insight
                 </p>
                 <p className="text-xs text-kpmg-on-surface-variant font-body leading-relaxed">
-                  {selectedCase.partnerInsight}
-                </p>
-              </div>
-
-              {/* Governance */}
-              <div>
-                <p className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-1.5" style={{ fontSize: '10px' }}>
-                  Governance Notes
-                </p>
-                <p className="text-xs text-kpmg-on-surface-variant font-body leading-relaxed">
-                  {selectedCase.governanceNotes}
+                  {selectedCase.insight}
                 </p>
               </div>
 

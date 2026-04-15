@@ -19,18 +19,18 @@ export default function InsightBlock() {
         </div>
       </div>
       <p className="text-sm text-white/80 font-body leading-relaxed">
-        Tax Research Assistant (AF-002) has reached scaled status with 89% adoption — the highest in the portfolio. 
-        Expansion to KPMG Law is the recommended next move, with an estimated additional £0.6M annual value.
+        Tax Research Assistant (TAX-002) has reached scaled status with 244 active users — the portfolio flagship.
+        Expansion to KPMG Law is the recommended next move. CON-001 eliminates post-meeting admin firm-wide with zero modification needed.
       </p>
       <div className="mt-4 pt-3 border-t border-white/15">
         <div className="grid grid-cols-2 gap-3">
           <div>
             <p className="text-xs text-white/50 font-body">Fastest growing</p>
-            <p className="text-sm font-semibold text-white font-body">AF-004 Meeting Converter</p>
+            <p className="text-sm font-semibold text-white font-body">CON-001 Meeting Converter</p>
           </div>
           <div>
             <p className="text-xs text-white/50 font-body">Needs attention</p>
-            <p className="text-sm font-semibold text-kpmg-accent-negative font-body">AF-003 Audit Summarizer</p>
+            <p className="text-sm font-semibold text-kpmg-accent-negative font-body">DEAL-001 DD Scanner</p>
           </div>
         </div>
       </div>

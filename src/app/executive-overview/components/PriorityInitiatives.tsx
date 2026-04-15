@@ -49,7 +49,7 @@ export default function PriorityInitiatives() {
                   </div>
                   <p className="text-sm font-semibold text-kpmg-on-surface truncate font-body">{c.title}</p>
                   <p className="text-xs text-kpmg-outline font-body mt-0.5">
-                    £{(c.metrics.annualizedReturn / 1000).toFixed(0)}k pa · {c.metrics.adoptionRate}% adoption
+                    {c.source} · {c.tech}
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">

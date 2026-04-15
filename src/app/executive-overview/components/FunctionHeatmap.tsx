@@ -1,24 +1,37 @@
 import React from 'react';
-import { HEATMAP_DATA, AI_CASES } from '@/lib/mockData';
-
-const MATURITY_LEVELS = ['Experimental', 'Emerging', 'Established', 'Mature'];
-
-function getCellColor(count: number, maturity: string): string {
-  if (count === 0) return '#F6F3F2';
-  const colors: Record<string, string[]> = {
-    Experimental: ['#FEF3C7', '#F59E0B'],
-    Emerging: ['#DBEAFE', '#3B82F6'],
-    Established: ['#D1FAE5', '#059669'],
-    Mature: ['#E0E7FF', '#00205F'],
-  };
-  return colors[maturity]?.[count > 0 ? 1 : 0] || '#F6F3F2';
-}
-
-function getCellTextColor(count: number): string {
-  return count === 0 ? '#C4C6D4' : '#FFFFFF';
-}
+import { AI_CASES, FUNCTIONS } from '@/lib/mockData';
 
 export default function FunctionHeatmap() {
+  // Derive heatmap data from the new case dataset
+  const rows = FUNCTIONS.map(fn => {
+    const fnCases = AI_CASES.filter(c => c.linkedFunctions.includes(fn.id));
+    const annualValue = fnCases.reduce((s, c) => s + c.numericMetrics.annualizedReturn, 0);
+    return {
+      function: fn.name,
+      fnId: fn.id,
+      total: fnCases.length,
+      annualValue,
+      // Map status to rough maturity buckets for display
+      experimental: fnCases.filter(c => c.maturityLevel === 'Experimental').length,
+      emerging:     fnCases.filter(c => c.maturityLevel === 'Emerging').length,
+      established:  fnCases.filter(c => c.maturityLevel === 'Established').length,
+      mature:       fnCases.filter(c => c.maturityLevel === 'Mature').length,
+    };
+  });
+
+  const MATURITY_LEVELS = ['Experimental', 'Emerging', 'Established', 'Mature'] as const;
+
+  function getCellColor(count: number, maturity: string): string {
+    if (count === 0) return '#F6F3F2';
+    const colors: Record<string, string> = {
+      Experimental: '#F59E0B',
+      Emerging: '#3B82F6',
+      Established: '#059669',
+      Mature: '#00205F',
+    };
+    return colors[maturity] || '#F6F3F2';
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-card p-6">
       <div className="flex items-center justify-between mb-5">
@@ -61,34 +74,21 @@ export default function FunctionHeatmap() {
               </th>
             </tr>
           </thead>
-          <tbody className="space-y-2">
-            {HEATMAP_DATA.map((row) => {
+          <tbody>
+            {rows.map((row) => {
               const counts: Record<string, number> = {
                 Experimental: row.experimental,
                 Emerging: row.emerging,
                 Established: row.established,
                 Mature: row.mature,
               };
-              const total = Object.values(counts).reduce((s, v) => s + v, 0);
-              const functionCases = AI_CASES.filter(c => c.linkedFunctions.some(f => {
-                const fnMap: Record<string, string> = {
-                  'Audit': 'fn-audit',
-                  'KPMG Law': 'fn-law',
-                  'Tax': 'fn-tax',
-                  'Deal Advisory': 'fn-deal',
-                  'Consulting': 'fn-consulting',
-                };
-                return f === fnMap[row.function];
-              }));
-              const annualValue = functionCases.reduce((s, c) => s + c.metrics.annualizedReturn, 0);
-
               return (
                 <tr key={`heatmap-${row.function}`} className="group">
                   <td className="py-2 pr-4">
                     <div>
                       <p className="text-sm font-semibold text-kpmg-on-surface font-body">{row.function}</p>
                       <p className="text-xs text-kpmg-outline font-body">
-                        £{(annualValue / 1000).toFixed(0)}k value
+                        £{(row.annualValue / 1000).toFixed(0)}k value
                       </p>
                     </div>
                   </td>
@@ -100,7 +100,7 @@ export default function FunctionHeatmap() {
                           className="w-full h-14 rounded-lg flex flex-col items-center justify-center transition-all duration-150 hover:scale-105 cursor-default"
                           style={{
                             backgroundColor: getCellColor(count, m),
-                            color: getCellTextColor(count),
+                            color: count > 0 ? '#FFFFFF' : '#C4C6D4',
                           }}
                         >
                           {count > 0 ? (
@@ -116,7 +116,7 @@ export default function FunctionHeatmap() {
                     );
                   })}
                   <td className="pl-4 py-2 text-right">
-                    <span className="font-display text-lg font-bold text-kpmg-primary tabular-nums">{total}</span>
+                    <span className="font-display text-lg font-bold text-kpmg-primary tabular-nums">{row.total}</span>
                   </td>
                 </tr>
               );
@@ -128,7 +128,7 @@ export default function FunctionHeatmap() {
                 <span className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body" style={{ fontSize: '10px' }}>Total</span>
               </td>
               {MATURITY_LEVELS.map((m) => {
-                const total = HEATMAP_DATA.reduce((s, r) => {
+                const total = rows.reduce((s, r) => {
                   const counts: Record<string, number> = {
                     Experimental: r.experimental,
                     Emerging: r.emerging,
@@ -144,9 +144,7 @@ export default function FunctionHeatmap() {
                 );
               })}
               <td className="pt-3 pl-4 text-right">
-                <span className="font-display text-base font-bold text-kpmg-primary tabular-nums">
-                  {AI_CASES.length}
-                </span>
+                <span className="font-display text-base font-bold text-kpmg-primary tabular-nums">{AI_CASES.length}</span>
               </td>
             </tr>
           </tfoot>

@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Manrope, DM_Sans } from 'next/font/google';
-import Script from 'next/script';
+
 import ToasterProvider from '@/components/ToasterProvider';
 import '../styles/tailwind.css';
 
@@ -40,9 +40,9 @@ export default function RootLayout({
       <body className="bg-kpmg-background font-body antialiased">
         {children}
         <ToasterProvider />
-      
-      <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Farchitectf1565back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.18" />
-      <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.2" /></body>
+
+        <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Farchitectf1565back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.18" />
+        <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.2" /></body>
     </html>
   );
 }
