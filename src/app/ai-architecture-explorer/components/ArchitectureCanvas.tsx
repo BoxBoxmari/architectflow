@@ -21,37 +21,37 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   Scaled: { bg: '#E0E7FF', text: '#00205F' },
 };
 
-// Value chips per case
-const VALUE_CHIPS: Record<string, { label: string; value: string; color: string }[]> = {
-  'TAX-001': [
-    { label: 'Value', value: '~5 FTE', color: '#0F6E56' },
-    { label: 'Maturity', value: 'SCALE', color: '#006397' },
-    { label: 'Functions', value: '4', color: '#00B8A9' },
-  ],
-  'KDC-001': [
-    { label: 'Value', value: 'Cost / Cycle', color: '#0F6E56' },
-    { label: 'Maturity', value: 'SCALE', color: '#006397' },
-    { label: 'Functions', value: '5', color: '#00B8A9' },
-  ],
-  'KDC-002': [
-    { label: 'Value', value: 'Accuracy', color: '#0F6E56' },
-    { label: 'Maturity', value: 'APPLY → SCALE', color: '#006397' },
-    { label: 'Functions', value: '4', color: '#00B8A9' },
-  ],
-  'CONS-001': [
-    { label: 'Value', value: 'New Revenue', color: '#0F6E56' },
-    { label: 'Maturity', value: 'INSPIRE → APPLY', color: '#006397' },
-    { label: 'Functions', value: '5', color: '#00B8A9' },
-  ],
-};
-
-// Maturity scale for filter ordering
-const MATURITY_LABELS: Record<string, string> = {
-  'TAX-001': 'SCALE',
-  'KDC-001': 'SCALE',
-  'KDC-002': 'APPLY → SCALE',
+// Real maturity labels per case ID
+const CASE_MATURITY: Record<string, string> = {
+  'TAX-001':  'SCALE',
+  'KDC-001':  'SCALE',
+  'KDC-002':  'APPLY → SCALE',
   'CONS-001': 'INSPIRE → APPLY',
 };
+
+// Real value labels per case ID
+const CASE_VALUE: Record<string, string> = {
+  'TAX-001':  '~5 FTE',
+  'KDC-001':  'Cost / Cycle',
+  'KDC-002':  'Accuracy / Efficiency',
+  'CONS-001': 'New Revenue / Capability',
+};
+
+// Dynamically build VALUE_CHIPS from real data
+function buildValueChips(caseId: string): { label: string; value: string; color: string }[] {
+  const maturity = CASE_MATURITY[caseId];
+  const value    = CASE_VALUE[caseId];
+  const fnCount  = AI_CASES.find((c) => c.id === caseId)?.linkedFunctions.length ?? 0;
+  if (!maturity && !value) return [];
+  return [
+    { label: 'Value',     value: value    ?? '—', color: '#0F6E56' },
+    { label: 'Maturity',  value: maturity ?? '—', color: '#006397' },
+    { label: 'Functions', value: String(fnCount), color: '#00B8A9' },
+  ];
+}
+
+// Maturity scale for filter ordering
+const MATURITY_LABELS: Record<string, string> = CASE_MATURITY;
 
 // Node position refs for Bezier connectors
 interface NodePos { top: number; height: number }
@@ -97,7 +97,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
       c.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.tech.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFunction = !activeFunction || c.linkedFunctions.includes(activeFunction);
-    const matchesScale = !scaleFilter || MATURITY_LABELS[c.id] === 'SCALE';
+    const matchesScale = !scaleFilter || CASE_MATURITY[c.id] === 'SCALE';
     return matchesSearch && matchesFunction && matchesScale;
   });
 
@@ -248,7 +248,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
     });
   });
 
-  const chips = selectedCase ? (VALUE_CHIPS[selectedCase.id] ?? []) : [];
+  const chips = selectedCase ? buildValueChips(selectedCase.id) : [];
 
   return (
     <div className="flex flex-col gap-4">
