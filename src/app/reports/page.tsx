@@ -5,6 +5,7 @@ import ReportBuilderContent from './components/ReportBuilderContent';
 export default function ReportsPage() {
   return (
     <AppLayout activeRoute="/reports">
+      <main id="main-content" aria-label="Report Builder">
       <div className="space-y-6 animate-fade-in">
         <div>
           <p className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase mb-1 font-body" style={{ fontSize: '10px' }}>
@@ -19,6 +20,7 @@ export default function ReportsPage() {
         </div>
         <ReportBuilderContent />
       </div>
+      </main>
     </AppLayout>
   );
 }

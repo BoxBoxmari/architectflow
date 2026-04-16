@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
 import { AI_CASES, FUNCTIONS, SERVICES } from '@/lib/mockData';
 import { X, ChevronRight, RotateCcw, Search, Mail, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
@@ -71,7 +71,10 @@ export default function ArchitectureCanvas() {
   const [selectingId, setSelectingId] = useState<string | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [valueFilter, setValueFilter] = useState<boolean>(false);
+  const [liveMessage, setLiveMessage] = useState('');
   const drawerRef = useRef<HTMLDivElement>(null);
+  const drawerCloseRef = useRef<HTMLButtonElement>(null);
+  const lastFocusedCaseRef = useRef<HTMLButtonElement | null>(null);
 
   // Refs for measuring node positions for Bezier connectors
   const caseNodeRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -117,14 +120,22 @@ export default function ArchitectureCanvas() {
       setTimeout(() => {
         setSelectedCase(null);
         setSelectingId(null);
+        // Return focus to the case node that was active
+        lastFocusedCaseRef.current?.focus();
       }, 200);
+      setLiveMessage('');
     } else {
+      // Remember which case node triggered the drawer
+      lastFocusedCaseRef.current = caseNodeRefs.current[c.id] ?? null;
       setSelectingId(c.id);
       setSelectedCase(c);
       setTimeout(() => {
         setDrawerVisible(true);
         setSelectingId(null);
       }, 50);
+      setLiveMessage(
+        `Tracing ${c.code}: ${c.title}. Technique: ${c.tech}. Status: ${c.status}. Architecture detail panel opened.`,
+      );
     }
   }
 
@@ -137,7 +148,15 @@ export default function ArchitectureCanvas() {
       setSelectingId(null);
       setValueFilter(false);
     }, 200);
+    setLiveMessage('All filters and selections cleared.');
   }
+
+  // Auto-focus the drawer close button when drawer becomes visible
+  useEffect(() => {
+    if (drawerVisible && drawerCloseRef.current) {
+      drawerCloseRef.current.focus();
+    }
+  }, [drawerVisible]);
 
   // Measure node positions for Bezier connectors
   const measurePositions = useCallback(() => {
@@ -229,6 +248,16 @@ export default function ArchitectureCanvas() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* ARIA live region — announces trace updates to screen readers */}
+      <div
+        role="status"
+        aria-live="assertive"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {liveMessage}
+      </div>
+
       {/* Filter bar */}
       <div
         role="search"
@@ -318,7 +347,7 @@ export default function ArchitectureCanvas() {
       {isTracing && selectedCase && (
         <div className="flex items-center gap-2 px-1" aria-live="polite" aria-atomic="true">
           <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster flex-shrink-0 animate-pulse" aria-hidden="true" />
-          <p className="text-xs font-semibold text-kpmg-primary font-body">
+          <p className="text-xs font-semibold text-kpmg-primary font-body" aria-hidden="true">
             Tracing <span className="font-bold">{selectedCase.code}</span> — {activeFunctionIds.size} functions · {activeServiceIds.size} services reached
           </p>
         </div>
@@ -329,6 +358,8 @@ export default function ArchitectureCanvas() {
         {/* Canvas — Paper on Stone */}
         <div
           className="flex-1 min-w-0 rounded-2xl overflow-hidden transition-all duration-300"
+          role="region"
+          aria-label="Architecture canvas — AI Cases, Business Functions, and Service Solutions"
           style={{
             background: '#FCF9F8',
             boxShadow: '0px 24px 48px rgba(0,32,95,0.06)',
@@ -649,8 +680,9 @@ export default function ArchitectureCanvas() {
           <div
             key={selectedCase.id}
             ref={drawerRef}
-            role="complementary"
-            aria-label={`Case detail: ${selectedCase.title}`}
+            role="dialog"
+            aria-modal="false"
+            aria-label={`Case detail: ${selectedCase.code} — ${selectedCase.title}`}
             style={{
               opacity: drawerVisible ? 1 : 0,
               transform: drawerVisible ? 'translateX(0)' : 'translateX(24px)',
@@ -678,9 +710,14 @@ export default function ArchitectureCanvas() {
                 </h3>
               </div>
               <button
+                ref={drawerCloseRef}
                 onClick={() => {
                   setDrawerVisible(false);
-                  setTimeout(() => setSelectedCase(null), 200);
+                  setLiveMessage(`Detail panel for ${selectedCase.code} closed.`);
+                  setTimeout(() => {
+                    setSelectedCase(null);
+                    lastFocusedCaseRef.current?.focus();
+                  }, 200);
                 }}
                 className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-kpmg-surface-container transition-colors flex-shrink-0 ml-2 focus:outline-none focus:ring-2 focus:ring-kpmg-primary"
                 aria-label={`Close detail panel for ${selectedCase.title}`}

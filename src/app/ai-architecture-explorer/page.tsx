@@ -13,6 +13,7 @@ export default function AIArchitectureExplorerPage() {
 
   return (
     <AppLayout activeRoute="/ai-architecture-explorer">
+      <main id="main-content" aria-label="AI Architecture Explorer">
       <div className="space-y-6 animate-fade-in">
         {/* Page header — Paper on Stone */}
         <div className="flex items-start justify-between gap-4">
@@ -46,6 +47,7 @@ export default function AIArchitectureExplorerPage() {
         </div>
         <ArchitectureCanvas />
       </div>
+      </main>
     </AppLayout>
   );
 }

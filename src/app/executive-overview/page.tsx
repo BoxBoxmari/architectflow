@@ -9,6 +9,7 @@ import InsightBlock from './components/InsightBlock';
 export default function ExecutiveOverviewPage() {
   return (
     <AppLayout activeRoute="/executive-overview">
+      <main id="main-content" aria-label="Executive Overview">
       <div className="space-y-12 animate-fade-in">
 
         {/* ── Hero header ─────────────────────────────────────────────────── */}
@@ -124,6 +125,7 @@ export default function ExecutiveOverviewPage() {
         </div>
 
       </div>
+      </main>
     </AppLayout>
   );
 }

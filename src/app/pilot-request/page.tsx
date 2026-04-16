@@ -5,6 +5,7 @@ import PilotRequestContent from './components/PilotRequestContent';
 export default function PilotRequestPage() {
   return (
     <AppLayout activeRoute="/pilot-request">
+      <main id="main-content" aria-label="Pilot Request">
       <div className="space-y-6 animate-fade-in max-w-3xl">
         <div>
           <p className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase mb-1 font-body" style={{ fontSize: '10px' }}>
@@ -19,6 +20,7 @@ export default function PilotRequestPage() {
         </div>
         <PilotRequestContent />
       </div>
+      </main>
     </AppLayout>
   );
 }
