@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
 import { AI_CASES, FUNCTIONS, SERVICES } from '@/lib/mockData';
-import { X, ChevronRight, RotateCcw, Search, Mail, TrendingUp } from 'lucide-react';
+import { X, RotateCcw, Search, Mail, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 
 type SelectedCase = (typeof AI_CASES)[0] | null;
@@ -873,10 +873,6 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               {/* CTAs */}
               <div className="pt-1 space-y-2">
                 <Link href="/value-simulator">
-                  <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1" style={{ display: 'flex' }}>
-                    Model the Value
-                    <ChevronRight size={13} aria-hidden="true" />
-                  </span>
                 </Link>
                 <button
                   className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 transition-colors focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1"
