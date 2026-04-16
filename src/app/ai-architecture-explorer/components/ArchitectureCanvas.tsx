@@ -505,7 +505,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                         </span>
                         <span
                           className="kpmg-badge text-xs flex-shrink-0"
-                          style={{ backgroundColor: `${techColor}15`, color: techColor, whiteSpace: 'normal', wordBreak: 'break-word', textAlign: 'right', maxWidth: '120px' }}
+                          style={{ backgroundColor: `${techColor}15`, color: techColor, whiteSpace: 'normal', wordBreak: 'break-word', textAlign: 'center', maxWidth: '110px', lineHeight: '1.3', display: 'inline-block', padding: '3px 8px', borderRadius: '999px' }}
                           aria-hidden="true"
                         >
                           {c.tech}
