@@ -29,6 +29,7 @@ export default function ArchitectureCanvas() {
   const [activeFunction, setActiveFunction] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectingId, setSelectingId] = useState<string | null>(null);
+  const [drawerVisible, setDrawerVisible] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
 
   const filteredCases = AI_CASES.filter((c) => {
@@ -57,21 +58,30 @@ export default function ArchitectureCanvas() {
   function handleSelectCase(c: (typeof AI_CASES)[0]) {
     const isSelected = selectedCase?.id === c.id;
     if (isSelected) {
-      setSelectedCase(null);
-      setSelectingId(null);
+      setDrawerVisible(false);
+      setTimeout(() => {
+        setSelectedCase(null);
+        setSelectingId(null);
+      }, 200);
     } else {
       setSelectingId(c.id);
       setSelectedCase(c);
-      setTimeout(() => setSelectingId(null), 400);
+      setTimeout(() => {
+        setDrawerVisible(true);
+        setSelectingId(null);
+      }, 50);
     }
   }
 
   function reset() {
-    setSelectedCase(null);
-    setHoveredCase(null);
-    setActiveFunction(null);
-    setSearchQuery('');
-    setSelectingId(null);
+    setDrawerVisible(false);
+    setTimeout(() => {
+      setSelectedCase(null);
+      setHoveredCase(null);
+      setActiveFunction(null);
+      setSearchQuery('');
+      setSelectingId(null);
+    }, 200);
   }
 
   return (
@@ -180,9 +190,13 @@ export default function ArchitectureCanvas() {
                       onClick={() => handleSelectCase(c)}
                       onMouseEnter={() => setHoveredCase(c.id)}
                       onMouseLeave={() => setHoveredCase(null)}
+                      style={{
+                        transition: 'border-color 250ms ease, background-color 250ms ease, box-shadow 250ms ease, opacity 200ms ease, transform 200ms ease',
+                        transform: isSelecting ? 'scale(0.97)' : isSelected ? 'scale(1.01)' : 'scale(1)',
+                        opacity: isTracing && !isSelected ? 0.55 : 1,
+                      }}
                       className={[
                         'text-left p-3 rounded-xl border-2 w-full node-card-hover',
-                        isSelecting ? 'node-card-selected' : '',
                         isSelected
                           ? 'border-kpmg-accent-faster bg-kpmg-accent-faster/5 shadow-card-hover'
                           : isHovered
@@ -215,12 +229,14 @@ export default function ArchitectureCanvas() {
               {/* Connector: Cases → Functions */}
               <div className="relative w-12 flex-shrink-0 self-stretch">
                 <div className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
-                {isTracing && (
-                  <div
-                    className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-0.5 transition-all duration-300"
-                    style={{ backgroundColor: '#00B8A9', opacity: 0.7 }}
-                  />
-                )}
+                <div
+                  className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-0.5"
+                  style={{
+                    backgroundColor: '#00B8A9',
+                    opacity: isTracing ? 0.7 : 0,
+                    transition: 'opacity 400ms ease',
+                  }}
+                />
               </div>
 
               {/* Functions column */}
@@ -236,8 +252,11 @@ export default function ArchitectureCanvas() {
                   return (
                     <div
                       key={`fn-node-${fn.id}`}
+                      style={{
+                        transition: 'opacity 350ms ease, border-color 300ms ease, background-color 300ms ease, box-shadow 300ms ease',
+                      }}
                       className={[
-                        'p-3 rounded-xl border-2 fn-node-active transition-all duration-200',
+                        'p-3 rounded-xl border-2 fn-node-active',
                         isActive
                           ? isTracing
                             ? 'border-kpmg-primary bg-kpmg-primary/8 opacity-100 shadow-card'
@@ -267,12 +286,14 @@ export default function ArchitectureCanvas() {
               {/* Connector: Functions → Services */}
               <div className="relative w-12 flex-shrink-0 self-stretch">
                 <div className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
-                {isTracing && (
-                  <div
-                    className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-0.5 transition-all duration-300"
-                    style={{ backgroundColor: '#006397', opacity: 0.7 }}
-                  />
-                )}
+                <div
+                  className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-0.5"
+                  style={{
+                    backgroundColor: '#006397',
+                    opacity: isTracing ? 0.7 : 0,
+                    transition: 'opacity 400ms ease 100ms',
+                  }}
+                />
               </div>
 
               {/* Services column */}
@@ -289,8 +310,11 @@ export default function ArchitectureCanvas() {
                   return (
                     <div
                       key={`svc-node-${svc.id}`}
+                      style={{
+                        transition: 'opacity 350ms ease 50ms, border-color 300ms ease, background-color 300ms ease, box-shadow 300ms ease',
+                      }}
                       className={[
-                        'px-3 py-2 rounded-lg border svc-node-active transition-all duration-200',
+                        'px-3 py-2 rounded-lg border svc-node-active',
                         isActive
                           ? isTracing
                             ? 'border-kpmg-outline-variant bg-white opacity-100 shadow-card'
@@ -333,8 +357,13 @@ export default function ArchitectureCanvas() {
           <div
             key={selectedCase.id}
             ref={drawerRef}
-            className="w-full lg:w-80 lg:flex-shrink-0 bg-white rounded-xl shadow-drawer overflow-y-auto scrollbar-thin animate-slide-in-right"
-            style={{ maxHeight: 'calc(100vh - 160px)' }}
+            style={{
+              opacity: drawerVisible ? 1 : 0,
+              transform: drawerVisible ? 'translateX(0)' : 'translateX(24px)',
+              transition: 'opacity 250ms ease, transform 250ms ease',
+              maxHeight: 'calc(100vh - 160px)',
+            }}
+            className="w-full lg:w-80 lg:flex-shrink-0 bg-white rounded-xl shadow-drawer overflow-y-auto scrollbar-thin"
           >
             <div className="sticky top-0 bg-white border-b border-kpmg-outline-variant/30 px-5 py-4 flex items-start justify-between z-10">
               <div>
@@ -346,7 +375,10 @@ export default function ArchitectureCanvas() {
                 </h3>
               </div>
               <button
-                onClick={() => setSelectedCase(null)}
+                onClick={() => {
+                  setDrawerVisible(false);
+                  setTimeout(() => setSelectedCase(null), 200);
+                }}
                 className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-kpmg-surface-container transition-colors flex-shrink-0 ml-2"
                 aria-label="Close drawer"
               >
