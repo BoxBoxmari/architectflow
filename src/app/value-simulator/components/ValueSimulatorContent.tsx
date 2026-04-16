@@ -29,10 +29,10 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="text-sm font-medium text-kpmg-on-surface font-body truncate">{label}</span>
+          <span className="text-sm font-medium text-kpmg-on-surface dark:text-gray-200 font-body truncate">{label}</span>
           <div className="group relative flex-shrink-0">
-            <Info size={12} className="text-kpmg-outline cursor-help" />
-            <div className="absolute left-0 bottom-full mb-1 w-48 px-2.5 py-1.5 bg-kpmg-on-surface text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-elevated font-body">
+            <Info size={12} className="text-kpmg-outline dark:text-gray-500 cursor-help" />
+            <div className="absolute left-0 bottom-full mb-1 w-48 px-2.5 py-1.5 bg-kpmg-on-surface dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-elevated font-body">
               {hint}
             </div>
           </div>
@@ -58,8 +58,8 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
         />
       </div>
       <div className="flex justify-between">
-        <span className="text-xs text-kpmg-outline font-body">{format(min)}</span>
-        <span className="text-xs text-kpmg-outline font-body">{format(max)}</span>
+        <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{format(min)}</span>
+        <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{format(max)}</span>
       </div>
     </div>
   );
@@ -234,11 +234,11 @@ export default function ValueSimulatorContent() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Left: Assumptions panel — order-1 on mobile so it appears above outputs */}
-      <div className="order-1 lg:order-none lg:col-span-4 xl:col-span-3 bg-white rounded-xl shadow-card p-6 space-y-6 h-fit">
+      {/* Left: Assumptions panel */}
+      <div className="order-1 lg:order-none lg:col-span-4 xl:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-6 space-y-6 h-fit">
         <div>
-          <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-1">Assumptions</h2>
-          <p className="text-xs text-kpmg-outline font-body">Adjust sliders to model different scenarios in real time</p>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface dark:text-gray-100 mb-1">Assumptions</h2>
+          <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body">Adjust sliders to model different scenarios in real time</p>
         </div>
 
         <div className="space-y-1">
@@ -282,7 +282,7 @@ export default function ValueSimulatorContent() {
           </div>
         </div>
 
-        <div className="border-t border-kpmg-outline-variant/30 pt-5 space-y-1">
+        <div className="border-t border-kpmg-outline-variant/30 dark:border-gray-700 pt-5 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-widest font-body mb-3" style={{ fontSize: '10px', color: '#F39C12' }}>
             DEEPER — Adoption Axis
           </p>
@@ -323,7 +323,7 @@ export default function ValueSimulatorContent() {
           </div>
         </div>
 
-        <div className="border-t border-kpmg-outline-variant/30 pt-4 space-y-2">
+        <div className="border-t border-kpmg-outline-variant/30 dark:border-gray-700 pt-4 space-y-2">
           <button onClick={handleSave} className="kpmg-btn-primary w-full justify-center text-sm">
             <Save size={14} />
             Save Scenario
@@ -342,16 +342,16 @@ export default function ValueSimulatorContent() {
         </div>
       </div>
 
-      {/* Center: Outputs panel — order-2 on mobile */}
+      {/* Center: Outputs panel */}
       <div className="order-2 lg:order-none lg:col-span-5 xl:col-span-6 space-y-5">
         {/* Scenario selector */}
-        <div className="bg-white rounded-xl shadow-card p-2 flex gap-1">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-2 flex gap-1">
           {SCENARIO_VIEWS.map(sv => (
             <button
               key={`sv-${sv.id}`}
               onClick={() => setActiveScenario(sv.id)}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-150 font-body ${
-                activeScenario === sv.id ? 'text-white shadow-elevated' : 'text-kpmg-on-surface-variant hover:bg-kpmg-surface-container'
+                activeScenario === sv.id ? 'text-white shadow-elevated' : 'text-kpmg-on-surface-variant dark:text-gray-400 hover:bg-kpmg-surface-container dark:hover:bg-gray-700'
               }`}
               style={activeScenario === sv.id ? { backgroundColor: sv.color } : {}}
             >
@@ -452,14 +452,14 @@ export default function ValueSimulatorContent() {
               color: '#00205F',
             },
           ].map(({ id, icon, label, value, suffix, color }) => (
-            <div key={id} className="bg-white rounded-xl shadow-card p-4">
+            <div key={id} className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-4">
               <div className="flex items-center gap-1.5 mb-2" style={{ color }}>
                 {icon}
-                <span className="text-xs font-semibold text-kpmg-outline font-body">{label}</span>
+                <span className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 font-body">{label}</span>
               </div>
               <div className="flex items-baseline gap-1">
                 <span className="font-display text-2xl sm:text-xl font-extrabold tabular-nums" style={{ color }}>{value}</span>
-                {suffix && <span className="text-xs text-kpmg-outline font-body">{suffix}</span>}
+                {suffix && <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{suffix}</span>}
               </div>
             </div>
           ))}
@@ -469,10 +469,10 @@ export default function ValueSimulatorContent() {
         <SimulatorOutputChart inputs={inputs} />
       </div>
 
-      {/* Right: Strategic summary — order-3 on mobile */}
+      {/* Right: Strategic summary */}
       <div className="order-3 lg:order-none lg:col-span-3 xl:col-span-3 space-y-5">
-        <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Scenario Summary</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-5">
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface dark:text-gray-100 mb-4">Scenario Summary</h3>
           <div className="space-y-4">
             {SCENARIO_VIEWS.map(sv => {
               const svOutputs = sv.id === 'current' ? outputs : sv.id === 'scale2x' ? scale2xOutputs : fullAdoptionOutputs;
@@ -482,17 +482,17 @@ export default function ValueSimulatorContent() {
                   key={`sum-${sv.id}`}
                   onClick={() => setActiveScenario(sv.id)}
                   className={`w-full text-left p-3 rounded-xl border-2 transition-all duration-150 ${
-                    isActive ? 'border-kpmg-primary bg-kpmg-primary/4' : 'border-transparent bg-kpmg-surface-container-low hover:border-kpmg-outline-variant'
+                    isActive ? 'border-kpmg-primary dark:border-blue-500 bg-kpmg-primary/4 dark:bg-blue-900/20' : 'border-transparent bg-kpmg-surface-container-low dark:bg-gray-700/50 hover:border-kpmg-outline-variant dark:hover:border-gray-600'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold font-body" style={{ color: sv.color }}>{sv.label}</span>
                     {isActive && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sv.color }} />}
                   </div>
-                  <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface">
+                  <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface dark:text-gray-100">
                     ${(svOutputs.annualizedReturn / 1000000).toFixed(2)}M
                   </p>
-                  <p className="text-xs text-kpmg-outline font-body mt-0.5">
+                  <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body mt-0.5">
                     {svOutputs.ftesFreed.toFixed(1)} FTEs · {svOutputs.activeUsers} users
                   </p>
                 </button>
@@ -501,8 +501,8 @@ export default function ValueSimulatorContent() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-3">Key Assumptions</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-5">
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface dark:text-gray-100 mb-3">Key Assumptions</h3>
           <div className="space-y-2">
             {[
               { id: 'ka-cost', label: 'Hourly cost rate', value: `$${SIM_CONSTANTS.HOURLY_COST}/hr (USD)` },
@@ -512,8 +512,8 @@ export default function ValueSimulatorContent() {
               { id: 'ka-users', label: 'Active users', value: `${outputs.activeUsers} of ${inputs.targetUserCount}` },
             ].map(({ id, label, value }) => (
               <div key={id} className="flex items-center justify-between gap-2">
-                <span className="text-xs text-kpmg-outline font-body">{label}</span>
-                <span className="text-xs font-semibold text-kpmg-on-surface font-body tabular-nums">{value}</span>
+                <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{label}</span>
+                <span className="text-xs font-semibold text-kpmg-on-surface dark:text-gray-200 font-body tabular-nums">{value}</span>
               </div>
             ))}
           </div>

@@ -9,11 +9,11 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children, activeRoute }: AppLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-kpmg-background">
+    <div className="flex h-screen overflow-hidden bg-kpmg-background dark:bg-gray-950 transition-colors duration-200">
       {/* Mobile overlay */}
       {mobileSidebarOpen && (
         <div

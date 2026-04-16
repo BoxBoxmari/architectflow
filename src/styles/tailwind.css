@@ -163,6 +163,18 @@
     color: #00205F;
     font-weight: 600;
   }
+  .dark .kpmg-sidebar-item {
+    color: #9ca3af;
+  }
+  .dark .kpmg-sidebar-item:hover {
+    background-color: #1f2937;
+    color: #f3f4f6;
+  }
+  .dark .kpmg-sidebar-item.active {
+    background-color: rgba(96, 165, 250, 0.12);
+    color: #93c5fd;
+    font-weight: 600;
+  }
   .kpmg-btn-primary {
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 active:scale-95;
     background-color: #00205F;
@@ -171,6 +183,12 @@
   }
   .kpmg-btn-primary:hover {
     background-color: #00338D;
+  }
+  .dark .kpmg-btn-primary {
+    background-color: #1d4ed8;
+  }
+  .dark .kpmg-btn-primary:hover {
+    background-color: #2563eb;
   }
   .kpmg-btn-secondary {
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 active:scale-95;
@@ -181,6 +199,14 @@
   }
   .kpmg-btn-secondary:hover {
     background-color: #EBE7E7;
+  }
+  .dark .kpmg-btn-secondary {
+    background-color: #1f2937;
+    color: #93c5fd;
+    border-color: #374151;
+  }
+  .dark .kpmg-btn-secondary:hover {
+    background-color: #374151;
   }
   .kpmg-filter-chip {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer border;
@@ -198,9 +224,26 @@
     border-color: #00205F;
     color: #FFFFFF;
   }
+  .dark .kpmg-filter-chip {
+    border-color: #374151;
+    color: #9ca3af;
+    background-color: #111827;
+  }
+  .dark .kpmg-filter-chip:hover {
+    border-color: #60a5fa;
+    color: #60a5fa;
+  }
+  .dark .kpmg-filter-chip.active {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #FFFFFF;
+  }
   .kpmg-metric-tile {
     @apply rounded-xl p-4;
     background-color: #F6F3F2;
+  }
+  .dark .kpmg-metric-tile {
+    background-color: #1f2937;
   }
   .kpmg-badge {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold;

@@ -14,26 +14,26 @@ export default function ExecutiveOverviewPage() {
         {/* ── Hero header ─────────────────────────────────────────────────── */}
         <div className="max-w-2xl">
           <p
-            className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase mb-3 font-body"
+            className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 tracking-widest uppercase mb-3 font-body"
             style={{ fontSize: '10px' }}
           >
             KPMG Vietnam &amp; Cambodia · Partner Briefing
           </p>
-          <h1 className="font-display text-4xl font-extrabold text-kpmg-on-surface leading-tight mb-4">
+          <h1 className="font-display text-4xl font-extrabold text-kpmg-on-surface dark:text-gray-100 leading-tight mb-4">
             One AI Foundation.<br />Every Function.
           </h1>
-          <p className="text-base text-kpmg-on-surface-variant font-body leading-relaxed">
+          <p className="text-base text-kpmg-on-surface-variant dark:text-gray-400 font-body leading-relaxed">
             Six AI cases. Five functions. One shared architecture. Each case is a reusable engine —
             not a one-off tool. Value compounds through two levers:{' '}
-            <strong className="text-kpmg-on-surface font-semibold">Faster</strong> (activate more use cases) and{' '}
-            <strong className="text-kpmg-on-surface font-semibold">Deeper</strong> (reach more users).
+            <strong className="text-kpmg-on-surface dark:text-gray-200 font-semibold">Faster</strong> (activate more use cases) and{' '}
+            <strong className="text-kpmg-on-surface dark:text-gray-200 font-semibold">Deeper</strong> (reach more users).
           </p>
         </div>
 
         {/* ── Two core stories ────────────────────────────────────────────── */}
         <div>
           <p
-            className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase mb-4 font-body"
+            className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 tracking-widest uppercase mb-4 font-body"
             style={{ fontSize: '10px' }}
           >
             Two stories to explore
@@ -41,47 +41,47 @@ export default function ExecutiveOverviewPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
 
             <Link href="/ai-architecture-explorer">
-              <div className="group p-6 rounded-xl border-2 border-kpmg-outline-variant/40 hover:border-kpmg-primary bg-white hover:shadow-card-hover transition-all duration-200 cursor-pointer h-full">
+              <div className="group p-6 rounded-xl border-2 border-kpmg-outline-variant/40 dark:border-gray-700 hover:border-kpmg-primary dark:hover:border-blue-500 bg-white dark:bg-gray-800 hover:shadow-card-hover transition-all duration-200 cursor-pointer h-full">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-kpmg-primary/8 flex items-center justify-center flex-shrink-0">
-                    <Network size={20} className="text-kpmg-primary" />
+                  <div className="w-10 h-10 rounded-lg bg-kpmg-primary/8 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                    <Network size={20} className="text-kpmg-primary dark:text-blue-400" />
                   </div>
                   <span
-                    className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body"
+                    className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body"
                     style={{ fontSize: '10px' }}
                   >
                     Architecture
                   </span>
                 </div>
-                <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-2 group-hover:text-kpmg-primary transition-colors leading-snug">
+                <h2 className="font-display text-base font-bold text-kpmg-on-surface dark:text-gray-100 mb-2 group-hover:text-kpmg-primary dark:group-hover:text-blue-400 transition-colors leading-snug">
                   How one foundation powers every function
                 </h2>
-                <p className="text-sm text-kpmg-on-surface-variant font-body leading-snug mb-4">
+                <p className="text-sm text-kpmg-on-surface-variant dark:text-gray-400 font-body leading-snug mb-4">
                   Trace how each AI case connects across functions and services — and why the architecture is the asset.
                 </p>
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-kpmg-primary font-body group-hover:gap-2.5 transition-all">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-kpmg-primary dark:text-blue-400 font-body group-hover:gap-2.5 transition-all">
                   Explore the map <ArrowRight size={13} />
                 </span>
               </div>
             </Link>
 
             <Link href="/value-simulator">
-              <div className="group p-6 rounded-xl border-2 border-kpmg-outline-variant/40 hover:border-kpmg-accent-faster bg-white hover:shadow-card-hover transition-all duration-200 cursor-pointer h-full">
+              <div className="group p-6 rounded-xl border-2 border-kpmg-outline-variant/40 dark:border-gray-700 hover:border-kpmg-accent-faster bg-white dark:bg-gray-800 hover:shadow-card-hover transition-all duration-200 cursor-pointer h-full">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-kpmg-accent-faster/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-kpmg-accent-faster/10 dark:bg-teal-900/30 flex items-center justify-center flex-shrink-0">
                     <Calculator size={20} className="text-kpmg-accent-faster" />
                   </div>
                   <span
-                    className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body"
+                    className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body"
                     style={{ fontSize: '10px' }}
                   >
                     Value
                   </span>
                 </div>
-                <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-2 group-hover:text-kpmg-accent-faster transition-colors leading-snug">
+                <h2 className="font-display text-base font-bold text-kpmg-on-surface dark:text-gray-100 mb-2 group-hover:text-kpmg-accent-faster transition-colors leading-snug">
                   Why the economic case compounds
                 </h2>
-                <p className="text-sm text-kpmg-on-surface-variant font-body leading-snug mb-4">
+                <p className="text-sm text-kpmg-on-surface-variant dark:text-gray-400 font-body leading-snug mb-4">
                   Model the Faster × Deeper multiplier with transparent assumptions — adjust any input, see the return instantly.
                 </p>
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-kpmg-accent-faster font-body group-hover:gap-2.5 transition-all">
@@ -96,8 +96,8 @@ export default function ExecutiveOverviewPage() {
         {/* ── Portfolio snapshot ──────────────────────────────────────────── */}
         <div>
           <div className="mb-5">
-            <h2 className="font-display text-lg font-bold text-kpmg-on-surface">Portfolio at a Glance</h2>
-            <p className="text-xs text-kpmg-outline mt-1 font-body">
+            <h2 className="font-display text-lg font-bold text-kpmg-on-surface dark:text-gray-100">Portfolio at a Glance</h2>
+            <p className="text-xs text-kpmg-outline dark:text-gray-500 mt-1 font-body">
               Illustrative executive view · Curated sample portfolio
             </p>
           </div>
@@ -107,8 +107,8 @@ export default function ExecutiveOverviewPage() {
         {/* ── Coverage + insight ──────────────────────────────────────────── */}
         <div>
           <div className="mb-5">
-            <h2 className="font-display text-lg font-bold text-kpmg-on-surface">Cross-Function Coverage</h2>
-            <p className="text-xs text-kpmg-outline mt-1 font-body">
+            <h2 className="font-display text-lg font-bold text-kpmg-on-surface dark:text-gray-100">Cross-Function Coverage</h2>
+            <p className="text-xs text-kpmg-outline dark:text-gray-500 mt-1 font-body">
               How many AI cases reach each function — and which ones
             </p>
           </div>

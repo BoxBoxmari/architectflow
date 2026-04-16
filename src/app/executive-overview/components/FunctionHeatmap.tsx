@@ -28,13 +28,13 @@ export default function FunctionHeatmap() {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-card p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-6">
       <div className="flex items-start justify-between mb-5">
         <div>
-          <h2 className="font-display text-base font-bold text-kpmg-on-surface">AI Cases by Function</h2>
-          <p className="text-xs text-kpmg-outline mt-0.5 font-body">Cases reaching each function — click Architecture Explorer to trace the full flow</p>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface dark:text-gray-100">AI Cases by Function</h2>
+          <p className="text-xs text-kpmg-outline dark:text-gray-500 mt-0.5 font-body">Cases reaching each function — click Architecture Explorer to trace the full flow</p>
         </div>
-        <span className="text-xs text-kpmg-outline font-body italic">6 cases · 5 functions</span>
+        <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body italic">6 cases · 5 functions</span>
       </div>
 
       <div className="space-y-4">
@@ -49,13 +49,13 @@ export default function FunctionHeatmap() {
                     className="w-2 h-2 rounded-full flex-shrink-0"
                     style={{ backgroundColor: barColor }}
                   />
-                  <span className="text-sm font-semibold text-kpmg-on-surface font-body">{row.function}</span>
+                  <span className="text-sm font-semibold text-kpmg-on-surface dark:text-gray-200 font-body">{row.function}</span>
                 </div>
                 <span className="font-display text-sm font-bold tabular-nums" style={{ color: barColor }}>
                   {row.total} {row.total === 1 ? 'case' : 'cases'}
                 </span>
               </div>
-              <div className="h-2 bg-kpmg-surface-container rounded-full overflow-hidden">
+              <div className="h-2 bg-kpmg-surface-container dark:bg-gray-700 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{ width: `${barPct}%`, backgroundColor: barColor }}
