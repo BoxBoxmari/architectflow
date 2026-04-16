@@ -43,7 +43,7 @@ export default function Sidebar({ collapsed, onToggleCollapse, activeRoute, onCl
 
         {!collapsed &&
         <div className="flex items-center gap-2.5 min-w-0">
-            <AppLogo size={32} />
+            <AppLogo size={48} />
             <div className="min-w-0">
               <span className="font-display text-sm font-bold text-kpmg-primary dark:text-blue-400 tracking-tight block leading-tight">Architect Flow
 
@@ -52,7 +52,7 @@ export default function Sidebar({ collapsed, onToggleCollapse, activeRoute, onCl
           </div>
         }
         {collapsed &&
-        <AppLogo size={28} />
+        <AppLogo size={40} />
         }
         <button
           onClick={onToggleCollapse}
