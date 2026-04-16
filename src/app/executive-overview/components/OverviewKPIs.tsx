@@ -62,7 +62,7 @@ export default function OverviewKPIs() {
       {kpis?.map((kpi) => (
         <div
           key={kpi?.id}
-          className="bg-white rounded-xl p-5 shadow-card"
+          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-card dark:shadow-none dark:border dark:border-gray-700"
           style={{ borderTop: `3px solid ${kpi?.color}` }}
         >
           <div className="flex items-start justify-between mb-3">
@@ -80,14 +80,14 @@ export default function OverviewKPIs() {
             </p>
           </div>
           <p
-            className="text-xs font-semibold text-kpmg-on-surface-variant tracking-wide uppercase mb-1 font-body"
+            className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 tracking-wide uppercase mb-1 font-body"
             style={{ fontSize: '10px', letterSpacing: '0.06em' }}
           >
             {kpi?.label}
           </p>
-          <p className="text-xs text-kpmg-outline font-body">{kpi?.subtext}</p>
-          <div className="mt-3 pt-3 border-t border-kpmg-outline-variant/30">
-            <span className="text-xs text-kpmg-outline font-body italic">{kpi?.note}</span>
+          <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{kpi?.subtext}</p>
+          <div className="mt-3 pt-3 border-t border-kpmg-outline-variant/30 dark:border-gray-700">
+            <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body italic">{kpi?.note}</span>
           </div>
         </div>
       ))}

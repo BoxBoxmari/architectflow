@@ -62,15 +62,15 @@ export default function ScenarioComparisonContent() {
       ['Generated', new Date().toLocaleString()],
       [],
       ['Metric', 'Current State', '2× Scale-Up', 'Full Adoption'],
-      ['Annualised Return (£)', Math.round(cur.annualizedReturn), Math.round(s2x.annualizedReturn), Math.round(full.annualizedReturn)],
-      ['Monthly Cost Savings (£)', Math.round(cur.monthlyCostSavings), Math.round(s2x.monthlyCostSavings), Math.round(full.monthlyCostSavings)],
+      ['Annualised Return (USD)', Math.round(cur.annualizedReturn), Math.round(s2x.annualizedReturn), Math.round(full.annualizedReturn)],
+      ['Monthly Cost Savings (USD)', Math.round(cur.monthlyCostSavings), Math.round(s2x.monthlyCostSavings), Math.round(full.monthlyCostSavings)],
       ['Hours Recovered / Month', Math.round(cur.hoursPerMonth), Math.round(s2x.hoursPerMonth), Math.round(full.hoursPerMonth)],
       ['FTEs Freed / Month', cur.ftesFreed.toFixed(1), s2x.ftesFreed.toFixed(1), full.ftesFreed.toFixed(1)],
       ['AI-Assisted Tasks / Month', Math.round(cur.tasksPerMonth), Math.round(s2x.tasksPerMonth), Math.round(full.tasksPerMonth)],
       ['Active Users', cur.activeUsers, s2x.activeUsers, full.activeUsers],
       ['Active Use Cases', cur.activeUseCases, s2x.activeUseCases, full.activeUseCases],
       ['Programme Penetration (%)', Math.round(cur.penetration), Math.round(s2x.penetration), Math.round(full.penetration)],
-      ['Value / User / Month (£)', Math.round(cur.valuePerUserPerMonth), Math.round(s2x.valuePerUserPerMonth), Math.round(full.valuePerUserPerMonth)],
+      ['Value / User / Month (USD)', Math.round(cur.valuePerUserPerMonth), Math.round(s2x.valuePerUserPerMonth), Math.round(full.valuePerUserPerMonth)],
       ['Daily AI Interactions', Math.round(cur.dailyInteractions), Math.round(s2x.dailyInteractions), Math.round(full.dailyInteractions)],
       [],
       ['--- ASSUMPTIONS ---'],
@@ -91,7 +91,7 @@ export default function ScenarioComparisonContent() {
       id: 'metric-annual',
       label: 'Annualised Return',
       icon: <TrendingUp size={14} />,
-      format: (v: number) => `£${(v / 1000000).toFixed(2)}M`,
+      format: (v: number) => `$${(v / 1000000).toFixed(2)}M`,
       getValue: (o: SimOutputs) => o.annualizedReturn,
       highlight: true,
     },
@@ -99,7 +99,7 @@ export default function ScenarioComparisonContent() {
       id: 'metric-monthly',
       label: 'Monthly Cost Savings',
       icon: <TrendingUp size={14} />,
-      format: (v: number) => `£${Math.round(v).toLocaleString()}`,
+      format: (v: number) => `$${Math.round(v).toLocaleString()}`,
       getValue: (o: SimOutputs) => o.monthlyCostSavings,
       highlight: false,
     },
@@ -147,7 +147,7 @@ export default function ScenarioComparisonContent() {
       id: 'metric-value-user',
       label: 'Value / User / Month',
       icon: <Info size={14} />,
-      format: (v: number) => `£${Math.round(v)}`,
+      format: (v: number) => `$${Math.round(v)}`,
       getValue: (o: SimOutputs) => o.valuePerUserPerMonth,
       highlight: false,
     },
@@ -243,7 +243,7 @@ export default function ScenarioComparisonContent() {
               <div>
                 <p className="text-xs text-kpmg-outline font-body mb-1">Annualised Return</p>
                 <p className="font-display text-2xl font-extrabold tabular-nums" style={{ color }}>
-                  £{(o.annualizedReturn / 1000000).toFixed(2)}M
+                  ${(o.annualizedReturn / 1000000).toFixed(2)}M
                 </p>
                 {idx > 0 && (
                   <DeltaBadge value={o.annualizedReturn} baseline={baselineOutputs.annualizedReturn} />
@@ -371,7 +371,7 @@ export default function ScenarioComparisonContent() {
             <p className="text-sm text-white/80 font-body leading-relaxed max-w-2xl">
               The 2X Scale-Up scenario delivers a{' '}
               <span className="font-semibold text-kpmg-accent-faster">
-                £{((allOutputs[1].annualizedReturn - allOutputs[0].annualizedReturn) / 1000000).toFixed(2)}M
+                ${((allOutputs[1].annualizedReturn - allOutputs[0].annualizedReturn) / 1000000).toFixed(2)}M
               </span>{' '}
               uplift over Current State by doubling active users and use cases within firm-wide capacity limits.
               Full Adoption offers the highest ceiling but requires 100% activation across all targeted users — recommended

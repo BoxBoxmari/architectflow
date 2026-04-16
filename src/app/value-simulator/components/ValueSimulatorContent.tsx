@@ -29,10 +29,10 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="text-sm font-medium text-kpmg-on-surface font-body truncate">{label}</span>
+          <span className="text-sm font-medium text-kpmg-on-surface dark:text-gray-200 font-body truncate">{label}</span>
           <div className="group relative flex-shrink-0">
-            <Info size={12} className="text-kpmg-outline cursor-help" />
-            <div className="absolute left-0 bottom-full mb-1 w-48 px-2.5 py-1.5 bg-kpmg-on-surface text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-elevated font-body">
+            <Info size={12} className="text-kpmg-outline dark:text-gray-500 cursor-help" />
+            <div className="absolute left-0 bottom-full mb-1 w-48 px-2.5 py-1.5 bg-kpmg-on-surface dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-elevated font-body">
               {hint}
             </div>
           </div>
@@ -58,8 +58,8 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
         />
       </div>
       <div className="flex justify-between">
-        <span className="text-xs text-kpmg-outline font-body">{format(min)}</span>
-        <span className="text-xs text-kpmg-outline font-body">{format(max)}</span>
+        <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{format(min)}</span>
+        <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{format(max)}</span>
       </div>
     </div>
   );
@@ -118,7 +118,7 @@ export default function ValueSimulatorContent() {
       ['Avg Time Saved / Task (min)', inputs.avgTimeSavedMinutes],
       [],
       ['--- KEY ASSUMPTIONS ---'],
-      ['Hourly Cost Rate (£/hr)', HOURLY_COST],
+      ['Hourly Cost Rate (USD/hr)', HOURLY_COST],
       ['Working Days / Month', WORKING_DAYS_PER_MONTH],
       ['Working Hours / Day', WORKING_HOURS_PER_DAY],
       [],
@@ -128,11 +128,11 @@ export default function ValueSimulatorContent() {
       ['Active Users', outputs.activeUsers, scale2xOutputs.activeUsers, fullAdoptionOutputs.activeUsers],
       ['AI-Assisted Tasks / Month', outputs.tasksPerMonth, scale2xOutputs.tasksPerMonth, fullAdoptionOutputs.tasksPerMonth],
       ['Hours Recovered / Month', Math.round(outputs.hoursPerMonth), Math.round(scale2xOutputs.hoursPerMonth), Math.round(fullAdoptionOutputs.hoursPerMonth)],
-      ['Monthly Cost Savings (£)', Math.round(outputs.monthlyCostSavings), Math.round(scale2xOutputs.monthlyCostSavings), Math.round(fullAdoptionOutputs.monthlyCostSavings)],
-      ['Annualised Return (£)', Math.round(outputs.annualizedReturn), Math.round(scale2xOutputs.annualizedReturn), Math.round(fullAdoptionOutputs.annualizedReturn)],
+      ['Monthly Cost Savings (USD)', Math.round(outputs.monthlyCostSavings), Math.round(scale2xOutputs.monthlyCostSavings), Math.round(fullAdoptionOutputs.monthlyCostSavings)],
+      ['Annualised Return (USD)', Math.round(outputs.annualizedReturn), Math.round(scale2xOutputs.annualizedReturn), Math.round(fullAdoptionOutputs.annualizedReturn)],
       ['FTEs Freed / Month', outputs.ftesFreed.toFixed(1), scale2xOutputs.ftesFreed.toFixed(1), fullAdoptionOutputs.ftesFreed.toFixed(1)],
       ['Time Freed / User / Month (min)', Math.round(outputs.timePerUserPerMonth), Math.round(scale2xOutputs.timePerUserPerMonth), Math.round(fullAdoptionOutputs.timePerUserPerMonth)],
-      ['Value / User / Month (£)', Math.round(outputs.valuePerUserPerMonth), Math.round(scale2xOutputs.valuePerUserPerMonth), Math.round(fullAdoptionOutputs.valuePerUserPerMonth)],
+      ['Value / User / Month (USD)', Math.round(outputs.valuePerUserPerMonth), Math.round(scale2xOutputs.valuePerUserPerMonth), Math.round(fullAdoptionOutputs.valuePerUserPerMonth)],
       ['Daily AI Interactions', outputs.dailyInteractions, scale2xOutputs.dailyInteractions, fullAdoptionOutputs.dailyInteractions],
       ['Programme Penetration (%)', Math.round(outputs.penetration), Math.round(scale2xOutputs.penetration), Math.round(fullAdoptionOutputs.penetration)],
     ];
@@ -145,15 +145,15 @@ export default function ValueSimulatorContent() {
   function handleExportPDF() {
     // Build a self-contained HTML string and open it in a new tab for printing
     const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
-    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const dateStr = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 
     const scenarioRows = [
       ['Active Use Cases', outputs.activeUseCases, scale2xOutputs.activeUseCases, fullAdoptionOutputs.activeUseCases],
       ['Active Users', outputs.activeUsers, scale2xOutputs.activeUsers, fullAdoptionOutputs.activeUsers],
       ['Tasks / Month', outputs.tasksPerMonth.toLocaleString(), scale2xOutputs.tasksPerMonth.toLocaleString(), fullAdoptionOutputs.tasksPerMonth.toLocaleString()],
       ['Hours Recovered / Month', Math.round(outputs.hoursPerMonth).toLocaleString(), Math.round(scale2xOutputs.hoursPerMonth).toLocaleString(), Math.round(fullAdoptionOutputs.hoursPerMonth).toLocaleString()],
-      ['Monthly Cost Savings', `£${Math.round(outputs.monthlyCostSavings).toLocaleString()}`, `£${Math.round(scale2xOutputs.monthlyCostSavings).toLocaleString()}`, `£${Math.round(fullAdoptionOutputs.monthlyCostSavings).toLocaleString()}`],
-      ['Annualised Return', `£${(outputs.annualizedReturn / 1000000).toFixed(2)}M`, `£${(scale2xOutputs.annualizedReturn / 1000000).toFixed(2)}M`, `£${(fullAdoptionOutputs.annualizedReturn / 1000000).toFixed(2)}M`],
+      ['Monthly Cost Savings', `$${Math.round(outputs.monthlyCostSavings).toLocaleString()}`, `$${Math.round(scale2xOutputs.monthlyCostSavings).toLocaleString()}`, `$${Math.round(fullAdoptionOutputs.monthlyCostSavings).toLocaleString()}`],
+      ['Annualised Return', `$${(outputs.annualizedReturn / 1000000).toFixed(2)}M`, `$${(scale2xOutputs.annualizedReturn / 1000000).toFixed(2)}M`, `$${(fullAdoptionOutputs.annualizedReturn / 1000000).toFixed(2)}M`],
       ['FTEs Freed / Month', outputs.ftesFreed.toFixed(1), scale2xOutputs.ftesFreed.toFixed(1), fullAdoptionOutputs.ftesFreed.toFixed(1)],
       ['Programme Penetration', `${Math.round(outputs.penetration)}%`, `${Math.round(scale2xOutputs.penetration)}%`, `${Math.round(fullAdoptionOutputs.penetration)}%`],
     ];
@@ -199,7 +199,7 @@ export default function ValueSimulatorContent() {
 <h2>Key Assumptions</h2>
 <table>
   <tr><th>Assumption</th><th>Value</th></tr>
-  <tr><td>Hourly cost rate</td><td>£${HOURLY_COST}/hr</td></tr>
+  <tr><td>Hourly cost rate (USD)</td><td>$${HOURLY_COST}/hr</td></tr>
   <tr><td>Working days / month</td><td>${WORKING_DAYS_PER_MONTH}</td></tr>
   <tr><td>Working hours / day</td><td>${WORKING_HOURS_PER_DAY}</td></tr>
 </table>
@@ -210,7 +210,7 @@ export default function ValueSimulatorContent() {
   ${tableRows}
 </table>
 
-<div class="footer">KPMG AI Architecture — Confidential. For internal use only.</div>
+<div class="footer">KPMG AI Architecture — Confidential. For internal use only. All figures are illustrative estimates based on modelled assumptions.</div>
 <script>window.onload = function(){ window.print(); }</script>
 </body>
 </html>`;
@@ -234,11 +234,11 @@ export default function ValueSimulatorContent() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Left: Assumptions panel — order-1 on mobile so it appears above outputs */}
-      <div className="order-1 lg:order-none lg:col-span-4 xl:col-span-3 bg-white rounded-xl shadow-card p-6 space-y-6 h-fit">
+      {/* Left: Assumptions panel */}
+      <div className="order-1 lg:order-none lg:col-span-4 xl:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-6 space-y-6 h-fit">
         <div>
-          <h2 className="font-display text-base font-bold text-kpmg-on-surface mb-1">Assumptions</h2>
-          <p className="text-xs text-kpmg-outline font-body">Adjust sliders to model different scenarios in real time</p>
+          <h2 className="font-display text-base font-bold text-kpmg-on-surface dark:text-gray-100 mb-1">Assumptions</h2>
+          <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body">Adjust sliders to model different scenarios in real time</p>
         </div>
 
         <div className="space-y-1">
@@ -282,7 +282,7 @@ export default function ValueSimulatorContent() {
           </div>
         </div>
 
-        <div className="border-t border-kpmg-outline-variant/30 pt-5 space-y-1">
+        <div className="border-t border-kpmg-outline-variant/30 dark:border-gray-700 pt-5 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-widest font-body mb-3" style={{ fontSize: '10px', color: '#F39C12' }}>
             DEEPER — Adoption Axis
           </p>
@@ -323,7 +323,7 @@ export default function ValueSimulatorContent() {
           </div>
         </div>
 
-        <div className="border-t border-kpmg-outline-variant/30 pt-4 space-y-2">
+        <div className="border-t border-kpmg-outline-variant/30 dark:border-gray-700 pt-4 space-y-2">
           <button onClick={handleSave} className="kpmg-btn-primary w-full justify-center text-sm">
             <Save size={14} />
             Save Scenario
@@ -342,16 +342,16 @@ export default function ValueSimulatorContent() {
         </div>
       </div>
 
-      {/* Center: Outputs panel — order-2 on mobile */}
+      {/* Center: Outputs panel */}
       <div className="order-2 lg:order-none lg:col-span-5 xl:col-span-6 space-y-5">
         {/* Scenario selector */}
-        <div className="bg-white rounded-xl shadow-card p-2 flex gap-1">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-2 flex gap-1">
           {SCENARIO_VIEWS.map(sv => (
             <button
               key={`sv-${sv.id}`}
               onClick={() => setActiveScenario(sv.id)}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-150 font-body ${
-                activeScenario === sv.id ? 'text-white shadow-elevated' : 'text-kpmg-on-surface-variant hover:bg-kpmg-surface-container'
+                activeScenario === sv.id ? 'text-white shadow-elevated' : 'text-kpmg-on-surface-variant dark:text-gray-400 hover:bg-kpmg-surface-container dark:hover:bg-gray-700'
               }`}
               style={activeScenario === sv.id ? { backgroundColor: sv.color } : {}}
             >
@@ -369,10 +369,10 @@ export default function ValueSimulatorContent() {
             Estimated Annualised Return
           </p>
           <p className="font-display text-4xl font-extrabold tabular-nums mb-1">
-            £{(displayOutputs.annualizedReturn / 1000000).toFixed(2)}M
+            ${(displayOutputs.annualizedReturn / 1000000).toFixed(2)}M
           </p>
           <p className="text-sm text-white/70 font-body">
-            £{Math.round(displayOutputs.monthlyCostSavings).toLocaleString()} per month · {displayOutputs.activeUsers.toLocaleString()} active users
+            ${Math.round(displayOutputs.monthlyCostSavings).toLocaleString()} per month · {displayOutputs.activeUsers.toLocaleString()} active users
           </p>
         </div>
 
@@ -431,7 +431,7 @@ export default function ValueSimulatorContent() {
               id: 'out-value-user',
               icon: <DollarSign size={15} />,
               label: 'Value / User / Month',
-              value: `£${Math.round(displayOutputs.valuePerUserPerMonth).toLocaleString()}`,
+              value: `$${Math.round(displayOutputs.valuePerUserPerMonth).toLocaleString()}`,
               suffix: '',
               color: '#F39C12',
             },
@@ -452,14 +452,14 @@ export default function ValueSimulatorContent() {
               color: '#00205F',
             },
           ].map(({ id, icon, label, value, suffix, color }) => (
-            <div key={id} className="bg-white rounded-xl shadow-card p-4">
+            <div key={id} className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-4">
               <div className="flex items-center gap-1.5 mb-2" style={{ color }}>
                 {icon}
-                <span className="text-xs font-semibold text-kpmg-outline font-body">{label}</span>
+                <span className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 font-body">{label}</span>
               </div>
               <div className="flex items-baseline gap-1">
                 <span className="font-display text-2xl sm:text-xl font-extrabold tabular-nums" style={{ color }}>{value}</span>
-                {suffix && <span className="text-xs text-kpmg-outline font-body">{suffix}</span>}
+                {suffix && <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{suffix}</span>}
               </div>
             </div>
           ))}
@@ -469,10 +469,10 @@ export default function ValueSimulatorContent() {
         <SimulatorOutputChart inputs={inputs} />
       </div>
 
-      {/* Right: Strategic summary — order-3 on mobile */}
+      {/* Right: Strategic summary */}
       <div className="order-3 lg:order-none lg:col-span-3 xl:col-span-3 space-y-5">
-        <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-4">Scenario Summary</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-5">
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface dark:text-gray-100 mb-4">Scenario Summary</h3>
           <div className="space-y-4">
             {SCENARIO_VIEWS.map(sv => {
               const svOutputs = sv.id === 'current' ? outputs : sv.id === 'scale2x' ? scale2xOutputs : fullAdoptionOutputs;
@@ -482,17 +482,17 @@ export default function ValueSimulatorContent() {
                   key={`sum-${sv.id}`}
                   onClick={() => setActiveScenario(sv.id)}
                   className={`w-full text-left p-3 rounded-xl border-2 transition-all duration-150 ${
-                    isActive ? 'border-kpmg-primary bg-kpmg-primary/4' : 'border-transparent bg-kpmg-surface-container-low hover:border-kpmg-outline-variant'
+                    isActive ? 'border-kpmg-primary dark:border-blue-500 bg-kpmg-primary/4 dark:bg-blue-900/20' : 'border-transparent bg-kpmg-surface-container-low dark:bg-gray-700/50 hover:border-kpmg-outline-variant dark:hover:border-gray-600'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold font-body" style={{ color: sv.color }}>{sv.label}</span>
                     {isActive && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sv.color }} />}
                   </div>
-                  <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface">
-                    £{(svOutputs.annualizedReturn / 1000000).toFixed(2)}M
+                  <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface dark:text-gray-100">
+                    ${(svOutputs.annualizedReturn / 1000000).toFixed(2)}M
                   </p>
-                  <p className="text-xs text-kpmg-outline font-body mt-0.5">
+                  <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body mt-0.5">
                     {svOutputs.ftesFreed.toFixed(1)} FTEs · {svOutputs.activeUsers} users
                   </p>
                 </button>
@@ -501,19 +501,19 @@ export default function ValueSimulatorContent() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-card p-5">
-          <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-3">Key Assumptions</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-5">
+          <h3 className="font-display text-sm font-bold text-kpmg-on-surface dark:text-gray-100 mb-3">Key Assumptions</h3>
           <div className="space-y-2">
             {[
-              { id: 'ka-cost', label: 'Hourly cost rate', value: `£${SIM_CONSTANTS.HOURLY_COST}/hr` },
+              { id: 'ka-cost', label: 'Hourly cost rate', value: `$${SIM_CONSTANTS.HOURLY_COST}/hr (USD)` },
               { id: 'ka-days', label: 'Working days/month', value: `${SIM_CONSTANTS.WORKING_DAYS_PER_MONTH}` },
               { id: 'ka-hrs', label: 'Working hours/day', value: `${SIM_CONSTANTS.WORKING_HOURS_PER_DAY}` },
               { id: 'ka-cases', label: 'Active use cases', value: `${outputs.activeUseCases} of ${inputs.targetUseCaseCount}` },
               { id: 'ka-users', label: 'Active users', value: `${outputs.activeUsers} of ${inputs.targetUserCount}` },
             ].map(({ id, label, value }) => (
               <div key={id} className="flex items-center justify-between gap-2">
-                <span className="text-xs text-kpmg-outline font-body">{label}</span>
-                <span className="text-xs font-semibold text-kpmg-on-surface font-body tabular-nums">{value}</span>
+                <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{label}</span>
+                <span className="text-xs font-semibold text-kpmg-on-surface dark:text-gray-200 font-body tabular-nums">{value}</span>
               </div>
             ))}
           </div>

@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Manrope, DM_Sans } from 'next/font/google';
 
 import ToasterProvider from '@/components/ToasterProvider';
+import { ThemeProvider } from '@/context/ThemeContext';
 import '../styles/tailwind.css';
 
 const manrope = Manrope({
@@ -37,9 +38,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${manrope.variable} ${dmSans.variable}`}>
-      <body className="bg-kpmg-background font-body antialiased">
-        {children}
-        <ToasterProvider />
+      <body className="bg-kpmg-background dark:bg-gray-950 font-body antialiased transition-colors duration-200">
+        <ThemeProvider>
+          {children}
+          <ToasterProvider />
+        </ThemeProvider>
 
         <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Farchitectf1565back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.18" />
         <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.2" /></body>

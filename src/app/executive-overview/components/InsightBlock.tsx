@@ -38,20 +38,20 @@ export default function InsightBlock() {
       </div>
 
       {/* Navigation prompt */}
-      <div className="bg-white rounded-xl shadow-card p-5">
-        <p className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase font-body mb-3" style={{ fontSize: '10px' }}>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-5">
+        <p className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 tracking-widest uppercase font-body mb-3" style={{ fontSize: '10px' }}>
           Continue the story
         </p>
         <div className="space-y-1">
           <Link href="/ai-architecture-explorer">
-            <span className="flex items-center justify-between w-full text-sm font-semibold text-kpmg-primary hover:text-kpmg-secondary transition-colors font-body cursor-pointer py-2">
+            <span className="flex items-center justify-between w-full text-sm font-semibold text-kpmg-primary dark:text-blue-400 hover:text-kpmg-secondary dark:hover:text-blue-300 transition-colors font-body cursor-pointer py-2">
               See the architecture map
               <ArrowRight size={14} />
             </span>
           </Link>
-          <div className="h-px bg-kpmg-outline-variant/30" />
+          <div className="h-px bg-kpmg-outline-variant/30 dark:bg-gray-700" />
           <Link href="/value-simulator">
-            <span className="flex items-center justify-between w-full text-sm font-semibold text-kpmg-primary hover:text-kpmg-secondary transition-colors font-body cursor-pointer py-2">
+            <span className="flex items-center justify-between w-full text-sm font-semibold text-kpmg-primary dark:text-blue-400 hover:text-kpmg-secondary dark:hover:text-blue-300 transition-colors font-body cursor-pointer py-2">
               Model the value case
               <ArrowRight size={14} />
             </span>

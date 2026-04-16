@@ -2,10 +2,8 @@
  * Centralized simulator calculation logic.
  * Single source of truth used by Value Simulator, Scenario Comparison, and Report Builder.
  *
- * Source of truth: ai_roi_simulator_desktop_v5.html
- *
  * Constants:
- *   HOURLY_COST              — £15/hr blended internal rate
+ *   HOURLY_COST              — $15/hr blended internal rate (USD)
  *   WORKING_DAYS_PER_MONTH   — 21 working days per month
  *   WORKING_HOURS_PER_DAY    — 8 working hours per day
  *   FIRM_WIDE_EMPLOYEE_CAP   — 1800 max employees
