@@ -10,7 +10,7 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  mode: 'system',
+  mode: 'light',
   resolvedTheme: 'light',
   setMode: () => {},
 });
@@ -22,7 +22,7 @@ export function useTheme() {
 const STORAGE_KEY = 'architectflow-theme';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setModeState] = useState<ThemeMode>('system');
+  const [mode, setModeState] = useState<ThemeMode>('light');
   const [systemDark, setSystemDark] = useState(false);
 
   // Load saved preference on mount

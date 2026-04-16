@@ -28,7 +28,10 @@ export default function FunctionHeatmap() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-6">
+    <div
+      className="bg-white dark:bg-gray-800 rounded-2xl p-6 dark:border dark:border-gray-700"
+      style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+    >
       <div className="flex items-start justify-between mb-5">
         <div>
           <h2 className="font-display text-base font-bold text-kpmg-on-surface dark:text-gray-100">AI Cases by Function</h2>
@@ -55,7 +58,7 @@ export default function FunctionHeatmap() {
                   {row.total} {row.total === 1 ? 'case' : 'cases'}
                 </span>
               </div>
-              <div className="h-2 bg-kpmg-surface-container dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#F0EDEC' }}>
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{ width: `${barPct}%`, backgroundColor: barColor }}

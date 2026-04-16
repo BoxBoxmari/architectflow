@@ -13,22 +13,24 @@ export default function AppLayout({ children, activeRoute }: AppLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
 
   return (
+    /* Paper on Stone: main canvas is #FCF9F8 (Base Stone) */
     <div className="flex h-screen overflow-hidden bg-kpmg-background dark:bg-gray-950 transition-colors duration-200">
       {/* Mobile overlay */}
       {mobileSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/20 z-30 lg:hidden backdrop-blur-sm"
           onClick={() => setMobileSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — Pure Paper (#FFFFFF) lifted above Stone canvas */}
       <div
         className={`
           fixed lg:relative z-40 h-full flex-shrink-0 transition-all duration-300 ease-in-out
           ${sidebarCollapsed ? 'w-16' : 'w-60'}
           ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
+        style={{ boxShadow: mobileSidebarOpen ? '0px 24px 48px rgba(0, 32, 95, 0.06)' : undefined }}
       >
         <Sidebar
           collapsed={sidebarCollapsed}
@@ -38,10 +40,11 @@ export default function AppLayout({ children, activeRoute }: AppLayoutProps) {
         />
       </div>
 
-      {/* Main content */}
+      {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Topbar onMenuClick={() => setMobileSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto scrollbar-thin">
+        {/* Surface Container Low (#F6F3F2) for the scroll area — structural lane */}
+        <main className="flex-1 overflow-y-auto scrollbar-thin bg-kpmg-background dark:bg-gray-950">
           <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 xl:px-10 py-8">
             {children}
           </div>

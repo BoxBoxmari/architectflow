@@ -37,8 +37,11 @@ export default function CaseLibraryContent() {
 
   return (
     <div className="space-y-5">
-      {/* Search + filters */}
-      <div className="bg-white rounded-xl shadow-card p-4 space-y-3">
+      {/* Search + filters — Pure Paper card */}
+      <div
+        className="bg-white rounded-2xl p-4 space-y-3"
+        style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+      >
         <div className="flex items-center gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-kpmg-outline pointer-events-none" />
@@ -47,22 +50,23 @@ export default function CaseLibraryContent() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search cases, codes, sources..."
-              className="w-full pl-8 pr-4 py-2 text-sm bg-kpmg-surface-container rounded-lg border border-transparent focus:border-kpmg-outline-variant focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 placeholder:text-kpmg-outline transition-all font-body"
+              className="w-full pl-8 pr-4 py-2 text-sm bg-kpmg-surface-container rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 placeholder:text-kpmg-outline transition-all font-body"
+              style={{ borderBottom: '1.5px solid #C4C6D4' }}
             />
           </div>
           <div className="ml-auto flex items-center gap-2">
             <span className="text-xs text-kpmg-outline font-body">{filtered.length} of {AI_CASES.length} cases</span>
-            <div className="flex items-center gap-1 border border-kpmg-outline-variant/40 rounded-lg p-0.5">
+            <div className="flex items-center gap-1 rounded-xl p-0.5" style={{ border: '1px solid rgba(196,198,212,0.4)' }}>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-kpmg-primary text-white' : 'text-kpmg-outline hover:bg-kpmg-surface-container'}`}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-navy-gradient text-white' : 'text-kpmg-outline hover:bg-kpmg-surface-container'}`}
                 aria-label="Grid view"
               >
                 <LayoutGrid size={14} />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-kpmg-primary text-white' : 'text-kpmg-outline hover:bg-kpmg-surface-container'}`}
+                className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-navy-gradient text-white' : 'text-kpmg-outline hover:bg-kpmg-surface-container'}`}
                 aria-label="List view"
               >
                 <List size={14} />
@@ -73,7 +77,7 @@ export default function CaseLibraryContent() {
 
         {/* Function filter chips */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-kpmg-outline font-body mr-1">Function:</span>
+          <span className="font-body text-kpmg-outline mr-1" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Function:</span>
           {FUNCTIONS.map(fn => (
             <button
               key={`lib-fn-${fn.id}`}

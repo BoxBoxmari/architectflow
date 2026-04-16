@@ -5,6 +5,7 @@ import ScenarioComparisonContent from './components/ScenarioComparisonContent';
 export default function ScenarioComparisonPage() {
   return (
     <AppLayout activeRoute="/scenario-comparison">
+      <main id="main-content" aria-label="Scenario Comparison">
       <div className="space-y-6 animate-fade-in">
         <div>
           <p className="text-xs font-semibold text-kpmg-outline tracking-widest uppercase mb-1 font-body" style={{ fontSize: '10px' }}>
@@ -19,6 +20,7 @@ export default function ScenarioComparisonPage() {
         </div>
         <ScenarioComparisonContent />
       </div>
+      </main>
     </AppLayout>
   );
 }

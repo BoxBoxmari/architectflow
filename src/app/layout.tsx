@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import { Manrope, DM_Sans } from 'next/font/google';
+import { Manrope, Inter } from 'next/font/google';
 
 import ToasterProvider from '@/components/ToasterProvider';
 import { ThemeProvider } from '@/context/ThemeContext';
@@ -13,7 +13,7 @@ const manrope = Manrope({
   display: 'swap',
 });
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
   variable: '--font-body',
@@ -37,7 +37,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${manrope.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
       <body className="bg-kpmg-background dark:bg-gray-950 font-body antialiased transition-colors duration-200">
         <ThemeProvider>
           {children}

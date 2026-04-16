@@ -6,14 +6,17 @@ export default function InsightBlock() {
   return (
     <div className="flex flex-col gap-4 h-full">
 
-      {/* Partner insight card */}
+      {/* Partner insight card — navy gradient per brand spec */}
       <div
-        className="rounded-xl p-6 flex-1"
-        style={{ background: 'linear-gradient(135deg, #00205F 0%, #00338D 100%)' }}
+        className="rounded-2xl p-6 flex-1"
+        style={{
+          background: 'linear-gradient(135deg, #00205F 0%, #00338D 100%)',
+          boxShadow: '0px 24px 48px rgba(0, 32, 95, 0.12)',
+        }}
       >
         <p
-          className="text-xs font-semibold text-white/50 tracking-widest uppercase font-body mb-3"
-          style={{ fontSize: '10px' }}
+          className="font-body text-white/50 mb-3"
+          style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
         >
           The Core Principle
         </p>
@@ -25,7 +28,7 @@ export default function InsightBlock() {
           DEAL-001 scans any data room. Change the corpus, keep the engine.
           That is why six cases reach all five functions.
         </p>
-        <div className="mt-5 pt-4 border-t border-white/15 grid grid-cols-2 gap-4">
+        <div className="mt-5 pt-4 grid grid-cols-2 gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.15)' }}>
           <div>
             <p className="text-xs text-white/50 font-body mb-0.5">Widest reach</p>
             <p className="text-sm font-semibold text-white font-body">CON-001 · 5 functions</p>
@@ -37,9 +40,15 @@ export default function InsightBlock() {
         </div>
       </div>
 
-      {/* Navigation prompt */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-5">
-        <p className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 tracking-widest uppercase font-body mb-3" style={{ fontSize: '10px' }}>
+      {/* Navigation prompt — Pure Paper card */}
+      <div
+        className="bg-white dark:bg-gray-800 rounded-2xl p-5 dark:border dark:border-gray-700"
+        style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+      >
+        <p
+          className="font-body text-kpmg-outline dark:text-gray-500 mb-3"
+          style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
+        >
           Continue the story
         </p>
         <div className="space-y-1">
@@ -49,7 +58,7 @@ export default function InsightBlock() {
               <ArrowRight size={14} />
             </span>
           </Link>
-          <div className="h-px bg-kpmg-outline-variant/30 dark:bg-gray-700" />
+          <div className="h-px" style={{ background: 'rgba(196,198,212,0.3)' }} />
           <Link href="/value-simulator">
             <span className="flex items-center justify-between w-full text-sm font-semibold text-kpmg-primary dark:text-blue-400 hover:text-kpmg-secondary dark:hover:text-blue-300 transition-colors font-body cursor-pointer py-2">
               Model the value case

@@ -5,6 +5,7 @@ import ValueSimulatorContent from './components/ValueSimulatorContent';
 export default function ValueSimulatorPage() {
   return (
     <AppLayout activeRoute="/value-simulator">
+      <main id="main-content" aria-label="Value Simulator">
       <div className="space-y-6 animate-fade-in">
         <div>
           <p className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 tracking-widest uppercase mb-1 font-body" style={{ fontSize: '10px' }}>
@@ -19,6 +20,7 @@ export default function ValueSimulatorPage() {
         </div>
         <ValueSimulatorContent />
       </div>
+      </main>
     </AppLayout>
   );
 }
