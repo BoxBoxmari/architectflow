@@ -10,7 +10,7 @@ const TECHNIQUE_COLORS: Record<string, string> = {
   'RAG + LLM Re-ranking': '#00205F',
   'RAG-based GenAI Drafting': '#006397',
   'Doc Parsing + LLM + Anomaly Flag': '#0F6E56',
-  'LLM Extraction + Template Gen': '#00B8A9',
+  'LLM Extraction + Template Gen': '#007A73',
   'LLM Clause Extraction + Risk Class': '#45004F',
   'Multi-doc Parsing + Risk Scoring': '#F39C12',
 };

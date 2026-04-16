@@ -86,7 +86,7 @@ export default function ExecutiveOverviewPage() {
                 <p className="text-sm text-kpmg-on-surface-variant dark:text-gray-400 font-body leading-snug mb-4">
                   Model the Faster × Deeper multiplier with transparent assumptions — adjust any input, see the return instantly.
                 </p>
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-kpmg-accent-faster font-body group-hover:gap-2.5 transition-all">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold font-body group-hover:gap-2.5 transition-all" style={{ color: '#007A73' }}>
                   Run the simulator <ArrowRight size={13} />
                 </span>
               </div>
