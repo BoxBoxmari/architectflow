@@ -170,9 +170,9 @@ export default function ArchitectureCanvas() {
           </div>
 
           <div className="p-4 overflow-x-auto">
-            <div className="flex gap-0 min-w-max">
+            <div className="flex gap-0 w-full">
               {/* Cases column */}
-              <div className="flex flex-col gap-3 w-44">
+              <div className="flex flex-col gap-3 flex-1 min-w-0">
                 <p
                   className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body mb-1"
                   style={{ fontSize: '10px' }}
@@ -240,7 +240,7 @@ export default function ArchitectureCanvas() {
               </div>
 
               {/* Functions column */}
-              <div className="flex flex-col gap-3 w-36">
+              <div className="flex flex-col gap-3 flex-1 min-w-0">
                 <p
                   className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body mb-1"
                   style={{ fontSize: '10px' }}
@@ -297,7 +297,7 @@ export default function ArchitectureCanvas() {
               </div>
 
               {/* Services column */}
-              <div className="flex flex-col gap-2 w-44">
+              <div className="flex flex-col gap-2 flex-1 min-w-0">
                 <p
                   className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body mb-1"
                   style={{ fontSize: '10px' }}
