@@ -21,7 +21,6 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   Scaled: { bg: '#E0E7FF', text: '#00205F' },
 };
 
-// Real maturity labels per case ID
 const CASE_MATURITY: Record<string, string> = {
   'TAX-001':  'SCALE',
   'KDC-001':  'SCALE',
@@ -29,7 +28,6 @@ const CASE_MATURITY: Record<string, string> = {
   'CONS-001': 'INSPIRE → APPLY',
 };
 
-// Real value labels per case ID
 const CASE_VALUE: Record<string, string> = {
   'TAX-001':  '~5 FTE',
   'KDC-001':  'Cost / Cycle',
@@ -37,7 +35,6 @@ const CASE_VALUE: Record<string, string> = {
   'CONS-001': 'New Revenue / Capability',
 };
 
-// Dynamically build VALUE_CHIPS from real data
 function buildValueChips(caseId: string): { label: string; value: string; color: string }[] {
   const maturity = CASE_MATURITY[caseId];
   const value    = CASE_VALUE[caseId];
@@ -50,10 +47,6 @@ function buildValueChips(caseId: string): { label: string; value: string; color:
   ];
 }
 
-// Maturity scale for filter ordering
-const MATURITY_LABELS: Record<string, string> = CASE_MATURITY;
-
-// Node position refs for Bezier connectors
 interface NodePos { top: number; height: number }
 
 interface ArchitectureCanvasProps {
@@ -77,7 +70,6 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
   const drawerCloseRef = useRef<HTMLButtonElement>(null);
   const lastFocusedCaseRef = useRef<HTMLButtonElement | null>(null);
 
-  // Refs for measuring node positions for Bezier connectors
   const caseNodeRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const fnNodeRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const svcNodeRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -101,13 +93,11 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
     return matchesSearch && matchesFunction && matchesScale;
   });
 
-  // Notify parent of live canvas state changes
   useEffect(() => {
     onStateChange?.({ selectedCase, activeFunction, searchQuery, filteredCases });
   }, [selectedCase, activeFunction, searchQuery, filteredCases.length]);
 
-  const activeCase =
-    selectedCase || null;
+  const activeCase = selectedCase || null;
 
   const activeFunctionIds = activeCase
     ? new Set(activeCase.linkedFunctions)
@@ -155,14 +145,12 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
     setLiveMessage('All filters and selections cleared.');
   }
 
-  // Auto-focus the drawer close button when drawer becomes visible
   useEffect(() => {
     if (drawerVisible && drawerCloseRef.current) {
       drawerCloseRef.current.focus();
     }
   }, [drawerVisible]);
 
-  // Measure node positions for Bezier connectors
   const measurePositions = useCallback(() => {
     if (!canvasRef.current || !caseColRef.current || !fnColRef.current || !svcColRef.current) return;
     const canvasRect = canvasRef.current.getBoundingClientRect();
@@ -210,7 +198,6 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
     measurePositions();
   }, [filteredCases.length, selectedCase?.id, measurePositions]);
 
-  // Build Bezier paths for Case→Function connectors
   const caseFnPaths: { path: string; caseId: string; fnId: string; active: boolean }[] = [];
   filteredCases.forEach((c) => {
     c.linkedFunctions.forEach((fnId) => {
@@ -230,7 +217,6 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
     });
   });
 
-  // Build Bezier paths for Function→Service connectors
   const fnSvcPaths: { path: string; fnId: string; svcId: string; active: boolean }[] = [];
   FUNCTIONS.forEach((fn) => {
     SERVICES.filter((s) => s.functionId === fn.id).forEach((svc) => {
@@ -253,48 +239,38 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
   return (
     <div className="flex flex-col gap-4">
       {/* ARIA live region */}
-      <div
-        role="status"
-        aria-live="assertive"
-        aria-atomic="true"
-        className="sr-only"
-      >
+      <div role="status" aria-live="assertive" aria-atomic="true" className="sr-only">
         {liveMessage}
       </div>
 
-      {/* Filter bar */}
+      {/* ── Filter bar ─────────────────────────────────────────────────────── */}
       <div
         role="search"
         aria-label="Filter AI cases"
         className="rounded-2xl px-5 py-3 flex items-center gap-3 flex-wrap"
-        style={{
-          background: '#FFFFFF',
-          boxShadow: '0px 24px 48px rgba(0,32,95,0.06)',
-        }}
+        style={{ background: '#FFFFFF', boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
       >
+        {/* Search */}
         <div className="relative w-full sm:flex-1 sm:min-w-40 sm:max-w-56">
-          <Search
-            size={13}
-            aria-hidden="true"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-kpmg-outline pointer-events-none"
-          />
+          <Search size={13} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#747683' }} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search cases or techniques..."
+            placeholder="Search cases or techniques…"
             aria-label="Search AI cases by name or technique"
-            className="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-kpmg-primary/15 placeholder:text-kpmg-outline transition-all font-body"
-            style={{ background: '#EBE7E7', color: '#1C1B1B' }}
+            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-offset-0 placeholder:text-kpmg-outline transition-all"
+            style={{ background: '#F0EDEC', color: '#1C1B1B', fontFamily: 'var(--font-body)', fontWeight: 500, letterSpacing: '0.01em' }}
           />
         </div>
+
+        {/* Function filter */}
         <div role="group" aria-label="Filter by function" className="flex items-center gap-2 flex-wrap">
           <span
-            className="font-body text-kpmg-outline"
-            style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
+            style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)' }}
             aria-hidden="true"
           >
-            Function:
+            Function
           </span>
           {FUNCTIONS.map((fn) => (
             <button
@@ -303,110 +279,103 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               aria-pressed={activeFunction === fn.id}
               aria-label={`Filter by ${fn.name} function${activeFunction === fn.id ? ' (active)' : ''}`}
               className={`kpmg-filter-chip ${activeFunction === fn.id ? 'active' : ''}`}
+              style={{ fontSize: '11px' }}
             >
               {fn.name}
             </button>
           ))}
         </div>
+
         {/* Maturity filter */}
         <div className="flex items-center gap-2">
           <span
-            className="font-body text-kpmg-outline"
-            style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
+            style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)' }}
             aria-hidden="true"
           >
-            Maturity:
+            Maturity
           </span>
           <button
             onClick={() => setScaleFilter(!scaleFilter)}
             aria-pressed={scaleFilter}
             aria-label={`Show only cases at SCALE maturity${scaleFilter ? ' (active)' : ''}`}
             className={`kpmg-filter-chip flex items-center gap-1 ${scaleFilter ? 'active' : ''}`}
+            style={{ fontSize: '11px' }}
           >
             <TrendingUp size={10} aria-hidden="true" />
             SCALE
           </button>
         </div>
+
         {(selectedCase || activeFunction || searchQuery || scaleFilter) && (
           <button
             onClick={reset}
             aria-label="Reset all filters and selection"
-            className="ml-auto flex items-center gap-1.5 text-xs text-kpmg-outline hover:text-kpmg-primary transition-colors font-body"
+            className="ml-auto flex items-center gap-1.5 transition-colors"
+            style={{ fontSize: '11px', color: '#747683', fontFamily: 'var(--font-body)', fontWeight: 500 }}
           >
-            <RotateCcw size={12} aria-hidden="true" />
+            <RotateCcw size={11} aria-hidden="true" />
             Reset
           </button>
         )}
       </div>
 
-      {/* Trace hint */}
+      {/* ── Trace hint ─────────────────────────────────────────────────────── */}
       {!isTracing && (
         <div className="flex items-center gap-2 px-1" aria-live="polite" aria-atomic="true">
-          <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster flex-shrink-0" aria-hidden="true" />
-          <p className="text-xs text-kpmg-on-surface font-body">
+          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#00B8A9' }} aria-hidden="true" />
+          <p style={{ fontSize: '11px', color: '#747683', fontFamily: 'var(--font-body)', fontWeight: 400 }}>
             Select a case to trace its architecture — which functions and services it reaches
           </p>
         </div>
       )}
       {isTracing && selectedCase && (
         <div className="flex items-center gap-2 px-1" aria-live="polite" aria-atomic="true">
-          <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster flex-shrink-0 animate-pulse" aria-hidden="true" />
-          <p className="text-xs font-semibold text-kpmg-primary font-body" aria-hidden="true">
-            Tracing <span className="font-bold">{selectedCase.code}</span> — {activeFunctionIds.size} functions · {activeServiceIds.size} services reached
+          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse" style={{ backgroundColor: '#00B8A9' }} aria-hidden="true" />
+          <p style={{ fontSize: '11px', fontWeight: 600, color: '#00205F', fontFamily: 'var(--font-body)' }} aria-hidden="true">
+            Tracing <span style={{ fontWeight: 700 }}>{selectedCase.code}</span> — {activeFunctionIds.size} functions · {activeServiceIds.size} services reached
           </p>
         </div>
       )}
 
-      {/* Canvas + Drawer */}
+      {/* ── Canvas + Drawer ─────────────────────────────────────────────────── */}
       <div className="flex flex-col lg:flex-row gap-4 min-h-0">
+
         {/* Canvas */}
         <div
           className="flex-1 min-w-0 rounded-2xl overflow-hidden transition-all duration-300"
           role="region"
           aria-label="Architecture canvas — AI Cases, Business Functions, and Service Solutions"
-          style={{
-            background: '#FCF9F8',
-            boxShadow: '0px 24px 48px rgba(0,32,95,0.06)',
-          }}
+          style={{ background: '#FCF9F8', boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
         >
           {/* Column header bar */}
           <div
-            className="px-5 py-3 flex items-center gap-4"
-            style={{ background: '#F0EDEC' }}
+            className="px-5 py-2.5 flex items-center gap-4 border-b"
+            style={{ background: '#F0EDEC', borderColor: 'rgba(196,198,212,0.3)' }}
             aria-hidden="true"
           >
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-kpmg-accent-faster" />
-              <span
-                className="font-body text-kpmg-on-surface-variant"
-                style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
-              >
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#00B8A9' }} />
+              <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444652', fontFamily: 'var(--font-body)' }}>
                 AI Cases ({filteredCases.length})
               </span>
             </div>
-            <div className="flex-1 h-px" style={{ background: 'rgba(196,198,212,0.3)' }} />
+            <div className="flex-1 h-px" style={{ background: 'rgba(196,198,212,0.4)' }} />
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-kpmg-primary" />
-              <span
-                className="font-body text-kpmg-on-surface-variant"
-                style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
-              >
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#00205F' }} />
+              <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444652', fontFamily: 'var(--font-body)' }}>
                 Business Functions
               </span>
             </div>
-            <div className="flex-1 h-px" style={{ background: 'rgba(196,198,212,0.3)' }} />
+            <div className="flex-1 h-px" style={{ background: 'rgba(196,198,212,0.4)' }} />
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-kpmg-outline-variant" />
-              <span
-                className="font-body text-kpmg-on-surface-variant"
-                style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
-              >
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#C4C6D4' }} />
+              <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444652', fontFamily: 'var(--font-body)' }}>
                 Service Solutions
               </span>
             </div>
           </div>
 
-          {/* Main canvas area with SVG overlay */}
+          {/* Main canvas area */}
           <div className="p-4 overflow-x-auto">
             <div ref={canvasRef} className="relative flex gap-0 w-full" style={{ minHeight: 320 }}>
               {/* SVG Bezier connector overlay */}
@@ -421,8 +390,8 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                     d={path}
                     fill="none"
                     stroke={active && isTracing ? '#00B8A9' : '#C4C6D4'}
-                    strokeWidth={active && isTracing ? 1.5 : 1}
-                    strokeOpacity={isTracing ? (active ? 0.85 : 0.15) : 0.35}
+                    strokeWidth={active && isTracing ? 1.5 : 0.75}
+                    strokeOpacity={isTracing ? (active ? 0.9 : 0.12) : 0.3}
                     style={{ transition: 'stroke 300ms ease, stroke-opacity 300ms ease, stroke-width 300ms ease' }}
                   />
                 ))}
@@ -432,24 +401,23 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                     d={path}
                     fill="none"
                     stroke={active && isTracing ? '#006397' : '#C4C6D4'}
-                    strokeWidth={active && isTracing ? 1.5 : 1}
-                    strokeOpacity={isTracing ? (active ? 0.85 : 0.15) : 0.35}
+                    strokeWidth={active && isTracing ? 1.5 : 0.75}
+                    strokeOpacity={isTracing ? (active ? 0.9 : 0.12) : 0.3}
                     style={{ transition: 'stroke 300ms ease, stroke-opacity 300ms ease, stroke-width 300ms ease' }}
                   />
                 ))}
               </svg>
 
-              {/* Cases column */}
+              {/* ── Cases column ─────────────────────────────────────────── */}
               <div
                 ref={caseColRef}
-                className="flex flex-col gap-3 flex-1 min-w-0 rounded-xl px-3 py-3"
-                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1 }}
+                className="flex flex-col gap-2.5 flex-1 min-w-0 rounded-xl px-3 py-3"
+                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)' }}
                 role="list"
                 aria-label="AI Cases"
               >
                 <p
-                  className="text-xs font-semibold text-kpmg-on-surface-variant uppercase tracking-widest font-body mb-1"
-                  style={{ fontSize: '10px' }}
+                  style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', marginBottom: '2px' }}
                   aria-hidden="true"
                 >
                   AI Cases
@@ -470,43 +438,59 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                       style={{
                         transition: 'border-color 250ms ease, background-color 250ms ease, box-shadow 250ms ease, opacity 200ms ease, transform 200ms ease',
                         transform: isSelecting ? 'scale(0.97)' : isSelected ? 'scale(1.01)' : 'scale(1)',
-                        opacity: dimmed ? 0.45 : 1,
-                        background: isSelected ? '#FFFFFF' : '#FCF9F8',
+                        opacity: dimmed ? 0.38 : 1,
+                        background: isSelected ? '#FFFFFF' : '#FAFAFA',
                         boxShadow: isSelected
-                          ? '0px 0px 0px 2px #00B8A9, 0px 24px 48px rgba(0,32,95,0.10)'
-                          : 'none',
-                        borderRadius: '12px',
+                          ? '0px 0px 0px 1.5px #00B8A9, 0px 8px 24px rgba(0,32,95,0.10)'
+                          : '0px 0px 0px 1px rgba(196,198,212,0.35)',
+                        borderRadius: '10px',
                         border: 'none',
-                        padding: '12px',
+                        padding: '11px 12px',
                         width: '100%',
                         textAlign: 'left',
                         cursor: 'pointer',
                       }}
                       className="focus:outline-none focus:ring-2 focus:ring-kpmg-accent-faster focus:ring-offset-1"
                     >
-                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                      {/* Case ID row */}
+                      <div className="flex items-start justify-between gap-2 mb-2">
                         <span
-                          className="font-body flex-shrink-0"
-                          style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#747683' }}
+                          style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', flexShrink: 0, paddingTop: '2px' }}
                         >
                           {c.code}
                         </span>
+                        {/* Technique badge — pill, compact */}
                         <span
-                          className="kpmg-badge text-xs flex-shrink-0"
-                          style={{ backgroundColor: `${techColor}15`, color: techColor, whiteSpace: 'normal', wordBreak: 'break-word', textAlign: 'center', maxWidth: '110px', lineHeight: '1.3', display: 'inline-block', padding: '3px 8px', borderRadius: '999px' }}
+                          style={{
+                            backgroundColor: `${techColor}12`,
+                            color: techColor,
+                            fontSize: '9px',
+                            fontWeight: 600,
+                            letterSpacing: '0.01em',
+                            fontFamily: 'var(--font-body)',
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            textAlign: 'center',
+                            maxWidth: '108px',
+                            lineHeight: '1.35',
+                            display: 'inline-block',
+                            padding: '3px 7px',
+                            borderRadius: '6px',
+                            border: `1px solid ${techColor}22`,
+                          }}
                           aria-hidden="true"
                         >
                           {c.tech}
                         </span>
                       </div>
-                      <p className="text-sm font-semibold text-kpmg-on-surface font-body leading-snug">
+                      {/* Case title */}
+                      <p style={{ fontSize: '12px', fontWeight: 600, color: '#1C1B1B', fontFamily: 'var(--font-display)', lineHeight: '1.4', letterSpacing: '-0.01em' }}>
                         {c.title}
                       </p>
                       {isSelected && (
-                        <div className="mt-2 flex items-center gap-1">
+                        <div className="mt-2">
                           <span
-                            className="inline-block rounded-full px-2 py-0.5 font-body"
-                            style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', background: '#00B8A920', color: '#00B8A9' }}
+                            style={{ display: 'inline-block', borderRadius: '4px', padding: '2px 7px', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', background: 'rgba(0,184,169,0.1)', color: '#00B8A9', fontFamily: 'var(--font-body)' }}
                           >
                             ✓ Tracing
                           </span>
@@ -520,17 +504,16 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               {/* Gap for SVG connectors */}
               <div className="w-10 flex-shrink-0" aria-hidden="true" />
 
-              {/* Functions column */}
+              {/* ── Functions column ─────────────────────────────────────── */}
               <div
                 ref={fnColRef}
-                className="flex flex-col gap-3 flex-1 min-w-0 rounded-xl px-3 py-3"
-                style={{ background: '#F0EDEC', position: 'relative', zIndex: 1 }}
+                className="flex flex-col gap-2.5 flex-1 min-w-0 rounded-xl px-3 py-3"
+                style={{ background: '#F6F3F2', position: 'relative', zIndex: 1 }}
                 role="list"
                 aria-label="Functions"
               >
                 <p
-                  className="text-xs font-semibold text-kpmg-on-surface-variant uppercase tracking-widest font-body mb-1"
-                  style={{ fontSize: '10px' }}
+                  style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', marginBottom: '2px' }}
                   aria-hidden="true"
                 >
                   Functions
@@ -553,36 +536,33 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                       }}
                       style={{
                         transition: 'opacity 350ms ease, box-shadow 300ms ease, background-color 300ms ease',
-                        opacity: isTracing ? (isActive ? 1 : 0.25) : 1,
+                        opacity: isTracing ? (isActive ? 1 : 0.22) : 1,
                         background: isActive && isTracing ? '#FFFFFF' : '#EBE7E7',
-                        boxShadow: isActive && isTracing ? '0px 4px 16px rgba(0,32,95,0.08)' : 'none',
-                        borderRadius: '12px',
-                        padding: '12px',
+                        boxShadow: isActive && isTracing
+                          ? `0px 0px 0px 1.5px ${fn.color ?? '#747683'}40, 0px 4px 12px rgba(0,32,95,0.07)`
+                          : '0px 0px 0px 1px rgba(196,198,212,0.25)',
+                        borderRadius: '10px',
+                        padding: '11px 12px',
                         cursor: 'default',
                       }}
                       className="focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1"
                     >
-                      <div
-                        className="w-2 h-2 rounded-full mb-2"
-                        style={{ backgroundColor: fn.color ?? '#747683' }}
-                        aria-hidden="true"
-                      />
-                      <p
-                        className="font-body break-words"
-                        style={{ fontSize: '13px', fontWeight: 600, color: '#1C1B1B' }}
-                      >
-                        {fn.name}
-                      </p>
-                      <p
-                        className="font-body mt-0.5"
-                        style={{ fontSize: '11px', color: '#747683' }}
-                      >
-                        {caseCount} cases
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <div
+                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: fn.color ?? '#747683' }}
+                          aria-hidden="true"
+                        />
+                        <p style={{ fontSize: '12px', fontWeight: 600, color: '#1C1B1B', fontFamily: 'var(--font-display)', letterSpacing: '-0.01em', lineHeight: '1.3' }}>
+                          {fn.name}
+                        </p>
+                      </div>
+                      <p style={{ fontSize: '10px', color: '#747683', fontFamily: 'var(--font-body)', fontWeight: 400, paddingLeft: '16px' }}>
+                        {caseCount} {caseCount === 1 ? 'case' : 'cases'}
                       </p>
                       {isTracing && isActive && (
                         <span
-                          className="inline-block mt-1.5 font-body"
-                          style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#00205F' }}
+                          style={{ display: 'inline-block', marginTop: '6px', marginLeft: '16px', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#00205F', fontFamily: 'var(--font-body)' }}
                         >
                           ✓ Reached
                         </span>
@@ -595,17 +575,16 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               {/* Gap for SVG connectors */}
               <div className="w-10 flex-shrink-0" aria-hidden="true" />
 
-              {/* Services column */}
+              {/* ── Services column ──────────────────────────────────────── */}
               <div
                 ref={svcColRef}
-                className="flex flex-col gap-2 flex-1 min-w-0 rounded-xl px-3 py-3"
-                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1 }}
+                className="flex flex-col gap-1.5 flex-1 min-w-0 rounded-xl px-3 py-3"
+                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)' }}
                 role="list"
                 aria-label="Services"
               >
                 <p
-                  className="text-xs font-semibold text-kpmg-on-surface-variant uppercase tracking-widest font-body mb-1"
-                  style={{ fontSize: '10px' }}
+                  style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', marginBottom: '2px' }}
                   aria-hidden="true"
                 >
                   Services
@@ -622,25 +601,18 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                       aria-label={`${svc.name} service${parentFn ? `, under ${parentFn.name}` : ''}.${isTracing ? (isActive ? ' Reached by selected case.' : ' Not reached by selected case.') : ''}`}
                       style={{
                         transition: 'opacity 350ms ease 50ms, box-shadow 300ms ease, background-color 300ms ease',
-                        opacity: isTracing ? (isActive ? 1 : 0.18) : 1,
-                        background: isActive && isTracing ? '#F0EDEC' : '#FCF9F8',
-                        boxShadow: isActive && isTracing ? '0px 2px 8px rgba(0,32,95,0.06)' : 'none',
-                        borderRadius: '8px',
-                        padding: '8px 12px',
+                        opacity: isTracing ? (isActive ? 1 : 0.15) : 1,
+                        background: isActive && isTracing ? '#F0EDEC' : 'transparent',
+                        boxShadow: isActive && isTracing ? '0px 1px 4px rgba(0,32,95,0.06)' : 'none',
+                        borderRadius: '7px',
+                        padding: '6px 10px',
                         cursor: 'default',
+                        borderLeft: isActive && isTracing && parentFn ? `2px solid ${parentFn.color ?? '#747683'}` : '2px solid transparent',
                       }}
                       className="focus:outline-none focus:ring-2 focus:ring-kpmg-secondary focus:ring-offset-1"
                     >
-                      {isActive && isTracing && parentFn && (
-                        <span
-                          className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 mb-0.5 align-middle"
-                          style={{ backgroundColor: parentFn.color ?? '#747683' }}
-                          aria-hidden="true"
-                        />
-                      )}
                       <span
-                        className="font-body"
-                        style={{ fontSize: '12px', fontWeight: 500, color: '#1C1B1B' }}
+                        style={{ fontSize: '11px', fontWeight: isActive && isTracing ? 500 : 400, color: isActive && isTracing ? '#1C1B1B' : '#747683', fontFamily: 'var(--font-body)', lineHeight: '1.35', display: 'block' }}
                       >
                         {svc.name}
                       </span>
@@ -651,18 +623,15 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
             </div>
           </div>
 
-          {/* Legend */}
+          {/* ── Legend ─────────────────────────────────────────────────────── */}
           <div
-            className="px-5 py-3 flex items-center gap-3 flex-wrap"
-            style={{ background: '#F0EDEC' }}
+            className="px-5 py-3 flex items-center gap-3 flex-wrap border-t"
+            style={{ background: '#F6F3F2', borderColor: 'rgba(196,198,212,0.25)' }}
             aria-label="AI Technique legend"
             role="region"
           >
-            <span
-              className="font-body text-kpmg-on-surface-variant"
-              style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
-            >
-              AI Technique:
+            <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)' }}>
+              AI Technique
             </span>
             {Object.entries(TECHNIQUE_COLORS).map(([tech, color]) => (
               <div key={`legend-tech-${tech}`} className="flex items-center gap-1.5">
@@ -671,13 +640,13 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                   style={{ backgroundColor: color }}
                   aria-hidden="true"
                 />
-                <span className="text-xs text-kpmg-on-surface-variant font-body">{tech}</span>
+                <span style={{ fontSize: '10px', color: '#444652', fontFamily: 'var(--font-body)', fontWeight: 400 }}>{tech}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Detail Drawer */}
+        {/* ── Detail Drawer ───────────────────────────────────────────────── */}
         {selectedCase && (
           <div
             key={selectedCase.id}
@@ -690,8 +659,9 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               transform: drawerVisible ? 'translateX(0)' : 'translateX(24px)',
               transition: 'opacity 250ms ease, transform 250ms ease',
               maxHeight: 'calc(100vh - 160px)',
-              boxShadow: '0px 24px 48px rgba(0, 32, 95, 0.10)',
+              boxShadow: '0px 24px 48px rgba(0,32,95,0.10)',
               background: '#FFFFFF',
+              border: '1px solid rgba(196,198,212,0.3)',
             }}
             className="w-full lg:w-80 lg:flex-shrink-0 rounded-2xl overflow-y-auto scrollbar-thin"
           >
@@ -702,12 +672,11 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
             >
               <div>
                 <span
-                  className="font-body"
-                  style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#747683' }}
+                  style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)' }}
                 >
                   {selectedCase.code}
                 </span>
-                <h3 className="font-display text-base font-bold text-kpmg-on-surface mt-0.5 leading-snug">
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 700, color: '#1C1B1B', marginTop: '3px', lineHeight: '1.3', letterSpacing: '-0.02em' }}>
                   {selectedCase.title}
                 </h3>
               </div>
@@ -724,19 +693,20 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                 className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-kpmg-surface-container transition-colors flex-shrink-0 ml-2 focus:outline-none focus:ring-2 focus:ring-kpmg-primary"
                 aria-label={`Close detail panel for ${selectedCase.title}`}
               >
-                <X size={14} className="text-kpmg-outline" aria-hidden="true" />
+                <X size={14} style={{ color: '#747683' }} aria-hidden="true" />
               </button>
             </div>
 
             <div className="p-5 space-y-5">
               {/* Status + Technique badges */}
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span
                     className="kpmg-badge"
                     style={{
                       backgroundColor: STATUS_COLORS[selectedCase.status]?.bg ?? '#F0EDEC',
                       color: STATUS_COLORS[selectedCase.status]?.text ?? '#747683',
+                      fontSize: '10px',
                     }}
                     aria-label={`Status: ${selectedCase.status}`}
                   >
@@ -745,24 +715,23 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                   <span
                     className="kpmg-badge"
                     style={{
-                      backgroundColor: `${TECHNIQUE_COLORS[selectedCase.tech] || '#747683'}15`,
+                      backgroundColor: `${TECHNIQUE_COLORS[selectedCase.tech] || '#747683'}12`,
                       color: TECHNIQUE_COLORS[selectedCase.tech] || '#747683',
+                      border: `1px solid ${TECHNIQUE_COLORS[selectedCase.tech] || '#747683'}22`,
+                      fontSize: '10px',
                     }}
                     aria-label={`Technique: ${selectedCase.tech}`}
                   >
                     {selectedCase.tech}
                   </span>
                 </div>
-                <p className="text-xs text-kpmg-outline font-body mt-1">{selectedCase.source}</p>
+                <p style={{ fontSize: '11px', color: '#747683', fontFamily: 'var(--font-body)' }}>{selectedCase.source}</p>
               </div>
 
               {/* Value Chips */}
               {chips.length > 0 && (
                 <div>
-                  <p
-                    className="font-body mb-2"
-                    style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#747683' }}
-                  >
+                  <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', marginBottom: '8px' }}>
                     Portfolio Value
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -770,18 +739,12 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                       <div
                         key={`chip-${i}`}
                         className="flex flex-col rounded-xl px-3 py-2"
-                        style={{ background: `${chip.color}10`, minWidth: '72px' }}
+                        style={{ background: `${chip.color}0D`, border: `1px solid ${chip.color}20`, minWidth: '72px' }}
                       >
-                        <span
-                          className="font-body"
-                          style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: chip.color }}
-                        >
+                        <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: chip.color, fontFamily: 'var(--font-body)' }}>
                           {chip.label}
                         </span>
-                        <span
-                          className="font-display font-bold mt-0.5"
-                          style={{ fontSize: '13px', color: chip.color }}
-                        >
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: chip.color, fontFamily: 'var(--font-display)', marginTop: '2px', letterSpacing: '-0.01em' }}>
                           {chip.value}
                         </span>
                       </div>
@@ -793,35 +756,29 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               {/* Foundation Reach */}
               <div
                 className="p-3 rounded-xl"
-                style={{ background: '#00B8A908', border: '1px solid rgba(0,184,169,0.2)' }}
+                style={{ background: 'rgba(0,184,169,0.05)', border: '1px solid rgba(0,184,169,0.18)' }}
               >
-                <p
-                  className="font-body mb-1.5"
-                  style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#00B8A9' }}
-                >
+                <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#00B8A9', fontFamily: 'var(--font-body)', marginBottom: '6px' }}>
                   Foundation Reach
                 </p>
-                <p className="text-sm font-bold text-kpmg-on-surface font-display">
+                <p style={{ fontSize: '14px', fontWeight: 700, color: '#1C1B1B', fontFamily: 'var(--font-display)', letterSpacing: '-0.01em' }}>
                   {selectedCase.linkedFunctions.length} functions · {selectedCase.linkedServices.length} services
                 </p>
-                <p className="text-xs text-kpmg-on-surface-variant font-body mt-1 leading-snug">
+                <p style={{ fontSize: '11px', color: '#747683', fontFamily: 'var(--font-body)', marginTop: '4px', lineHeight: '1.45' }}>
                   One architecture pattern — reused across all highlighted functions
                 </p>
               </div>
 
               {/* Key Value Metrics */}
               <div>
-                <p
-                  className="font-body mb-2"
-                  style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#747683' }}
-                >
+                <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', marginBottom: '8px' }}>
                   Key Value Metrics
                 </p>
                 <ul className="space-y-1.5" aria-label="Key value metrics">
                   {selectedCase.metrics.map((m, i) => (
-                    <li key={`dm-${selectedCase.id}-${i}`} className="flex items-start gap-1.5">
-                      <span className="w-1 h-1 rounded-full bg-kpmg-primary mt-1.5 flex-shrink-0" aria-hidden="true" />
-                      <span className="text-xs text-kpmg-on-surface-variant font-body">{m}</span>
+                    <li key={`dm-${selectedCase.id}-${i}`} className="flex items-start gap-2">
+                      <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: '#00205F', marginTop: '5px' }} aria-hidden="true" />
+                      <span style={{ fontSize: '11px', color: '#444652', fontFamily: 'var(--font-body)', lineHeight: '1.5' }}>{m}</span>
                     </li>
                   ))}
                 </ul>
@@ -829,40 +786,30 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
 
               {/* Reaches */}
               <div>
-                <p
-                  className="font-body mb-2"
-                  style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#747683' }}
-                >
+                <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', marginBottom: '8px' }}>
                   Reaches
                 </p>
                 <div className="space-y-2" role="list" aria-label="Reached functions and services">
                   {FUNCTIONS.filter((fn) => selectedCase.linkedFunctions.includes(fn.id)).map((fn) => {
                     const fnSvcs = SERVICES.filter(
-                      (s) =>
-                        s.functionId === fn.id &&
-                        selectedCase.linkedServices.includes(s.id),
+                      (s) => s.functionId === fn.id && selectedCase.linkedServices.includes(s.id),
                     );
                     return (
                       <div
                         key={`reach-fn-${fn.id}`}
                         role="listitem"
-                        className="p-2 rounded-lg"
-                        style={{ background: '#F0EDEC' }}
+                        className="p-2.5 rounded-lg"
+                        style={{ background: '#F6F3F2', borderLeft: `2px solid ${fn.color ?? '#747683'}` }}
                       >
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <span
-                            className="w-1.5 h-1.5 rounded-full"
-                            style={{ backgroundColor: fn.color ?? '#747683' }}
-                            aria-hidden="true"
-                          />
-                          <span className="text-xs font-semibold text-kpmg-on-surface font-body">
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <span style={{ fontSize: '11px', fontWeight: 600, color: '#1C1B1B', fontFamily: 'var(--font-body)' }}>
                             {fn.name}
                           </span>
                         </div>
                         {fnSvcs.map((svc) => (
                           <p
                             key={`reach-svc-${svc.id}`}
-                            className="text-xs text-kpmg-outline font-body ml-3"
+                            style={{ fontSize: '10px', color: '#747683', fontFamily: 'var(--font-body)', paddingLeft: '4px', lineHeight: '1.5' }}
                           >
                             → {svc.name}
                           </p>
@@ -875,31 +822,28 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
 
               {/* Partner Insight */}
               <div
-                className="p-3 rounded-xl"
-                style={{ background: '#00205F08', border: '1px solid rgba(0,32,95,0.12)' }}
+                className="p-3.5 rounded-xl"
+                style={{ background: 'rgba(0,32,95,0.04)', border: '1px solid rgba(0,32,95,0.10)' }}
               >
-                <p
-                  className="font-body mb-1.5"
-                  style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#00205F' }}
-                >
+                <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#00205F', fontFamily: 'var(--font-body)', marginBottom: '6px' }}>
                   Partner Insight
                 </p>
-                <p className="text-xs text-kpmg-on-surface-variant font-body leading-relaxed">
+                <p style={{ fontSize: '11px', color: '#444652', fontFamily: 'var(--font-body)', lineHeight: '1.6' }}>
                   {selectedCase.insight}
                 </p>
               </div>
 
               {/* CTAs */}
-              <div className="pt-2 space-y-2">
+              <div className="pt-1 space-y-2">
                 <Link href="/value-simulator">
-                  <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1">
+                  <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1" style={{ display: 'flex' }}>
                     Model the Value
                     <ChevronRight size={13} aria-hidden="true" />
                   </span>
                 </Link>
                 <button
-                  className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold font-body transition-colors focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1"
-                  style={{ background: '#F0EDEC', color: '#00205F' }}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 transition-colors focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1"
+                  style={{ background: '#F0EDEC', color: '#00205F', fontSize: '12px', fontWeight: 600, fontFamily: 'var(--font-body)' }}
                   onClick={() => window.open('mailto:ai-innovation@kpmg.com?subject=AI Architecture Inquiry: ' + selectedCase.code, '_blank')}
                   aria-label={`Contact AI Innovation team about ${selectedCase.code}`}
                 >
