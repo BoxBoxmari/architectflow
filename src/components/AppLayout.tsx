@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Sidebar from './Sidebar';
@@ -21,9 +21,15 @@ export default function AppLayout({ children, activeRoute }: AppLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const pathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
 
-  const variants = prefersReducedMotion ? reducedPageVariants : pageVariants;
-  const transition = prefersReducedMotion ? reducedPageTransition : pageTransition;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Use default (non-reduced) variants until mounted on client to avoid hydration mismatch
+  const variants = mounted && prefersReducedMotion ? reducedPageVariants : pageVariants;
+  const transition = mounted && prefersReducedMotion ? reducedPageTransition : pageTransition;
 
   return (
     /* Paper on Stone: main canvas is #FCF9F8 (Base Stone) */
