@@ -10,8 +10,8 @@ module.exports = {
     extend: {
       fontFamily: {
         display: ['Manrope', 'sans-serif'],
-        body: ['DM Sans', 'sans-serif'],
-        sans: ['DM Sans', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
       },
       colors: {
         kpmg: {
@@ -40,10 +40,16 @@ module.exports = {
         '3xl': '20px',
       },
       boxShadow: {
-        'card': '0 1px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(196, 198, 212, 0.3)',
-        'card-hover': '0 4px 16px rgba(0, 32, 95, 0.10)',
-        'drawer': '-4px 0 24px rgba(0, 0, 0, 0.08)',
-        'elevated': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'ghost': '0px 24px 48px rgba(0, 32, 95, 0.06)',
+        'card': '0px 1px 3px rgba(0, 32, 95, 0.04), 0px 0px 0px 1px rgba(196, 198, 212, 0.25)',
+        'card-hover': '0px 8px 24px rgba(0, 32, 95, 0.10)',
+        'drawer': '-4px 0 32px rgba(0, 32, 95, 0.08)',
+        'elevated': '0px 2px 8px rgba(0, 32, 95, 0.06)',
+        'overlay': '0px 24px 48px rgba(0, 32, 95, 0.12)',
+      },
+      backgroundImage: {
+        'navy-gradient': 'linear-gradient(135deg, #00205F 0%, #00338D 100%)',
+        'navy-gradient-subtle': 'linear-gradient(135deg, #00205F 0%, #003580 100%)',
       },
       animation: {
         'fade-in': 'fadeIn 0.2s ease-out',
@@ -72,7 +78,7 @@ module.exports = {
         caseSelect: {
           '0%': { boxShadow: '0 0 0 0 rgba(0, 184, 169, 0.4)' },
           '60%': { boxShadow: '0 0 0 6px rgba(0, 184, 169, 0)' },
-          '100%': { boxShadow: '0 4px 16px rgba(0, 32, 95, 0.10)' },
+          '100%': { boxShadow: '0px 8px 24px rgba(0, 32, 95, 0.10)' },
         },
       },
     },

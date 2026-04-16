@@ -32,7 +32,10 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
 
 export default function AdoptionChart() {
   return (
-    <div className="bg-white rounded-xl shadow-card p-6">
+    <div
+      className="bg-white rounded-2xl p-6"
+      style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+    >
       <div className="flex items-center justify-between mb-5">
         <div>
           <h2 className="font-display text-base font-bold text-kpmg-on-surface">Adoption Trajectory</h2>

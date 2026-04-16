@@ -14,12 +14,12 @@ export default function ExecutiveOverviewPage() {
         {/* ── Hero header ─────────────────────────────────────────────────── */}
         <div className="max-w-2xl">
           <p
-            className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 tracking-widest uppercase mb-3 font-body"
-            style={{ fontSize: '10px' }}
+            className="font-body text-kpmg-outline dark:text-gray-500 mb-3"
+            style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
           >
             KPMG Vietnam &amp; Cambodia · Partner Briefing
           </p>
-          <h1 className="font-display text-4xl font-extrabold text-kpmg-on-surface dark:text-gray-100 leading-tight mb-4">
+          <h1 className="font-display text-4xl font-extrabold text-kpmg-on-surface dark:text-gray-100 leading-tight mb-4" style={{ letterSpacing: '-0.02em' }}>
             One AI Foundation.<br />Every Function.
           </h1>
           <p className="text-base text-kpmg-on-surface-variant dark:text-gray-400 font-body leading-relaxed">
@@ -33,22 +33,23 @@ export default function ExecutiveOverviewPage() {
         {/* ── Two core stories ────────────────────────────────────────────── */}
         <div>
           <p
-            className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 tracking-widest uppercase mb-4 font-body"
-            style={{ fontSize: '10px' }}
+            className="font-body text-kpmg-outline dark:text-gray-500 mb-4"
+            style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
           >
             Two stories to explore
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
 
+            {/* Pure Paper card on Stone canvas — natural lift via shadow */}
             <Link href="/ai-architecture-explorer">
-              <div className="group p-6 rounded-xl border-2 border-kpmg-outline-variant/40 dark:border-gray-700 hover:border-kpmg-primary dark:hover:border-blue-500 bg-white dark:bg-gray-800 hover:shadow-card-hover transition-all duration-200 cursor-pointer h-full">
+              <div className="group p-6 rounded-2xl bg-white dark:bg-gray-800 hover:shadow-card-hover transition-all duration-200 cursor-pointer h-full" style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-kpmg-primary/8 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,32,95,0.06)' }}>
                     <Network size={20} className="text-kpmg-primary dark:text-blue-400" />
                   </div>
                   <span
-                    className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body"
-                    style={{ fontSize: '10px' }}
+                    className="font-body text-kpmg-outline dark:text-gray-500"
+                    style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
                   >
                     Architecture
                   </span>
@@ -66,14 +67,14 @@ export default function ExecutiveOverviewPage() {
             </Link>
 
             <Link href="/value-simulator">
-              <div className="group p-6 rounded-xl border-2 border-kpmg-outline-variant/40 dark:border-gray-700 hover:border-kpmg-accent-faster bg-white dark:bg-gray-800 hover:shadow-card-hover transition-all duration-200 cursor-pointer h-full">
+              <div className="group p-6 rounded-2xl bg-white dark:bg-gray-800 hover:shadow-card-hover transition-all duration-200 cursor-pointer h-full" style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-kpmg-accent-faster/10 dark:bg-teal-900/30 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,184,169,0.08)' }}>
                     <Calculator size={20} className="text-kpmg-accent-faster" />
                   </div>
                   <span
-                    className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body"
-                    style={{ fontSize: '10px' }}
+                    className="font-body text-kpmg-outline dark:text-gray-500"
+                    style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
                   >
                     Value
                   </span>
@@ -97,7 +98,7 @@ export default function ExecutiveOverviewPage() {
         <div>
           <div className="mb-5">
             <h2 className="font-display text-lg font-bold text-kpmg-on-surface dark:text-gray-100">Portfolio at a Glance</h2>
-            <p className="text-xs text-kpmg-outline dark:text-gray-500 mt-1 font-body">
+            <p className="font-body text-kpmg-outline dark:text-gray-500 mt-1" style={{ fontSize: '11px' }}>
               Illustrative executive view · Curated sample portfolio
             </p>
           </div>
@@ -108,7 +109,7 @@ export default function ExecutiveOverviewPage() {
         <div>
           <div className="mb-5">
             <h2 className="font-display text-lg font-bold text-kpmg-on-surface dark:text-gray-100">Cross-Function Coverage</h2>
-            <p className="text-xs text-kpmg-outline dark:text-gray-500 mt-1 font-body">
+            <p className="font-body text-kpmg-outline dark:text-gray-500 mt-1" style={{ fontSize: '11px' }}>
               How many AI cases reach each function — and which ones
             </p>
           </div>

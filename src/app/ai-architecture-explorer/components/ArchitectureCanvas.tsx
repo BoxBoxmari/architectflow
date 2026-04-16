@@ -90,7 +90,8 @@ export default function ArchitectureCanvas() {
       <div
         role="search"
         aria-label="Filter AI cases"
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 px-5 py-3 flex items-center gap-3 flex-wrap"
+        className="bg-white dark:bg-gray-800 rounded-2xl px-5 py-3 flex items-center gap-3 flex-wrap dark:border dark:border-gray-700"
+        style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
       >
         <div className="relative w-full sm:flex-1 sm:min-w-40 sm:max-w-56">
           <Search
@@ -104,11 +105,12 @@ export default function ArchitectureCanvas() {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search cases or techniques..."
             aria-label="Search AI cases by name or technique"
-            className="w-full pl-8 pr-3 py-1.5 text-sm bg-kpmg-surface-container dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-500 rounded-lg border border-transparent focus:border-kpmg-outline-variant dark:focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 placeholder:text-kpmg-outline transition-all font-body"
+            className="w-full pl-8 pr-3 py-1.5 text-sm bg-kpmg-surface-container dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-500 rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-kpmg-primary/15 placeholder:text-kpmg-outline transition-all font-body"
+            style={{ borderBottom: '1.5px solid #C4C6D4' }}
           />
         </div>
         <div role="group" aria-label="Filter by function" className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 font-body" aria-hidden="true">Filter:</span>
+          <span className="font-body text-kpmg-outline dark:text-gray-500" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }} aria-hidden="true">Filter:</span>
           {FUNCTIONS.map((fn) => (
             <button
               key={`filter-fn-${fn.id}`}
@@ -153,26 +155,26 @@ export default function ArchitectureCanvas() {
 
       {/* Canvas + Drawer */}
       <div className="flex flex-col lg:flex-row gap-4 min-h-0">
-        {/* Canvas */}
-        <div className="flex-1 min-w-0 bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 overflow-hidden transition-all duration-300">
-          <div className="p-5 border-b border-kpmg-outline-variant/30 dark:border-gray-700 flex items-center gap-4" aria-hidden="true">
+        {/* Canvas — Pure Paper on Stone */}
+        <div className="flex-1 min-w-0 bg-white dark:bg-gray-800 rounded-2xl overflow-hidden transition-all duration-300 dark:border dark:border-gray-700" style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}>
+          <div className="p-5 flex items-center gap-4" style={{ borderBottom: '1px solid rgba(196,198,212,0.3)' }} aria-hidden="true">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-kpmg-accent-faster" />
-              <span className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 font-body">
+              <span className="font-body text-kpmg-on-surface-variant dark:text-gray-400" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 AI Cases ({filteredCases.length})
               </span>
             </div>
-            <div className="flex-1 h-px bg-kpmg-outline-variant/30 dark:bg-gray-700" />
+            <div className="flex-1 h-px" style={{ background: 'rgba(196,198,212,0.3)' }} />
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-kpmg-primary" />
-              <span className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 font-body">
+              <span className="font-body text-kpmg-on-surface-variant dark:text-gray-400" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 Functions
               </span>
             </div>
-            <div className="flex-1 h-px bg-kpmg-outline-variant/30 dark:bg-gray-700" />
+            <div className="flex-1 h-px" style={{ background: 'rgba(196,198,212,0.3)' }} />
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-kpmg-outline-variant" />
-              <span className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 font-body">
+              <span className="font-body text-kpmg-on-surface-variant dark:text-gray-400" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 Services
               </span>
             </div>
@@ -377,8 +379,8 @@ export default function ArchitectureCanvas() {
           </div>
 
           {/* Legend */}
-          <div className="px-5 py-3 border-t border-kpmg-outline-variant/30 dark:border-gray-700 flex items-center gap-3 flex-wrap" aria-label="AI Technique legend" role="region">
-            <span className="text-xs text-kpmg-on-surface-variant dark:text-gray-400 font-body flex-shrink-0">AI Technique:</span>
+          <div className="px-5 py-3 flex items-center gap-3 flex-wrap" style={{ borderTop: '1px solid rgba(196,198,212,0.3)' }} aria-label="AI Technique legend" role="region">
+            <span className="font-body text-kpmg-on-surface-variant dark:text-gray-400" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>AI Technique:</span>
             {Object.entries(TECHNIQUE_COLORS).map(([tech, color]) => (
               <div key={`legend-tech-${tech}`} className="flex items-center gap-1.5">
                 <span
@@ -392,7 +394,7 @@ export default function ArchitectureCanvas() {
           </div>
         </div>
 
-        {/* Detail Drawer */}
+        {/* Detail Drawer — ghost shadow, right-side contextual */}
         {selectedCase && (
           <div
             key={selectedCase.id}
@@ -404,10 +406,11 @@ export default function ArchitectureCanvas() {
               transform: drawerVisible ? 'translateX(0)' : 'translateX(24px)',
               transition: 'opacity 250ms ease, transform 250ms ease',
               maxHeight: 'calc(100vh - 160px)',
+              boxShadow: '0px 24px 48px rgba(0, 32, 95, 0.06)',
             }}
-            className="w-full lg:w-80 lg:flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl shadow-drawer dark:shadow-none dark:border dark:border-gray-700 overflow-y-auto scrollbar-thin"
+            className="w-full lg:w-80 lg:flex-shrink-0 bg-white dark:bg-gray-800 rounded-2xl overflow-y-auto scrollbar-thin dark:border dark:border-gray-700"
           >
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-kpmg-outline-variant/30 dark:border-gray-700 px-5 py-4 flex items-start justify-between z-10">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 px-5 py-4 flex items-start justify-between z-10" style={{ borderBottom: '1px solid rgba(196,198,212,0.3)' }}>
               <div>
                 <span className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 font-body">
                   {selectedCase.code}

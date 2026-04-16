@@ -261,15 +261,18 @@ export default function ValueSimulatorContent() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Left: Assumptions panel */}
-      <div className="order-1 lg:order-none lg:col-span-4 xl:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-6 space-y-6 h-fit">
+      {/* Left: Assumptions panel — Pure Paper card */}
+      <div
+        className="order-1 lg:order-none lg:col-span-4 xl:col-span-3 bg-white dark:bg-gray-800 rounded-2xl dark:border dark:border-gray-700 p-6 space-y-6 h-fit"
+        style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+      >
         <div>
           <h2 className="font-display text-base font-bold text-kpmg-on-surface dark:text-gray-100 mb-1">Assumptions</h2>
           <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body">Adjust sliders to model different scenarios in real time</p>
         </div>
 
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-widest font-body mb-3" style={{ fontSize: '10px', color: '#00B8A9' }}>
+          <p className="font-body mb-3" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#00B8A9' }}>
             FASTER — Use Case Axis
           </p>
           <div className="space-y-5">
@@ -309,8 +312,8 @@ export default function ValueSimulatorContent() {
           </div>
         </div>
 
-        <div className="border-t border-kpmg-outline-variant/30 dark:border-gray-700 pt-5 space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-widest font-body mb-3" style={{ fontSize: '10px', color: '#F39C12' }}>
+        <div className="pt-5 space-y-1" style={{ borderTop: '1px solid rgba(196,198,212,0.3)' }}>
+          <p className="font-body mb-3" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#F39C12' }}>
             DEEPER — Adoption Axis
           </p>
           <div className="space-y-5">
@@ -350,7 +353,7 @@ export default function ValueSimulatorContent() {
           </div>
         </div>
 
-        <div className="border-t border-kpmg-outline-variant/30 dark:border-gray-700 pt-4 space-y-2">
+        <div className="pt-4 space-y-2" style={{ borderTop: '1px solid rgba(196,198,212,0.3)' }}>
           <button
             onClick={handleSave}
             className="kpmg-btn-primary w-full justify-center text-sm"
@@ -359,7 +362,6 @@ export default function ValueSimulatorContent() {
             <Save size={14} aria-hidden="true" />
             Save Scenario
           </button>
-          {/* Export split buttons */}
           <div className="flex gap-2">
             <button
               onClick={handleExportCSV}
@@ -379,15 +381,14 @@ export default function ValueSimulatorContent() {
             </button>
           </div>
 
-          {/* Ready to Brief confirmation */}
           {readyToBrief && lastSavedAt && (
-            <div className="mt-3 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 transition-all duration-300">
+            <div className="mt-3 p-3 rounded-xl transition-all duration-300" style={{ background: 'rgba(15,110,86,0.06)', border: '1px solid rgba(15,110,86,0.15)' }}>
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 font-body uppercase tracking-wider">Ready to Brief</span>
+                <div className="w-2 h-2 rounded-full bg-kpmg-accent-positive flex-shrink-0" />
+                <span className="font-body text-kpmg-accent-positive" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Ready to Brief</span>
               </div>
-              <p className="text-xs text-emerald-600 dark:text-emerald-500 font-body">{lastAction}</p>
-              <p className="text-xs text-emerald-500 dark:text-emerald-600 font-body mt-0.5 tabular-nums">
+              <p className="text-xs text-kpmg-accent-positive font-body">{lastAction}</p>
+              <p className="text-xs font-body mt-0.5 tabular-nums" style={{ color: '#0F6E56', opacity: 0.7 }}>
                 {lastSavedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                 {' · '}
                 {lastSavedAt.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -399,9 +400,10 @@ export default function ValueSimulatorContent() {
 
       {/* Center: Outputs panel */}
       <div className="order-2 lg:order-none lg:col-span-5 xl:col-span-6 space-y-5">
-        {/* Scenario selector */}
+        {/* Scenario selector — tonal surface */}
         <div
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-2 flex gap-1"
+          className="bg-white dark:bg-gray-800 rounded-2xl p-2 flex gap-1 dark:border dark:border-gray-700"
+          style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
           role="group"
           aria-label="Select scenario view"
         >
@@ -411,25 +413,25 @@ export default function ValueSimulatorContent() {
               onClick={() => setActiveScenario(sv.id)}
               aria-pressed={activeScenario === sv.id}
               aria-label={`View ${sv.label} scenario`}
-              className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-150 font-body ${
-                activeScenario === sv.id ? 'text-white shadow-elevated' : 'text-kpmg-on-surface-variant dark:text-gray-400 hover:bg-kpmg-surface-container dark:hover:bg-gray-700'
+              className={`flex-1 py-2 px-3 rounded-xl text-sm font-semibold transition-all duration-150 font-body ${
+                activeScenario === sv.id ? 'text-white' : 'text-kpmg-on-surface-variant dark:text-gray-400 hover:bg-kpmg-surface-container dark:hover:bg-gray-700'
               }`}
-              style={activeScenario === sv.id ? { backgroundColor: sv.color } : {}}
+              style={activeScenario === sv.id ? { backgroundColor: sv.color, boxShadow: '0px 2px 8px rgba(0,32,95,0.15)' } : {}}
             >
               {sv.label}
             </button>
           ))}
         </div>
 
-        {/* Headline metric */}
+        {/* Headline metric — navy gradient */}
         <div
-          className="rounded-xl p-6 text-white"
-          style={{ background: 'linear-gradient(135deg, #00205F 0%, #006397 100%)' }}
+          className="rounded-2xl p-6 text-white"
+          style={{ background: 'linear-gradient(135deg, #00205F 0%, #006397 100%)', boxShadow: '0px 24px 48px rgba(0, 32, 95, 0.12)' }}
         >
-          <p className="text-xs font-semibold text-white/60 uppercase tracking-widest font-body mb-1" style={{ fontSize: '10px' }}>
+          <p className="font-body text-white/60 mb-1" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             Estimated Annualised Return
           </p>
-          <p className="font-display text-4xl font-extrabold tabular-nums mb-1">
+          <p className="font-display text-4xl font-extrabold tabular-nums mb-1" style={{ letterSpacing: '-0.02em' }}>
             ${(displayOutputs.annualizedReturn / 1000000).toFixed(2)}M
           </p>
           <p className="text-sm text-white/70 font-body">
@@ -437,7 +439,7 @@ export default function ValueSimulatorContent() {
           </p>
         </div>
 
-        {/* Output metrics grid */}
+        {/* Output metrics grid — Pure Paper cards */}
         <div className="grid grid-cols-2 gap-3">
           {[
             {
@@ -513,26 +515,32 @@ export default function ValueSimulatorContent() {
               color: '#00205F',
             },
           ].map(({ id, icon, label, value, suffix, color }) => (
-            <div key={id} className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-4">
+            <div
+              key={id}
+              className="bg-white dark:bg-gray-800 rounded-2xl p-4 dark:border dark:border-gray-700"
+              style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+            >
               <div className="flex items-center gap-1.5 mb-2" style={{ color }}>
                 {icon}
                 <span className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 font-body">{label}</span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="font-display text-2xl sm:text-xl font-extrabold tabular-nums" style={{ color }}>{value}</span>
+                <span className="font-display text-2xl sm:text-xl font-extrabold tabular-nums" style={{ color, letterSpacing: '-0.01em' }}>{value}</span>
                 {suffix && <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{suffix}</span>}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Chart */}
         <SimulatorOutputChart inputs={inputs} />
       </div>
 
       {/* Right: Strategic summary */}
       <div className="order-3 lg:order-none lg:col-span-3 xl:col-span-3 space-y-5">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-5">
+        <div
+          className="bg-white dark:bg-gray-800 rounded-2xl p-5 dark:border dark:border-gray-700"
+          style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+        >
           <h3 className="font-display text-sm font-bold text-kpmg-on-surface dark:text-gray-100 mb-4">Scenario Summary</h3>
           <div className="space-y-4">
             {SCENARIO_VIEWS.map(sv => {
@@ -542,15 +550,19 @@ export default function ValueSimulatorContent() {
                 <button
                   key={`sum-${sv.id}`}
                   onClick={() => setActiveScenario(sv.id)}
-                  className={`w-full text-left p-3 rounded-xl border-2 transition-all duration-150 ${
-                    isActive ? 'border-kpmg-primary dark:border-blue-500 bg-kpmg-primary/4 dark:bg-blue-900/20' : 'border-transparent bg-kpmg-surface-container-low dark:bg-gray-700/50 hover:border-kpmg-outline-variant dark:hover:border-gray-600'
+                  className={`w-full text-left p-3 rounded-xl transition-all duration-150 ${
+                    isActive ? '' : 'hover:bg-kpmg-surface-container dark:hover:bg-gray-700/50'
                   }`}
+                  style={isActive ? {
+                    background: `rgba(${sv.color === '#006397' ? '0,99,151' : sv.color === '#00B8A9' ? '0,184,169' : '15,110,86'}, 0.06)`,
+                    border: `1px solid rgba(${sv.color === '#006397' ? '0,99,151' : sv.color === '#00B8A9' ? '0,184,169' : '15,110,86'}, 0.15)`,
+                  } : { border: '1px solid transparent' }}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold font-body" style={{ color: sv.color }}>{sv.label}</span>
                     {isActive && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sv.color }} />}
                   </div>
-                  <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface dark:text-gray-100">
+                  <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface dark:text-gray-100" style={{ letterSpacing: '-0.01em' }}>
                     ${(svOutputs.annualizedReturn / 1000000).toFixed(2)}M
                   </p>
                   <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body mt-0.5">
@@ -562,7 +574,10 @@ export default function ValueSimulatorContent() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-5">
+        <div
+          className="bg-white dark:bg-gray-800 rounded-2xl p-5 dark:border dark:border-gray-700"
+          style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+        >
           <h3 className="font-display text-sm font-bold text-kpmg-on-surface dark:text-gray-100 mb-3">Key Assumptions</h3>
           <div className="space-y-2">
             {[
