@@ -33,7 +33,6 @@ export const SERVICES = [
   { id: 'val-mod',     functionId: 'fn-deal',       name: 'Valuation & Modelling' },
   { id: 'strat-ma',    functionId: 'fn-deal',       name: 'Strategy / M&A Advisory' },
   // Consulting
-  { id: 'people-fs',   functionId: 'fn-consulting', name: 'People & Change / FS Transform' },
   { id: 'fs-reg',      functionId: 'fn-consulting', name: 'FS Regulatory / GRC' },
   { id: 'people',      functionId: 'fn-consulting', name: 'People & Change' },
   { id: 'fs-trans',    functionId: 'fn-consulting', name: 'FS Transform' },
@@ -140,14 +139,15 @@ export const AI_CASES: AICase[] = [
     readinessScore: 88,
     reusabilityScore: 92,
     linkedFunctions: ['fn-audit', 'fn-law', 'fn-tax', 'fn-deal', 'fn-consulting'],
-    linkedServices: ['fin-audit', 'aud-data', 'corp-comp', 'tax-adv-svc', 'ma-adv', 'people-fs'],
+    linkedServices: ['fin-audit', 'aud-data', 'corp-comp', 'tax-adv-svc', 'ma-adv', 'people', 'fs-trans'],
     reach: [
       { fnId: 'fn-audit',      svcId: 'fin-audit' },
       { fnId: 'fn-audit',      svcId: 'aud-data' },
       { fnId: 'fn-law',        svcId: 'corp-comp' },
       { fnId: 'fn-tax',        svcId: 'tax-adv-svc' },
       { fnId: 'fn-deal',       svcId: 'ma-adv' },
-      { fnId: 'fn-consulting', svcId: 'people-fs' },
+      { fnId: 'fn-consulting', svcId: 'people' },
+      { fnId: 'fn-consulting', svcId: 'fs-trans' },
     ],
     metrics: [
       'Cost and cycle time reduction',
