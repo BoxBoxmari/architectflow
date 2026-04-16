@@ -1,13 +1,20 @@
 'use client';
 import React, { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { Save, Download, ChevronRight, Info, TrendingUp, Users, Clock, DollarSign, Zap, BarChart3, FileText } from 'lucide-react';
+import { Save, Download, ChevronRight, Info, Users, FileText } from 'lucide-react';
 import Link from 'next/link';
 import SimulatorOutputChart from './SimulatorOutputChart';
 import { calcScenarioVariants, SIM_CONSTANTS, SIM_DEFAULTS, SIM_RANGES, type SimInputs } from '@/lib/simulator/calcOutputs';
 import { downloadFile, buildCSV } from '@/lib/exportUtils';
 
 const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
+
+// Executive number formatter: $1.2M, $450K, $12K
+function fmtExec(value: number): string {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
+  return `$${Math.round(value)}`;
+}
 
 interface SliderRowProps {
   label: string;
@@ -29,27 +36,29 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 min-w-0">
-          <span id={`slider-label-${label.replace(/\s+/g, '-').toLowerCase()}`} className="text-sm font-medium text-kpmg-on-surface dark:text-gray-200 font-body truncate">{label}</span>
+          <span className="text-xs font-bold uppercase tracking-widest truncate" style={{ color: '#00205F', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>{label}</span>
           <div className="group relative flex-shrink-0">
-            <Info size={12} className="text-kpmg-outline dark:text-gray-500 cursor-help" aria-hidden="true" />
+            <Info size={11} className="cursor-help" style={{ color: '#9E9E9E' }} aria-hidden="true" />
             <div
               role="tooltip"
-              className="absolute left-0 bottom-full mb-1 w-48 px-2.5 py-1.5 bg-kpmg-on-surface dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-elevated font-body"
+              className="absolute left-0 bottom-full mb-1 w-52 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10"
+              style={{ background: '#00205F', fontFamily: 'Inter, sans-serif' }}
             >
               {hint}
             </div>
           </div>
         </div>
         <span
-          className="font-display text-xl sm:text-base font-bold tabular-nums flex-shrink-0"
-          style={{ color: trackColor }}
+          className="font-bold tabular-nums flex-shrink-0"
+          style={{ color: trackColor, fontFamily: 'Manrope, sans-serif', fontSize: '22px', letterSpacing: '-0.01em' }}
           aria-live="polite"
           aria-atomic="true"
         >
           {format(value)}
         </span>
       </div>
-      <div className="relative w-full">
+      {/* Oversized 38px tactile slider */}
+      <div className="relative w-full" style={{ height: '38px', display: 'flex', alignItems: 'center' }}>
         <input
           type="range"
           min={min}
@@ -57,9 +66,14 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
           step={step}
           value={value}
           onChange={e => onChange(Number(e.target.value))}
-          className="slider-track w-full"
+          className="w-full"
           style={{
-            '--val': `${pct}%`,
+            WebkitAppearance: 'none',
+            appearance: 'none',
+            height: '6px',
+            borderRadius: '3px',
+            outline: 'none',
+            cursor: 'pointer',
             background: `linear-gradient(to right, ${trackColor} 0%, ${trackColor} ${pct}%, #EBE7E7 ${pct}%, #EBE7E7 100%)`,
           } as React.CSSProperties}
           aria-label={label}
@@ -70,9 +84,34 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
         />
       </div>
       <div className="flex justify-between" aria-hidden="true">
-        <span className="text-xs text-kpmg-on-surface-variant dark:text-gray-400 font-body">{format(min)}</span>
-        <span className="text-xs text-kpmg-on-surface-variant dark:text-gray-400 font-body">{format(max)}</span>
+        <span className="text-xs" style={{ color: '#9E9E9E', fontFamily: 'Inter, sans-serif' }}>{format(min)}</span>
+        <span className="text-xs" style={{ color: '#9E9E9E', fontFamily: 'Inter, sans-serif' }}>{format(max)}</span>
       </div>
+      <style jsx>{`
+        input[type='range']::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          background: ${trackColor};
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          border: 3px solid #fff;
+          transition: box-shadow 0.15s;
+        }
+        input[type='range']::-webkit-slider-thumb:hover {
+          box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+        }
+        input[type='range']::-moz-range-thumb {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          background: ${trackColor};
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+          border: 3px solid #fff;
+        }
+      `}</style>
     </div>
   );
 }
@@ -88,7 +127,6 @@ export default function ValueSimulatorContent() {
     setInputs(prev => ({ ...prev, [key]: val }));
   }, []);
 
-  // All scenario variants from shared formula
   const variants = calcScenarioVariants(inputs);
   const outputs = variants.currentState.outputs;
   const scale2xOutputs = variants.scale2x.outputs;
@@ -97,7 +135,6 @@ export default function ValueSimulatorContent() {
   const displayOutputs = activeScenario === 'current' ? outputs : activeScenario === 'scale2x' ? scale2xOutputs : fullAdoptionOutputs;
 
   function handleSave() {
-    // Persist scenario to localStorage so Scenario Comparison can read it
     const saved = {
       id: `scenario-${Date.now()}`,
       name: `Scenario ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
@@ -124,7 +161,6 @@ export default function ValueSimulatorContent() {
   }
 
   function handleExportCSV() {
-    const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
     const rows: (string | number)[][] = [
       ['KPMG AI Value Simulator — Scenario Export'],
       ['Generated', new Date().toLocaleString()],
@@ -168,25 +204,20 @@ export default function ValueSimulatorContent() {
   }
 
   function handleExportPDF() {
-    // Build a self-contained HTML string and open it in a new tab for printing
-    const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
     const dateStr = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
-
     const scenarioRows = [
       ['Active Use Cases', outputs.activeUseCases, scale2xOutputs.activeUseCases, fullAdoptionOutputs.activeUseCases],
       ['Active Users', outputs.activeUsers, scale2xOutputs.activeUsers, fullAdoptionOutputs.activeUsers],
       ['Tasks / Month', outputs.tasksPerMonth.toLocaleString(), scale2xOutputs.tasksPerMonth.toLocaleString(), fullAdoptionOutputs.tasksPerMonth.toLocaleString()],
       ['Hours Recovered / Month', Math.round(outputs.hoursPerMonth).toLocaleString(), Math.round(scale2xOutputs.hoursPerMonth).toLocaleString(), Math.round(fullAdoptionOutputs.hoursPerMonth).toLocaleString()],
-      ['Monthly Cost Savings', `$${Math.round(outputs.monthlyCostSavings).toLocaleString()}`, `$${Math.round(scale2xOutputs.monthlyCostSavings).toLocaleString()}`, `$${Math.round(fullAdoptionOutputs.monthlyCostSavings).toLocaleString()}`],
-      ['Annualised Return', `$${(outputs.annualizedReturn / 1000000).toFixed(2)}M`, `$${(scale2xOutputs.annualizedReturn / 1000000).toFixed(2)}M`, `$${(fullAdoptionOutputs.annualizedReturn / 1000000).toFixed(2)}M`],
+      ['Monthly Cost Savings', fmtExec(outputs.monthlyCostSavings), fmtExec(scale2xOutputs.monthlyCostSavings), fmtExec(fullAdoptionOutputs.monthlyCostSavings)],
+      ['Annualised Return', fmtExec(outputs.annualizedReturn), fmtExec(scale2xOutputs.annualizedReturn), fmtExec(fullAdoptionOutputs.annualizedReturn)],
       ['FTEs Freed / Month', outputs.ftesFreed.toFixed(1), scale2xOutputs.ftesFreed.toFixed(1), fullAdoptionOutputs.ftesFreed.toFixed(1)],
       ['Programme Penetration', `${Math.round(outputs.penetration)}%`, `${Math.round(scale2xOutputs.penetration)}%`, `${Math.round(fullAdoptionOutputs.penetration)}%`],
     ];
-
     const tableRows = scenarioRows.map(([label, cur, s2x, full]) =>
       `<tr><td>${label}</td><td>${cur}</td><td>${s2x}</td><td>${full}</td></tr>`
     ).join('');
-
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -239,7 +270,6 @@ export default function ValueSimulatorContent() {
 <script>window.onload = function(){ window.print(); }</script>
 </body>
 </html>`;
-
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const win = window.open(url, '_blank');
@@ -261,345 +291,442 @@ export default function ValueSimulatorContent() {
     { id: 'fulladoption' as const, label: 'Full Adoption', color: '#0F6E56' },
   ];
 
+  // Helper: get scenario outputs
+  const getScenarioOutputs = (id: string) =>
+    id === 'current' ? outputs : id === 'scale2x' ? scale2xOutputs : fullAdoptionOutputs;
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Left: Assumptions panel — Pure Paper card */}
+    // Stone Base canvas
+    <div className="min-h-screen" style={{ background: '#FCF9F8' }}>
+      {/* ── HERO METRIC ROW — Summary-First Principle ── */}
       <div
-        className="order-1 lg:order-none lg:col-span-4 xl:col-span-3 bg-white dark:bg-gray-800 rounded-2xl dark:border dark:border-gray-700 p-6 space-y-6 h-fit"
-        style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+        className="rounded-2xl p-8 mb-6"
+        style={{ background: 'linear-gradient(135deg, #00205F 0%, #003580 100%)' }}
       >
-        <div>
-          <h2 className="font-display text-base font-bold text-kpmg-on-surface dark:text-gray-100 mb-1">Assumptions</h2>
-          <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body">Adjust sliders to model different scenarios in real time</p>
-        </div>
-
-        <div className="space-y-1">
-          <p className="font-body mb-3" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#00B8A9' }}>
-            FASTER — Use Case Axis
-          </p>
-          <div className="space-y-5">
-            <SliderRow
-              label="Target Use Case Count"
-              hint="Total number of AI use cases targeted for activation in this scenario"
-              value={inputs.targetUseCaseCount}
-              min={SIM_RANGES.targetUseCaseCount.min}
-              max={SIM_RANGES.targetUseCaseCount.max}
-              step={SIM_RANGES.targetUseCaseCount.step}
-              format={v => `${v}`}
-              color="teal"
-              onChange={v => set('targetUseCaseCount', v)}
-            />
-            <SliderRow
-              label="Use Case Activation Rate"
-              hint="Percentage of targeted use cases that will be successfully activated"
-              value={inputs.activationRate}
-              min={SIM_RANGES.activationRate.min}
-              max={SIM_RANGES.activationRate.max}
-              step={SIM_RANGES.activationRate.step}
-              format={v => `${v}%`}
-              color="teal"
-              onChange={v => set('activationRate', v)}
-            />
-            <SliderRow
-              label="Tasks / User / Use Case / Month"
-              hint="Average number of tasks each active user performs per use case per month"
-              value={inputs.tasksPerUserPerUseCasePerMonth}
-              min={SIM_RANGES.tasksPerUserPerUseCasePerMonth.min}
-              max={SIM_RANGES.tasksPerUserPerUseCasePerMonth.max}
-              step={SIM_RANGES.tasksPerUserPerUseCasePerMonth.step}
-              format={v => `${v}`}
-              color="teal"
-              onChange={v => set('tasksPerUserPerUseCasePerMonth', v)}
-            />
-          </div>
-        </div>
-
-        <div className="pt-5 space-y-1" style={{ borderTop: '1px solid rgba(196,198,212,0.3)' }}>
-          <p className="font-body mb-3" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#F39C12' }}>
-            DEEPER — Adoption Axis
-          </p>
-          <div className="space-y-5">
-            <SliderRow
-              label="Target User Count"
-              hint="Total number of KPMG staff targeted to use AI tools in this scenario"
-              value={inputs.targetUserCount}
-              min={SIM_RANGES.targetUserCount.min}
-              max={SIM_RANGES.targetUserCount.max}
-              step={SIM_RANGES.targetUserCount.step}
-              format={v => v.toLocaleString()}
-              color="amber"
-              onChange={v => set('targetUserCount', v)}
-            />
-            <SliderRow
-              label="User Adoption Rate"
-              hint="Percentage of targeted users who actively use the AI tools"
-              value={inputs.adoptionRate}
-              min={SIM_RANGES.adoptionRate.min}
-              max={SIM_RANGES.adoptionRate.max}
-              step={SIM_RANGES.adoptionRate.step}
-              format={v => `${v}%`}
-              color="amber"
-              onChange={v => set('adoptionRate', v)}
-            />
-            <SliderRow
-              label="Avg Time Saved / Task (min)"
-              hint="Average minutes saved per AI-assisted task compared to manual completion"
-              value={inputs.avgTimeSavedMinutes}
-              min={SIM_RANGES.avgTimeSavedMinutes.min}
-              max={SIM_RANGES.avgTimeSavedMinutes.max}
-              step={SIM_RANGES.avgTimeSavedMinutes.step}
-              format={v => `${v}m`}
-              color="amber"
-              onChange={v => set('avgTimeSavedMinutes', v)}
-            />
-          </div>
-        </div>
-
-        <div className="pt-4 space-y-2" style={{ borderTop: '1px solid rgba(196,198,212,0.3)' }}>
-          <button
-            onClick={handleSave}
-            className="kpmg-btn-primary w-full justify-center text-sm"
-            aria-label="Save current scenario to local storage for Scenario Comparison"
-          >
-            <Save size={14} aria-hidden="true" />
-            Save Scenario
-          </button>
-          <div className="flex gap-2">
-            <button
-              onClick={handleExportCSV}
-              className="kpmg-btn-secondary flex-1 justify-center text-sm"
-              aria-label="Export scenario data as CSV file"
-            >
-              <Download size={14} aria-hidden="true" />
-              CSV
-            </button>
-            <button
-              onClick={handleExportPDF}
-              className="kpmg-btn-secondary flex-1 justify-center text-sm"
-              aria-label="Export scenario data as PDF report"
-            >
-              <FileText size={14} aria-hidden="true" />
-              PDF
-            </button>
-          </div>
-
-          {readyToBrief && lastSavedAt && (
-            <div className="mt-3 p-3 rounded-xl transition-all duration-300" style={{ background: 'rgba(15,110,86,0.06)', border: '1px solid rgba(15,110,86,0.15)' }}>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-2 h-2 rounded-full bg-kpmg-accent-positive flex-shrink-0" />
-                <span className="font-body text-kpmg-accent-positive" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Ready to Brief</span>
-              </div>
-              <p className="text-xs text-kpmg-accent-positive font-body">{lastAction}</p>
-              <p className="text-xs font-body mt-0.5 tabular-nums" style={{ color: '#0F6E56', opacity: 0.7 }}>
-                {lastSavedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                {' · '}
-                {lastSavedAt.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Center: Outputs panel */}
-      <div className="order-2 lg:order-none lg:col-span-5 xl:col-span-6 space-y-5">
-        {/* Scenario selector — tonal surface */}
-        <div
-          className="bg-white dark:bg-gray-800 rounded-2xl p-2 flex gap-1 dark:border dark:border-gray-700"
-          style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
-          role="group"
-          aria-label="Select scenario view"
-        >
+        {/* Scenario selector inside hero */}
+        <div className="flex flex-wrap gap-2 mb-6">
           {SCENARIO_VIEWS.map(sv => (
             <button
               key={`sv-${sv.id}`}
               onClick={() => setActiveScenario(sv.id)}
               aria-pressed={activeScenario === sv.id}
-              aria-label={`View ${sv.label} scenario`}
-              className={`flex-1 py-2 px-3 rounded-xl text-sm font-semibold transition-all duration-150 font-body ${
-                activeScenario === sv.id ? 'text-white' : 'text-kpmg-on-surface-variant dark:text-gray-400 hover:bg-kpmg-surface-container dark:hover:bg-gray-700'
-              }`}
-              style={activeScenario === sv.id ? { backgroundColor: sv.color, boxShadow: '0px 2px 8px rgba(0,32,95,0.15)' } : {}}
+              className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-150"
+              style={
+                activeScenario === sv.id
+                  ? { background: sv.color, color: '#fff', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }
+                  : { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }
+              }
             >
               {sv.label}
             </button>
           ))}
         </div>
 
-        {/* Headline metric — navy gradient */}
-        <div
-          className="rounded-2xl p-6 text-white"
-          style={{ background: 'linear-gradient(135deg, #00205F 0%, #006397 100%)', boxShadow: '0px 24px 48px rgba(0, 32, 95, 0.12)' }}
-        >
-          <p className="font-body text-white/60 mb-1" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Estimated Annualised Return
+        {/* Hero metric — 56px Manrope Bold */}
+        <div className="mb-2">
+          <p
+            className="uppercase font-bold mb-3"
+            style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '0.08em', fontFamily: 'Inter, sans-serif' }}
+          >
+            ESTIMATED ANNUALISED RETURN
           </p>
-          <p className="font-display text-4xl font-extrabold tabular-nums mb-1" style={{ letterSpacing: '-0.02em' }}>
-            ${(displayOutputs.annualizedReturn / 1000000).toFixed(2)}M
-          </p>
-          <p className="text-sm text-white/70 font-body">
-            ${Math.round(displayOutputs.monthlyCostSavings).toLocaleString()} per month · {displayOutputs.activeUsers.toLocaleString()} active users
-          </p>
-        </div>
-
-        {/* Output metrics grid — Pure Paper cards */}
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            {
-              id: 'out-active-cases',
-              icon: <Zap size={15} />,
-              label: 'Active Use Cases',
-              value: displayOutputs.activeUseCases.toString(),
-              suffix: `of ${inputs.targetUseCaseCount}`,
-              color: '#00B8A9',
-            },
-            {
-              id: 'out-active-users',
-              icon: <Users size={15} />,
-              label: 'Active Users',
-              value: displayOutputs.activeUsers.toLocaleString(),
-              suffix: `of ${inputs.targetUserCount}`,
-              color: '#006397',
-            },
-            {
-              id: 'out-hours',
-              icon: <Clock size={15} />,
-              label: 'Hours Recovered / Month',
-              value: Math.round(displayOutputs.hoursPerMonth).toLocaleString(),
-              suffix: 'hrs',
-              color: '#00B8A9',
-            },
-            {
-              id: 'out-tasks',
-              icon: <Zap size={15} />,
-              label: 'AI-Assisted Tasks / Month',
-              value: Math.round(displayOutputs.tasksPerMonth).toLocaleString(),
-              suffix: 'tasks',
-              color: '#006397',
-            },
-            {
-              id: 'out-ftes',
-              icon: <Users size={15} />,
-              label: 'FTEs Freed / Month',
-              value: displayOutputs.ftesFreed.toFixed(1),
-              suffix: 'FTEs',
-              color: '#0F6E56',
-            },
-            {
-              id: 'out-time-user',
-              icon: <Clock size={15} />,
-              label: 'Time Freed / User / Month',
-              value: Math.round(displayOutputs.timePerUserPerMonth).toLocaleString(),
-              suffix: 'min',
-              color: '#45004F',
-            },
-            {
-              id: 'out-value-user',
-              icon: <DollarSign size={15} />,
-              label: 'Value / User / Month',
-              value: `$${Math.round(displayOutputs.valuePerUserPerMonth).toLocaleString()}`,
-              suffix: '',
-              color: '#F39C12',
-            },
-            {
-              id: 'out-daily',
-              icon: <BarChart3 size={15} />,
-              label: 'Daily AI Interactions',
-              value: Math.round(displayOutputs.dailyInteractions).toLocaleString(),
-              suffix: '/day',
-              color: '#006397',
-            },
-            {
-              id: 'out-penetration',
-              icon: <TrendingUp size={15} />,
-              label: 'Programme Penetration',
-              value: `${Math.round(displayOutputs.penetration)}`,
-              suffix: '%',
-              color: '#00205F',
-            },
-          ].map(({ id, icon, label, value, suffix, color }) => (
-            <div
-              key={id}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-4 dark:border dark:border-gray-700"
-              style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+          <div className="flex items-baseline gap-3 flex-wrap">
+            <span
+              className="tabular-nums font-bold"
+              style={{ fontFamily: 'Manrope, sans-serif', fontSize: '56px', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1 }}
             >
-              <div className="flex items-center gap-1.5 mb-2" style={{ color }}>
-                {icon}
-                <span className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 font-body">{label}</span>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="font-display text-2xl sm:text-xl font-extrabold tabular-nums" style={{ color, letterSpacing: '-0.01em' }}>{value}</span>
-                {suffix && <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{suffix}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <SimulatorOutputChart inputs={inputs} />
-      </div>
-
-      {/* Right: Strategic summary */}
-      <div className="order-3 lg:order-none lg:col-span-3 xl:col-span-3 space-y-5">
-        <div
-          className="bg-white dark:bg-gray-800 rounded-2xl p-5 dark:border dark:border-gray-700"
-          style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
-        >
-          <h3 className="font-display text-sm font-bold text-kpmg-on-surface dark:text-gray-100 mb-4">Scenario Summary</h3>
-          <div className="space-y-4">
-            {SCENARIO_VIEWS.map(sv => {
-              const svOutputs = sv.id === 'current' ? outputs : sv.id === 'scale2x' ? scale2xOutputs : fullAdoptionOutputs;
-              const isActive = activeScenario === sv.id;
-              return (
-                <button
-                  key={`sum-${sv.id}`}
-                  onClick={() => setActiveScenario(sv.id)}
-                  className={`w-full text-left p-3 rounded-xl transition-all duration-150 ${
-                    isActive ? '' : 'hover:bg-kpmg-surface-container dark:hover:bg-gray-700/50'
-                  }`}
-                  style={isActive ? {
-                    background: `rgba(${sv.color === '#006397' ? '0,99,151' : sv.color === '#00B8A9' ? '0,184,169' : '15,110,86'}, 0.06)`,
-                    border: `1px solid rgba(${sv.color === '#006397' ? '0,99,151' : sv.color === '#00B8A9' ? '0,184,169' : '15,110,86'}, 0.15)`,
-                  } : { border: '1px solid transparent' }}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold font-body" style={{ color: sv.color }}>{sv.label}</span>
-                    {isActive && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sv.color }} />}
-                  </div>
-                  <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface dark:text-gray-100" style={{ letterSpacing: '-0.01em' }}>
-                    ${(svOutputs.annualizedReturn / 1000000).toFixed(2)}M
-                  </p>
-                  <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body mt-0.5">
-                    {svOutputs.ftesFreed.toFixed(1)} FTEs · {svOutputs.activeUsers} users
-                  </p>
-                </button>
-              );
-            })}
+              {fmtExec(displayOutputs.annualizedReturn)}
+            </span>
+            <span
+              className="font-bold"
+              style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.04em', textTransform: 'uppercase' }}
+            >
+              / YEAR
+            </span>
           </div>
         </div>
 
+        {/* Supporting hero metrics */}
+        <div className="flex flex-wrap gap-6 mt-5 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+          <div>
+            <p className="uppercase font-bold mb-1" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.07em', fontFamily: 'Inter, sans-serif' }}>MONTHLY SAVINGS</p>
+            <p className="tabular-nums font-bold" style={{ fontFamily: 'Manrope, sans-serif', fontSize: '26px', color: '#00B8A9', letterSpacing: '-0.02em' }}>
+              {fmtExec(displayOutputs.monthlyCostSavings)}
+            </p>
+          </div>
+          <div>
+            <p className="uppercase font-bold mb-1" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.07em', fontFamily: 'Inter, sans-serif' }}>ACTIVE USERS</p>
+            <p className="tabular-nums font-bold" style={{ fontFamily: 'Manrope, sans-serif', fontSize: '26px', color: '#F39C12', letterSpacing: '-0.02em' }}>
+              {displayOutputs.activeUsers.toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="uppercase font-bold mb-1" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.07em', fontFamily: 'Inter, sans-serif' }}>FTES FREED / MO</p>
+            <p className="tabular-nums font-bold" style={{ fontFamily: 'Manrope, sans-serif', fontSize: '26px', color: '#0F6E56', letterSpacing: '-0.02em' }}>
+              {displayOutputs.ftesFreed.toFixed(1)}
+            </p>
+          </div>
+          <div>
+            <p className="uppercase font-bold mb-1" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.07em', fontFamily: 'Inter, sans-serif' }}>ACTIVE USE CASES</p>
+            <p className="tabular-nums font-bold" style={{ fontFamily: 'Manrope, sans-serif', fontSize: '26px', color: '#00B8A9', letterSpacing: '-0.02em' }}>
+              {displayOutputs.activeUseCases}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── MAIN CONTENT GRID ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        {/* LEFT: Assumptions Panel — Paper on Stone */}
         <div
-          className="bg-white dark:bg-gray-800 rounded-2xl p-5 dark:border dark:border-gray-700"
-          style={{ boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
+          className="order-1 lg:order-none lg:col-span-4 xl:col-span-3 rounded-2xl p-6 space-y-6 h-fit"
+          style={{ background: '#FFFFFF' }}
         >
-          <h3 className="font-display text-sm font-bold text-kpmg-on-surface dark:text-gray-100 mb-3">Key Assumptions</h3>
-          <div className="space-y-2">
+          <div>
+            <h2
+              className="font-bold mb-1"
+              style={{ fontFamily: 'Manrope, sans-serif', fontSize: '16px', color: '#00205F' }}
+            >
+              Assumptions
+            </h2>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', color: '#9E9E9E' }}>
+              Adjust sliders to model scenarios in real time
+            </p>
+          </div>
+
+          {/* FASTER axis */}
+          <div>
+            <p
+              className="mb-4 uppercase font-bold"
+              style={{ fontSize: '10px', letterSpacing: '0.08em', color: '#00B8A9', fontFamily: 'Inter, sans-serif' }}
+            >
+              FASTER — Use Case Axis
+            </p>
+            <div className="space-y-6">
+              <SliderRow
+                label="Target Use Case Count"
+                hint="Total number of AI use cases targeted for activation in this scenario"
+                value={inputs.targetUseCaseCount}
+                min={SIM_RANGES.targetUseCaseCount.min}
+                max={SIM_RANGES.targetUseCaseCount.max}
+                step={SIM_RANGES.targetUseCaseCount.step}
+                format={v => `${v}`}
+                color="teal"
+                onChange={v => set('targetUseCaseCount', v)}
+              />
+              <SliderRow
+                label="Use Case Activation Rate"
+                hint="Percentage of targeted use cases that will be successfully activated"
+                value={inputs.activationRate}
+                min={SIM_RANGES.activationRate.min}
+                max={SIM_RANGES.activationRate.max}
+                step={SIM_RANGES.activationRate.step}
+                format={v => `${v}%`}
+                color="teal"
+                onChange={v => set('activationRate', v)}
+              />
+              <SliderRow
+                label="Tasks / User / Use Case / Mo"
+                hint="Average number of tasks each active user performs per use case per month"
+                value={inputs.tasksPerUserPerUseCasePerMonth}
+                min={SIM_RANGES.tasksPerUserPerUseCasePerMonth.min}
+                max={SIM_RANGES.tasksPerUserPerUseCasePerMonth.max}
+                step={SIM_RANGES.tasksPerUserPerUseCasePerMonth.step}
+                format={v => `${v}`}
+                color="teal"
+                onChange={v => set('tasksPerUserPerUseCasePerMonth', v)}
+              />
+            </div>
+          </div>
+
+          {/* DEEPER axis */}
+          <div className="pt-5" style={{ borderTop: '1px solid #EBE7E7' }}>
+            <p
+              className="mb-4 uppercase font-bold"
+              style={{ fontSize: '10px', letterSpacing: '0.08em', color: '#F39C12', fontFamily: 'Inter, sans-serif' }}
+            >
+              DEEPER — Adoption Axis
+            </p>
+            <div className="space-y-6">
+              <SliderRow
+                label="Target User Count"
+                hint="Total number of KPMG staff targeted to use AI tools in this scenario"
+                value={inputs.targetUserCount}
+                min={SIM_RANGES.targetUserCount.min}
+                max={SIM_RANGES.targetUserCount.max}
+                step={SIM_RANGES.targetUserCount.step}
+                format={v => v.toLocaleString()}
+                color="amber"
+                onChange={v => set('targetUserCount', v)}
+              />
+              <SliderRow
+                label="User Adoption Rate"
+                hint="Percentage of targeted users who actively use the AI tools"
+                value={inputs.adoptionRate}
+                min={SIM_RANGES.adoptionRate.min}
+                max={SIM_RANGES.adoptionRate.max}
+                step={SIM_RANGES.adoptionRate.step}
+                format={v => `${v}%`}
+                color="amber"
+                onChange={v => set('adoptionRate', v)}
+              />
+              <SliderRow
+                label="Avg Time Saved / Task"
+                hint="Average minutes saved per AI-assisted task compared to manual completion"
+                value={inputs.avgTimeSavedMinutes}
+                min={SIM_RANGES.avgTimeSavedMinutes.min}
+                max={SIM_RANGES.avgTimeSavedMinutes.max}
+                step={SIM_RANGES.avgTimeSavedMinutes.step}
+                format={v => `${v}m`}
+                color="amber"
+                onChange={v => set('avgTimeSavedMinutes', v)}
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="pt-4 space-y-2" style={{ borderTop: '1px solid #EBE7E7' }}>
+            <button
+              onClick={handleSave}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all duration-150"
+              style={{ background: '#00205F', color: '#fff', fontFamily: 'Inter, sans-serif' }}
+              aria-label="Save current scenario to local storage for Scenario Comparison"
+            >
+              <Save size={14} aria-hidden="true" />
+              Save Scenario
+            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleExportCSV}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-all duration-150"
+                style={{ background: '#EBE7E7', color: '#00205F', fontFamily: 'Inter, sans-serif' }}
+                aria-label="Export scenario data as CSV file"
+              >
+                <Download size={14} aria-hidden="true" />
+                CSV
+              </button>
+              <button
+                onClick={handleExportPDF}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-all duration-150"
+                style={{ background: '#EBE7E7', color: '#00205F', fontFamily: 'Inter, sans-serif' }}
+                aria-label="Export scenario data as PDF report"
+              >
+                <FileText size={14} aria-hidden="true" />
+                PDF
+              </button>
+            </div>
+
+            {readyToBrief && lastSavedAt && (
+              <div className="mt-3 p-3 rounded-xl" style={{ background: 'rgba(15,110,86,0.06)', border: '1px solid rgba(15,110,86,0.15)' }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#0F6E56' }} />
+                  <span className="font-bold uppercase" style={{ fontSize: '10px', letterSpacing: '0.06em', color: '#0F6E56', fontFamily: 'Inter, sans-serif' }}>Ready to Brief</span>
+                </div>
+                <p style={{ fontSize: '12px', color: '#0F6E56', fontFamily: 'Inter, sans-serif' }}>{lastAction}</p>
+                <p className="tabular-nums mt-0.5" style={{ fontSize: '11px', color: '#0F6E56', opacity: 0.7, fontFamily: 'Inter, sans-serif' }}>
+                  {lastSavedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  {' · '}
+                  {lastSavedAt.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* CENTER: Output Metrics — Paper cards on Stone */}
+        <div className="order-2 lg:order-none lg:col-span-5 xl:col-span-6 space-y-4">
+
+          {/* Output metrics grid */}
+          <div className="grid grid-cols-2 gap-3">
             {[
-              { id: 'ka-cost', label: 'Hourly cost rate', value: `$${SIM_CONSTANTS.HOURLY_COST}/hr (USD)` },
-              { id: 'ka-days', label: 'Working days/month', value: `${SIM_CONSTANTS.WORKING_DAYS_PER_MONTH}` },
-              { id: 'ka-hrs', label: 'Working hours/day', value: `${SIM_CONSTANTS.WORKING_HOURS_PER_DAY}` },
-              { id: 'ka-cases', label: 'Active use cases', value: `${outputs.activeUseCases} of ${inputs.targetUseCaseCount}` },
-              { id: 'ka-users', label: 'Active users', value: `${outputs.activeUsers} of ${inputs.targetUserCount}` },
-            ].map(({ id, label, value }) => (
-              <div key={id} className="flex items-center justify-between gap-2">
-                <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{label}</span>
-                <span className="text-xs font-semibold text-kpmg-on-surface dark:text-gray-200 font-body tabular-nums">{value}</span>
+              {
+                id: 'out-active-cases',
+                label: 'ACTIVE USE CASES',
+                value: displayOutputs.activeUseCases.toString(),
+                suffix: `of ${inputs.targetUseCaseCount}`,
+                color: '#00B8A9',
+                axis: 'FASTER',
+              },
+              {
+                id: 'out-active-users',
+                label: 'ACTIVE USERS',
+                value: displayOutputs.activeUsers.toLocaleString(),
+                suffix: `of ${inputs.targetUserCount.toLocaleString()}`,
+                color: '#F39C12',
+                axis: 'DEEPER',
+              },
+              {
+                id: 'out-hours',
+                label: 'HOURS RECOVERED / MO',
+                value: Math.round(displayOutputs.hoursPerMonth).toLocaleString(),
+                suffix: 'hrs',
+                color: '#00B8A9',
+                axis: 'FASTER',
+              },
+              {
+                id: 'out-tasks',
+                label: 'AI TASKS / MONTH',
+                value: Math.round(displayOutputs.tasksPerMonth).toLocaleString(),
+                suffix: 'tasks',
+                color: '#F39C12',
+                axis: 'DEEPER',
+              },
+              {
+                id: 'out-ftes',
+                label: 'FTES FREED / MONTH',
+                value: displayOutputs.ftesFreed.toFixed(1),
+                suffix: 'FTEs',
+                color: '#0F6E56',
+                axis: 'FINANCIAL',
+              },
+              {
+                id: 'out-value-user',
+                label: 'VALUE / USER / MONTH',
+                value: fmtExec(displayOutputs.valuePerUserPerMonth),
+                suffix: '',
+                color: '#0F6E56',
+                axis: 'FINANCIAL',
+              },
+              {
+                id: 'out-time-user',
+                label: 'TIME FREED / USER / MO',
+                value: Math.round(displayOutputs.timePerUserPerMonth).toLocaleString(),
+                suffix: 'min',
+                color: '#45004F',
+                axis: 'INSIGHT',
+              },
+              {
+                id: 'out-daily',
+                label: 'DAILY AI INTERACTIONS',
+                value: Math.round(displayOutputs.dailyInteractions).toLocaleString(),
+                suffix: '/day',
+                color: '#00205F',
+                axis: 'INSIGHT',
+              },
+              {
+                id: 'out-penetration',
+                label: 'PROGRAMME PENETRATION',
+                value: `${Math.round(displayOutputs.penetration)}`,
+                suffix: '%',
+                color: '#00205F',
+                axis: 'INSIGHT',
+              },
+            ].map(({ id, label, value, suffix, color }) => (
+              <div
+                key={id}
+                className="rounded-2xl p-4"
+                style={{ background: '#FFFFFF' }}
+              >
+                <p
+                  className="uppercase font-bold mb-2"
+                  style={{ fontSize: '9px', letterSpacing: '0.07em', color: '#9E9E9E', fontFamily: 'Inter, sans-serif' }}
+                >
+                  {label}
+                </p>
+                <div className="flex items-baseline gap-1 flex-wrap">
+                  <span
+                    className="tabular-nums font-bold"
+                    style={{ fontFamily: 'Manrope, sans-serif', fontSize: '28px', color, letterSpacing: '-0.02em', lineHeight: 1.1 }}
+                  >
+                    {value}
+                  </span>
+                  {suffix && (
+                    <span
+                      className="font-bold"
+                      style={{ fontFamily: 'Inter, sans-serif', fontSize: '11px', color: '#9E9E9E', letterSpacing: '0.02em' }}
+                    >
+                      {suffix}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
+
+          <SimulatorOutputChart inputs={inputs} />
         </div>
 
-        <div className="space-y-2">
+        {/* RIGHT: Strategic Summary — Paper on Stone */}
+        <div className="order-3 lg:order-none lg:col-span-3 xl:col-span-3 space-y-4">
+
+          {/* Scenario Summary */}
+          <div className="rounded-2xl p-5" style={{ background: '#FFFFFF' }}>
+            <h3
+              className="font-bold mb-4"
+              style={{ fontFamily: 'Manrope, sans-serif', fontSize: '14px', color: '#00205F' }}
+            >
+              Scenario Summary
+            </h3>
+            <div className="space-y-3">
+              {SCENARIO_VIEWS.map(sv => {
+                const svOutputs = getScenarioOutputs(sv.id);
+                const isActive = activeScenario === sv.id;
+                return (
+                  <button
+                    key={`sum-${sv.id}`}
+                    onClick={() => setActiveScenario(sv.id)}
+                    className="w-full text-left p-3 rounded-xl transition-all duration-150"
+                    style={
+                      isActive
+                        ? { background: `rgba(0,0,0,0.03)`, outline: `2px solid ${sv.color}` }
+                        : { background: '#FCF9F8' }
+                    }
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span
+                        className="font-bold uppercase"
+                        style={{ fontSize: '10px', letterSpacing: '0.06em', color: sv.color, fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {sv.label}
+                      </span>
+                      {isActive && <span className="w-2 h-2 rounded-full" style={{ background: sv.color }} />}
+                    </div>
+                    <p
+                      className="tabular-nums font-bold"
+                      style={{ fontFamily: 'Manrope, sans-serif', fontSize: '22px', color: '#00205F', letterSpacing: '-0.02em' }}
+                    >
+                      {fmtExec(svOutputs.annualizedReturn)}
+                    </p>
+                    <p style={{ fontSize: '11px', color: '#9E9E9E', fontFamily: 'Inter, sans-serif', marginTop: '2px' }}>
+                      {svOutputs.ftesFreed.toFixed(1)} FTEs · {svOutputs.activeUsers.toLocaleString()} users
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Key Assumptions — Submerged utility */}
+          <div className="rounded-2xl p-5" style={{ background: '#FFFFFF' }}>
+            <h3
+              className="font-bold mb-3"
+              style={{ fontFamily: 'Manrope, sans-serif', fontSize: '14px', color: '#00205F' }}
+            >
+              Key Assumptions
+            </h3>
+            <div className="space-y-2.5">
+              {[
+                { id: 'ka-cost', label: 'Hourly cost rate', value: `$${SIM_CONSTANTS.HOURLY_COST}/hr` },
+                { id: 'ka-days', label: 'Working days/month', value: `${SIM_CONSTANTS.WORKING_DAYS_PER_MONTH}` },
+                { id: 'ka-hrs', label: 'Working hours/day', value: `${SIM_CONSTANTS.WORKING_HOURS_PER_DAY}` },
+                { id: 'ka-cases', label: 'Active use cases', value: `${outputs.activeUseCases} of ${inputs.targetUseCaseCount}` },
+                { id: 'ka-users', label: 'Active users', value: `${outputs.activeUsers.toLocaleString()} of ${inputs.targetUserCount.toLocaleString()}` },
+              ].map(({ id, label, value }) => (
+                <div key={id} className="flex items-center justify-between gap-2">
+                  <span style={{ fontSize: '12px', color: '#9E9E9E', fontFamily: 'Inter, sans-serif' }}>{label}</span>
+                  <span className="tabular-nums font-bold" style={{ fontSize: '12px', color: '#00205F', fontFamily: 'Inter, sans-serif' }}>{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA */}
           <Link href="/ai-architecture-explorer">
-            <span className="kpmg-btn-primary w-full justify-between text-sm cursor-pointer">
+            <span
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm cursor-pointer transition-all duration-150"
+              style={{ background: '#00205F', color: '#fff', fontFamily: 'Inter, sans-serif' }}
+            >
               Explore Architecture
               <ChevronRight size={14} />
             </span>
