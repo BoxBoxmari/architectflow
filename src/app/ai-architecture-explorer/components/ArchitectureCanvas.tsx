@@ -282,24 +282,37 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
       <div
         role="search"
         aria-label="Filter AI cases"
-        className="rounded-2xl px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap"
+        className="rounded-2xl px-4 py-3 flex flex-col gap-3"
         style={{ background: '#FFFFFF', boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
       >
-        {/* Search */}
-        <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-36 sm:max-w-56">
-          <Search size={13} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#747683' }} />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search cases or techniques…"
-            aria-label="Search AI cases by name or technique"
-            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-offset-0 placeholder:text-kpmg-outline transition-all"
-            style={{ background: '#F0EDEC', color: '#1C1B1B', fontFamily: 'var(--font-body)', fontWeight: 500, letterSpacing: '0.01em' }}
-          />
+        {/* Row 1: Search + Reset */}
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1 min-w-0">
+            <Search size={13} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#747683' }} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search cases or techniques…"
+              aria-label="Search AI cases by name or technique"
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-offset-0 placeholder:text-kpmg-outline transition-all"
+              style={{ background: '#F0EDEC', color: '#1C1B1B', fontFamily: 'var(--font-body)', fontWeight: 500, letterSpacing: '0.01em' }}
+            />
+          </div>
+          {(selectedCase || activeFunction || searchQuery || scaleFilter) && (
+            <button
+              onClick={reset}
+              aria-label="Reset all filters and selection"
+              className="flex-shrink-0 flex items-center gap-1.5 transition-colors"
+              style={{ fontSize: '11px', color: '#747683', fontFamily: 'var(--font-body)', fontWeight: 500 }}
+            >
+              <RotateCcw size={11} aria-hidden="true" />
+              Reset
+            </button>
+          )}
         </div>
 
-        {/* Function filter */}
+        {/* Row 2: Function filter chips */}
         <div role="group" aria-label="Filter by function" className="flex items-center gap-1.5 flex-wrap">
           <span
             style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', flexShrink: 0 }}
@@ -319,12 +332,9 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               {fn.name}
             </button>
           ))}
-        </div>
-
-        {/* Maturity filter */}
-        <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Maturity filter inline */}
           <span
-            style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', flexShrink: 0 }}
+            style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', flexShrink: 0, marginLeft: '4px' }}
             aria-hidden="true"
           >
             Maturity
@@ -340,18 +350,6 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
             SCALE
           </button>
         </div>
-
-        {(selectedCase || activeFunction || searchQuery || scaleFilter) && (
-          <button
-            onClick={reset}
-            aria-label="Reset all filters and selection"
-            className="sm:ml-auto flex items-center gap-1.5 transition-colors"
-            style={{ fontSize: '11px', color: '#747683', fontFamily: 'var(--font-body)', fontWeight: 500 }}
-          >
-            <RotateCcw size={11} aria-hidden="true" />
-            Reset
-          </button>
-        )}
       </div>
 
       {/* ── Trace hint ─────────────────────────────────────────────────────── */}
@@ -412,7 +410,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
 
           {/* Main canvas area */}
           <div className="p-3 overflow-x-auto">
-            <div ref={canvasRef} className="relative flex gap-0" style={{ minHeight: 320, minWidth: 520 }}>
+            <div ref={canvasRef} className="relative flex gap-0" style={{ minHeight: 320, minWidth: 640 }}>
               {/* SVG Bezier connector overlay */}
               <svg
                 className="absolute inset-0 w-full h-full pointer-events-none"
@@ -447,7 +445,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               <div
                 ref={caseColRef}
                 className="flex flex-col gap-2.5 rounded-xl px-2.5 py-3"
-                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)', width: '34%', minWidth: 140, flexShrink: 0 }}
+                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)', width: '34%', minWidth: 160, flexShrink: 0 }}
                 role="list"
                 aria-label="AI Cases"
               >
@@ -543,7 +541,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               <div
                 ref={fnColRef}
                 className="flex flex-col gap-2.5 rounded-xl px-2.5 py-3"
-                style={{ background: '#F6F3F2', position: 'relative', zIndex: 1, width: '28%', minWidth: 120, flexShrink: 0 }}
+                style={{ background: '#F6F3F2', position: 'relative', zIndex: 1, width: '28%', minWidth: 140, flexShrink: 0 }}
                 role="list"
                 aria-label="Functions"
               >
@@ -614,7 +612,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               <div
                 ref={svcColRef}
                 className="flex flex-col gap-1.5 rounded-xl px-2.5 py-3"
-                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)', flex: 1, minWidth: 120 }}
+                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)', flex: 1, minWidth: 140 }}
                 role="list"
                 aria-label="Services"
               >
