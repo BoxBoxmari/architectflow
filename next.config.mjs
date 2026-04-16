@@ -20,7 +20,7 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/executive-overview',
+        destination: '/ai-architecture-explorer',
         permanent: false,
       },
     ];

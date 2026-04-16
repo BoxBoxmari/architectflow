@@ -94,7 +94,7 @@ export default function PilotRequestContent() {
           <button onClick={() => setSubmitted(false)} className="kpmg-btn-secondary text-sm">
             Submit Another Request
           </button>
-          <Link href="/executive-overview" className="kpmg-btn-primary text-sm">
+          <Link href="/ai-architecture-explorer" className="kpmg-btn-primary text-sm">
             Back to Overview
             <ChevronRight size={13} />
           </Link>
