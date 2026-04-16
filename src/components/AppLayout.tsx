@@ -1,7 +1,15 @@
 'use client';
 import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import {
+  pageVariants,
+  pageTransition,
+  reducedPageVariants,
+  reducedPageTransition,
+} from '@/lib/animations';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -11,6 +19,11 @@ interface AppLayoutProps {
 export default function AppLayout({ children, activeRoute }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
+  const pathname = usePathname();
+  const prefersReducedMotion = useReducedMotion();
+
+  const variants = prefersReducedMotion ? reducedPageVariants : pageVariants;
+  const transition = prefersReducedMotion ? reducedPageTransition : pageTransition;
 
   return (
     /* Paper on Stone: main canvas is #FCF9F8 (Base Stone) */
@@ -23,7 +36,7 @@ export default function AppLayout({ children, activeRoute }: AppLayoutProps) {
         />
       )}
 
-      {/* Sidebar — Pure Paper (#FFFFFF) lifted above Stone canvas */}
+      {/* Sidebar — Pure Paper (#FFFFFF) lifted above Stone canvas — STATIC, excluded from transitions */}
       <div
         className={`
           fixed lg:relative z-40 h-full flex-shrink-0 transition-all duration-300 ease-in-out
@@ -42,12 +55,24 @@ export default function AppLayout({ children, activeRoute }: AppLayoutProps) {
 
       {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        {/* Topbar — STATIC, excluded from transitions */}
         <Topbar onMenuClick={() => setMobileSidebarOpen(true)} />
+
         {/* Surface Container Low (#F6F3F2) for the scroll area — structural lane */}
         <main className="flex-1 overflow-y-auto scrollbar-thin bg-kpmg-background dark:bg-gray-950">
-          <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 xl:px-10 py-8">
-            {children}
-          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={pathname}
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={transition}
+              className="max-w-screen-2xl mx-auto px-6 lg:px-8 xl:px-10 py-8"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>
