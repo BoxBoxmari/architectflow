@@ -98,7 +98,7 @@ export default function ReportBuilderContent() {
 
     const exportSortedSections = [...sections].sort((a, b) => a.order - b.order).filter(s => s.included);
     const exportCaseObjects = AI_CASES.filter(c => selectedCases.includes(c.id));
-    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const dateStr = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 
     const exportTotalAnnualized = exportCaseObjects.reduce((sum, c) => sum + c.numericMetrics.annualizedReturn, 0);
     const exportTotalHours = exportCaseObjects.reduce((sum, c) => sum + c.numericMetrics.hoursRecoveredPerMonth, 0);
@@ -112,15 +112,15 @@ export default function ReportBuilderContent() {
       if (section.id === 'sec-exec') {
         content = `
           <p style="margin-bottom:10px;">This report summarises the ${DEMO_CONTEXT.firm.name} AI portfolio status as of ${DEMO_CONTEXT.firm.reportingPeriod}. The portfolio comprises <strong>${AI_CASES.length} AI cases</strong> across <strong>${uniqueFunctions} functions</strong>, with <strong>${exportActiveCases.length} cases</strong> at Active or Scaled status.</p>
-          <p style="margin-bottom:10px;">${exportScaledCases.map(c => `${c.code} ${c.title}`).join(', ')} ${exportScaledCases.length === 1 ? 'has' : 'have'} achieved Scaled status. The selected ${exportCaseObjects.length} case${exportCaseObjects.length !== 1 ? 's' : ''} in this report represent a combined annualised return of <strong>£${(exportTotalAnnualized / 1000000).toFixed(2)}M</strong> and <strong>${Math.round(exportTotalHours).toLocaleString()} hours recovered per month</strong>.</p>
-          <p>Under the <strong>${scenarioLabel}</strong> scenario, the simulator projects an annualised return of <strong>£${(exportOutputs.annualizedReturn / 1000000).toFixed(2)}M</strong> with <strong>${exportOutputs.activeUsers} active users</strong> across <strong>${exportOutputs.activeUseCases} active use cases</strong>.</p>
+          <p style="margin-bottom:10px;">${exportScaledCases.map(c => `${c.code} ${c.title}`).join(', ')} ${exportScaledCases.length === 1 ? 'has' : 'have'} achieved Scaled status. The selected ${exportCaseObjects.length} case${exportCaseObjects.length !== 1 ? 's' : ''} in this report represent a combined annualised return of <strong>$${(exportTotalAnnualized / 1000000).toFixed(2)}M</strong> and <strong>${Math.round(exportTotalHours).toLocaleString()} hours recovered per month</strong>.</p>
+          <p>Under the <strong>${scenarioLabel}</strong> scenario, the simulator projects an annualised return of <strong>$${(exportOutputs.annualizedReturn / 1000000).toFixed(2)}M</strong> with <strong>${exportOutputs.activeUsers} active users</strong> across <strong>${exportOutputs.activeUseCases} active use cases</strong>.</p>
           <table style="margin-top:12px;">
             <tr><th>Metric</th><th>Value</th></tr>
             <tr><td>Portfolio Cases</td><td>${AI_CASES.length}</td></tr>
             <tr><td>Functions Covered</td><td>${uniqueFunctions}</td></tr>
             <tr><td>Active / Scaled Cases</td><td>${exportActiveCases.length}</td></tr>
             <tr><td>Selected Cases (This Report)</td><td>${exportCaseObjects.length}</td></tr>
-            <tr><td>Combined Annualised Return (Selected)</td><td>£${(exportTotalAnnualized / 1000000).toFixed(2)}M</td></tr>
+            <tr><td>Combined Annualised Return (Selected)</td><td>$${(exportTotalAnnualized / 1000000).toFixed(2)}M</td></tr>
             <tr><td>Hours Recovered / Month (Selected)</td><td>${Math.round(exportTotalHours).toLocaleString()} hrs</td></tr>
             <tr><td>FTEs Freed / Month (Selected)</td><td>${exportTotalFTEs.toFixed(1)}</td></tr>
           </table>`;
@@ -154,7 +154,7 @@ export default function ReportBuilderContent() {
             <p style="font-size:11px;font-style:italic;color:#006397;margin-bottom:8px;">"${c.partnerInsight}"</p>
             <table style="margin-bottom:0;">
               <tr><th>Metric</th><th>Value</th></tr>
-              <tr><td>Annualised Return</td><td>£${(c.numericMetrics.annualizedReturn / 1000000).toFixed(2)}M</td></tr>
+              <tr><td>Annualised Return</td><td>$${(c.numericMetrics.annualizedReturn / 1000000).toFixed(2)}M</td></tr>
               <tr><td>Hours Recovered / Month</td><td>${c.numericMetrics.hoursRecoveredPerMonth.toLocaleString()} hrs</td></tr>
               <tr><td>FTEs Freed / Month</td><td>${c.numericMetrics.ftesFreed.toFixed(1)}</td></tr>
               <tr><td>Adoption Rate</td><td>${c.numericMetrics.adoptionRate}%</td></tr>
@@ -169,15 +169,15 @@ export default function ReportBuilderContent() {
           <p style="margin-bottom:10px;">Scenario: <strong>${scenarioLabel}</strong> — based on simulator assumptions below.</p>
           <table>
             <tr><th>Output Metric</th><th>${scenarioLabel}</th></tr>
-            <tr><td>Annualised Return</td><td>£${(exportOutputs.annualizedReturn / 1000000).toFixed(2)}M</td></tr>
-            <tr><td>Monthly Cost Savings</td><td>£${Math.round(exportOutputs.monthlyCostSavings).toLocaleString()}</td></tr>
+            <tr><td>Annualised Return</td><td>$${(exportOutputs.annualizedReturn / 1000000).toFixed(2)}M</td></tr>
+            <tr><td>Monthly Cost Savings</td><td>$${Math.round(exportOutputs.monthlyCostSavings).toLocaleString()}</td></tr>
             <tr><td>Hours Recovered / Month</td><td>${Math.round(exportOutputs.hoursPerMonth).toLocaleString()} hrs</td></tr>
             <tr><td>FTEs Freed / Month</td><td>${exportOutputs.ftesFreed.toFixed(1)}</td></tr>
             <tr><td>Active Users</td><td>${exportOutputs.activeUsers}</td></tr>
             <tr><td>Active Use Cases</td><td>${exportOutputs.activeUseCases}</td></tr>
             <tr><td>Tasks / Month</td><td>${exportOutputs.tasksPerMonth.toLocaleString()}</td></tr>
             <tr><td>Daily Interactions</td><td>${exportOutputs.dailyInteractions.toLocaleString()}</td></tr>
-            <tr><td>Value / User / Month</td><td>£${Math.round(exportOutputs.valuePerUserPerMonth).toLocaleString()}</td></tr>
+            <tr><td>Value / User / Month</td><td>$${Math.round(exportOutputs.valuePerUserPerMonth).toLocaleString()}</td></tr>
           </table>
           <p style="margin-top:12px;font-weight:bold;font-size:12px;">Simulator Assumptions</p>
           <table>
@@ -188,7 +188,7 @@ export default function ReportBuilderContent() {
             <tr><td>Adoption Rate</td><td>${SIM_DEFAULTS.adoptionRate}%</td></tr>
             <tr><td>Tasks / User / Use Case / Month</td><td>${SIM_DEFAULTS.tasksPerUserPerUseCasePerMonth}</td></tr>
             <tr><td>Avg Time Saved / Task</td><td>${SIM_DEFAULTS.avgTimeSavedMinutes} min</td></tr>
-            <tr><td>Blended Hourly Cost Rate</td><td>£${SIM_CONSTANTS.HOURLY_COST}/hr</td></tr>
+            <tr><td>Blended Hourly Cost Rate (USD)</td><td>$${SIM_CONSTANTS.HOURLY_COST}/hr</td></tr>
           </table>`;
       } else if (section.id === 'sec-comparison') {
         const cso = allVariants.currentState.outputs;
@@ -197,8 +197,8 @@ export default function ReportBuilderContent() {
         content = `
           <table>
             <tr><th>Metric</th><th>Current State</th><th>2× Scale-Up</th><th>Full Adoption</th></tr>
-            <tr><td>Annualised Return</td><td>£${(cso.annualizedReturn / 1000000).toFixed(2)}M</td><td>£${(s2o.annualizedReturn / 1000000).toFixed(2)}M</td><td>£${(fao.annualizedReturn / 1000000).toFixed(2)}M</td></tr>
-            <tr><td>Monthly Cost Savings</td><td>£${Math.round(cso.monthlyCostSavings).toLocaleString()}</td><td>£${Math.round(s2o.monthlyCostSavings).toLocaleString()}</td><td>£${Math.round(fao.monthlyCostSavings).toLocaleString()}</td></tr>
+            <tr><td>Annualised Return</td><td>$${(cso.annualizedReturn / 1000000).toFixed(2)}M</td><td>$${(s2o.annualizedReturn / 1000000).toFixed(2)}M</td><td>$${(fao.annualizedReturn / 1000000).toFixed(2)}M</td></tr>
+            <tr><td>Monthly Cost Savings</td><td>$${Math.round(cso.monthlyCostSavings).toLocaleString()}</td><td>$${Math.round(s2o.monthlyCostSavings).toLocaleString()}</td><td>$${Math.round(fao.monthlyCostSavings).toLocaleString()}</td></tr>
             <tr><td>Hours Recovered / Month</td><td>${Math.round(cso.hoursPerMonth).toLocaleString()}</td><td>${Math.round(s2o.hoursPerMonth).toLocaleString()}</td><td>${Math.round(fao.hoursPerMonth).toLocaleString()}</td></tr>
             <tr><td>FTEs Freed / Month</td><td>${cso.ftesFreed.toFixed(1)}</td><td>${s2o.ftesFreed.toFixed(1)}</td><td>${fao.ftesFreed.toFixed(1)}</td></tr>
             <tr><td>Active Users</td><td>${cso.activeUsers}</td><td>${s2o.activeUsers}</td><td>${fao.activeUsers}</td></tr>
@@ -229,7 +229,7 @@ export default function ReportBuilderContent() {
             <tr><th>Recommendation</th><th>Detail</th></tr>
             <tr><td>Lead Case</td><td>${topCase ? `${topCase.code} — ${topCase.title} (Value Score: ${topCase.valueScore}/100)` : 'TBD'}</td></tr>
             <tr><td>Target Scenario</td><td>${scenarioLabel}</td></tr>
-            <tr><td>Projected Annualised Return</td><td>£${(exportOutputs.annualizedReturn / 1000000).toFixed(2)}M</td></tr>
+            <tr><td>Projected Annualised Return</td><td>$${(exportOutputs.annualizedReturn / 1000000).toFixed(2)}M</td></tr>
             <tr><td>Target Active Users</td><td>${exportOutputs.activeUsers}</td></tr>
             <tr><td>Target Active Use Cases</td><td>${exportOutputs.activeUseCases}</td></tr>
             <tr><td>Primary Functions</td><td>${primaryFunctions.join(', ')}</td></tr>
@@ -445,7 +445,7 @@ ${sectionHTML}
                   <span className="font-display text-sm font-bold text-kpmg-primary tracking-tight">KPMG</span>
                 </div>
                 <h1 className="font-display text-xl font-extrabold text-kpmg-on-surface leading-tight mb-1">{reportTitle}</h1>
-                <p className="text-xs text-kpmg-outline font-body">Prepared by {DEMO_CONTEXT.user.name}, {DEMO_CONTEXT.user.role} · {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p className="text-xs text-kpmg-outline font-body">Prepared by {DEMO_CONTEXT.user.name}, {DEMO_CONTEXT.user.role} · {new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 <p className="text-xs text-kpmg-outline font-body">CONFIDENTIAL — Internal Use Only</p>
               </div>
               <div className="text-right">
@@ -479,7 +479,7 @@ ${sectionHTML}
                       {[
                         { label: 'Portfolio Cases', value: `${AI_CASES.length}` },
                         { label: 'Selected Cases', value: `${selectedCaseObjects.length}` },
-                        { label: 'Combined Return', value: `£${(totalAnnualizedReturn / 1000000).toFixed(1)}M` },
+                        { label: 'Combined Return', value: `$${(totalAnnualizedReturn / 1000000).toFixed(1)}M` },
                         { label: 'Hrs Recovered / Mo', value: `${Math.round(totalHoursRecovered).toLocaleString()}` },
                       ].map(({ label, value }) => (
                         <div key={label} className="p-3 rounded-lg bg-kpmg-primary/5 text-center">
@@ -491,7 +491,7 @@ ${sectionHTML}
                     <div className="p-3 rounded-lg bg-kpmg-surface-container border border-kpmg-outline-variant/20">
                       <p className="text-xs font-semibold text-kpmg-outline font-body mb-1 uppercase tracking-wider">Scenario: {scenarioLabel}</p>
                       <p className="text-sm text-kpmg-on-surface-variant font-body">
-                        Annualised return <strong>£${(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M</strong> · {scenarioOutputs.activeUsers} active users · {scenarioOutputs.activeUseCases} active use cases · {scenarioOutputs.ftesFreed.toFixed(1)} FTEs freed/month
+                        Annualised return <strong>${(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M USD</strong> · {scenarioOutputs.activeUsers} active users · {scenarioOutputs.activeUseCases} active use cases · {scenarioOutputs.ftesFreed.toFixed(1)} FTEs freed/month
                       </p>
                     </div>
                   </div>
@@ -546,7 +546,7 @@ ${sectionHTML}
                         <p className="text-xs text-kpmg-primary font-body italic mb-2">&ldquo;{c.partnerInsight}&rdquo;</p>
                         <div className="grid grid-cols-2 gap-1.5">
                           {[
-                            { label: 'Annualised Return', value: `£${(c.numericMetrics.annualizedReturn / 1000000).toFixed(2)}M` },
+                            { label: 'Annualised Return', value: `$${(c.numericMetrics.annualizedReturn / 1000000).toFixed(2)}M` },
                             { label: 'Hrs Recovered / Mo', value: `${c.numericMetrics.hoursRecoveredPerMonth.toLocaleString()}` },
                             { label: 'FTEs Freed / Mo', value: `${c.numericMetrics.ftesFreed.toFixed(1)}` },
                             { label: 'Adoption Rate', value: `${c.numericMetrics.adoptionRate}%` },
@@ -573,12 +573,12 @@ ${sectionHTML}
                     <p className="text-xs text-kpmg-outline font-body">Scenario: <strong className="text-kpmg-on-surface">{scenarioLabel}</strong></p>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { label: 'Annualised Return', value: `£${(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M` },
+                        { label: 'Annualised Return', value: `$${(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M` },
                         { label: 'FTEs Freed / Month', value: `${scenarioOutputs.ftesFreed.toFixed(1)}` },
                         { label: 'Hours Recovered / Month', value: `${Math.round(scenarioOutputs.hoursPerMonth).toLocaleString()}` },
                         { label: 'Active Users', value: `${scenarioOutputs.activeUsers}` },
                         { label: 'Active Use Cases', value: `${scenarioOutputs.activeUseCases}` },
-                        { label: 'Monthly Cost Savings', value: `£${Math.round(scenarioOutputs.monthlyCostSavings).toLocaleString()}` },
+                        { label: 'Monthly Cost Savings', value: `$${Math.round(scenarioOutputs.monthlyCostSavings).toLocaleString()}` },
                       ].map(({ label, value }) => (
                         <div key={label} className="p-3 rounded-lg bg-kpmg-surface-container-low">
                           <p className="text-xs text-kpmg-outline font-body mb-0.5">{label}</p>
@@ -596,7 +596,7 @@ ${sectionHTML}
                           { label: 'Adoption Rate', value: `${SIM_DEFAULTS.adoptionRate}%` },
                           { label: 'Tasks / User / UC / Mo', value: `${SIM_DEFAULTS.tasksPerUserPerUseCasePerMonth}` },
                           { label: 'Avg Time Saved', value: `${SIM_DEFAULTS.avgTimeSavedMinutes} min` },
-                          { label: 'Hourly Cost Rate', value: `£${SIM_CONSTANTS.HOURLY_COST}/hr` },
+                          { label: 'Hourly Cost Rate', value: `$${SIM_CONSTANTS.HOURLY_COST}/hr (USD)` },
                         ].map(({ label, value }) => (
                           <div key={label} className="flex justify-between text-xs font-body">
                             <span className="text-kpmg-outline">{label}</span>
@@ -619,7 +619,7 @@ ${sectionHTML}
                       ].map(({ label, outputs }) => (
                         <div key={label} className="p-3 rounded-lg bg-kpmg-surface-container-low border border-kpmg-outline-variant/20">
                           <p className="text-xs font-semibold text-kpmg-outline font-body mb-2 uppercase tracking-wider">{label}</p>
-                          <p className="font-display text-base font-extrabold text-kpmg-primary tabular-nums">£{(outputs.annualizedReturn / 1000000).toFixed(2)}M</p>
+                          <p className="font-display text-base font-extrabold text-kpmg-primary tabular-nums">${(outputs.annualizedReturn / 1000000).toFixed(2)}M USD</p>
                           <p className="text-xs text-kpmg-outline font-body">annualised</p>
                           <div className="mt-2 space-y-1">
                             {[
@@ -692,7 +692,7 @@ ${sectionHTML}
                         <p className="text-sm text-kpmg-on-surface-variant font-body leading-relaxed">
                           Initiate a formal pilot request for the <strong>{scenarioLabel}</strong> scenario.
                           {topCase && <> Lead with <strong>{topCase.code} — {topCase.title}</strong> (Value Score: {topCase.valueScore}/100).</>}
-                          {' '}Projected annualised return: <strong>£{(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M</strong> with <strong>{scenarioOutputs.activeUsers} active users</strong> across <strong>{scenarioOutputs.activeUseCases} use cases</strong>.
+                          {' '}Projected annualised return: <strong>${(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M USD</strong> with <strong>{scenarioOutputs.activeUsers} active users</strong> across <strong>{scenarioOutputs.activeUseCases} use cases</strong>.
                         </p>
                       </div>
                       {selectedCaseObjects.length > 0 && (
@@ -700,7 +700,7 @@ ${sectionHTML}
                           {[
                             { label: 'Lead Case', value: topCase ? `${topCase.code}` : 'TBD' },
                             { label: 'Target Scenario', value: scenarioLabel },
-                            { label: 'Projected Return', value: `£${(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M` },
+                            { label: 'Projected Return', value: `$${(scenarioOutputs.annualizedReturn / 1000000).toFixed(2)}M` },
                             { label: 'Pilot Duration', value: '90 days' },
                           ].map(({ label, value }) => (
                             <div key={label} className="p-2 rounded-lg bg-kpmg-surface-container-low">

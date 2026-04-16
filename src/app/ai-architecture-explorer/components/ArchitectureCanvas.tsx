@@ -52,6 +52,8 @@ export default function ArchitectureCanvas() {
     ? new Set(activeCase.linkedServices)
     : new Set(filteredCases.flatMap((c) => c.linkedServices));
 
+  const isTracing = !!(selectedCase || hoveredCase);
+
   function handleSelectCase(c: (typeof AI_CASES)[0]) {
     const isSelected = selectedCase?.id === c.id;
     if (isSelected) {
@@ -60,7 +62,6 @@ export default function ArchitectureCanvas() {
     } else {
       setSelectingId(c.id);
       setSelectedCase(c);
-      // clear the glow class after animation completes
       setTimeout(() => setSelectingId(null), 400);
     }
   }
@@ -113,6 +114,24 @@ export default function ArchitectureCanvas() {
         )}
       </div>
 
+      {/* Trace hint */}
+      {!isTracing && (
+        <div className="flex items-center gap-2 px-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster flex-shrink-0" />
+          <p className="text-xs text-kpmg-outline font-body">
+            Select a case to trace its architecture — which functions and services it reaches
+          </p>
+        </div>
+      )}
+      {isTracing && selectedCase && (
+        <div className="flex items-center gap-2 px-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster flex-shrink-0 animate-pulse" />
+          <p className="text-xs font-semibold text-kpmg-primary font-body">
+            Tracing <span className="font-bold">{selectedCase.code}</span> — {activeFunctionIds.size} functions · {activeServiceIds.size} services reached
+          </p>
+        </div>
+      )}
+
       {/* Canvas + Drawer */}
       <div className="flex flex-col lg:flex-row gap-4 min-h-0">
         {/* Canvas */}
@@ -141,7 +160,7 @@ export default function ArchitectureCanvas() {
           </div>
 
           <div className="p-4 overflow-x-auto">
-            <div className="flex gap-4 min-w-max">
+            <div className="flex gap-0 min-w-max">
               {/* Cases column */}
               <div className="flex flex-col gap-3 w-44">
                 <p
@@ -193,78 +212,103 @@ export default function ArchitectureCanvas() {
                 })}
               </div>
 
-              {/* Connector */}
-              <div className="flex gap-4 items-start">
-                <div className="relative w-8 flex items-center justify-center">
-                  <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
-                </div>
+              {/* Connector: Cases → Functions */}
+              <div className="relative w-12 flex-shrink-0 self-stretch">
+                <div className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
+                {isTracing && (
+                  <div
+                    className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-0.5 transition-all duration-300"
+                    style={{ backgroundColor: '#00B8A9', opacity: 0.7 }}
+                  />
+                )}
+              </div>
 
-                {/* Functions column */}
-                <div className="flex flex-col gap-3 w-36">
-                  <p
-                    className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-1"
-                    style={{ fontSize: '10px' }}
-                  >
-                    Functions
-                  </p>
-                  {FUNCTIONS.map((fn) => {
-                    const isActive = activeFunctionIds.has(fn.id);
-                    return (
+              {/* Functions column */}
+              <div className="flex flex-col gap-3 w-36">
+                <p
+                  className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-1"
+                  style={{ fontSize: '10px' }}
+                >
+                  Functions
+                </p>
+                {FUNCTIONS.map((fn) => {
+                  const isActive = activeFunctionIds.has(fn.id);
+                  return (
+                    <div
+                      key={`fn-node-${fn.id}`}
+                      className={[
+                        'p-3 rounded-xl border-2 fn-node-active transition-all duration-200',
+                        isActive
+                          ? isTracing
+                            ? 'border-kpmg-primary bg-kpmg-primary/8 opacity-100 shadow-card'
+                            : 'border-kpmg-primary bg-kpmg-primary/5 opacity-100' :'border-transparent bg-kpmg-surface-container opacity-25',
+                      ].join(' ')}
+                    >
                       <div
-                        key={`fn-node-${fn.id}`}
-                        className={[
-                          'p-3 rounded-xl border-2 fn-node-active',
-                          isActive
-                            ? 'border-kpmg-primary bg-kpmg-primary/5 opacity-100' :'border-transparent bg-kpmg-surface-container opacity-35',
-                        ].join(' ')}
-                      >
-                        <div
-                          className="w-2 h-2 rounded-full mb-2"
-                          style={{ backgroundColor: fn.color ?? '#747683' }}
+                        className="w-2 h-2 rounded-full mb-2"
+                        style={{ backgroundColor: fn.color ?? '#747683' }}
+                      />
+                      <p className="text-sm font-semibold text-kpmg-on-surface font-body break-words">
+                        {fn.name}
+                      </p>
+                      <p className="text-xs text-kpmg-outline font-body mt-0.5">
+                        {AI_CASES.filter((c) => c.linkedFunctions.includes(fn.id)).length} cases
+                      </p>
+                      {isTracing && isActive && (
+                        <span className="inline-block mt-1.5 text-xs font-semibold text-kpmg-primary font-body" style={{ fontSize: '10px' }}>
+                          ✓ Reached
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Connector: Functions → Services */}
+              <div className="relative w-12 flex-shrink-0 self-stretch">
+                <div className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
+                {isTracing && (
+                  <div
+                    className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-0.5 transition-all duration-300"
+                    style={{ backgroundColor: '#006397', opacity: 0.7 }}
+                  />
+                )}
+              </div>
+
+              {/* Services column */}
+              <div className="flex flex-col gap-2 w-44">
+                <p
+                  className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-1"
+                  style={{ fontSize: '10px' }}
+                >
+                  Services
+                </p>
+                {SERVICES.map((svc) => {
+                  const isActive = activeServiceIds.has(svc.id);
+                  const parentFn = FUNCTIONS.find(fn => fn.id === svc.functionId);
+                  return (
+                    <div
+                      key={`svc-node-${svc.id}`}
+                      className={[
+                        'px-3 py-2 rounded-lg border svc-node-active transition-all duration-200',
+                        isActive
+                          ? isTracing
+                            ? 'border-kpmg-outline-variant bg-white opacity-100 shadow-card'
+                            : 'border-kpmg-outline-variant bg-white opacity-100' :'border-transparent bg-kpmg-surface-container opacity-20',
+                      ].join(' ')}
+                    >
+                      {isActive && isTracing && parentFn && (
+                        <span
+                          className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 mb-0.5 align-middle"
+                          style={{ backgroundColor: parentFn.color ?? '#747683' }}
                         />
-                        <p className="text-sm font-semibold text-kpmg-on-surface font-body break-words">
-                          {fn.name}
-                        </p>
-                        <p className="text-xs text-kpmg-outline font-body mt-0.5">
-                          {AI_CASES.filter((c) => c.linkedFunctions.includes(fn.id)).length} cases
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Connector */}
-                <div className="relative w-8 flex items-center justify-center">
-                  <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30" />
-                </div>
-
-                {/* Services column */}
-                <div className="flex flex-col gap-2 w-44">
-                  <p
-                    className="text-xs font-semibold text-kpmg-outline uppercase tracking-widest font-body mb-1"
-                    style={{ fontSize: '10px' }}
-                  >
-                    Services
-                  </p>
-                  {SERVICES.map((svc) => {
-                    const isActive = activeServiceIds.has(svc.id);
-                    return (
-                      <div
-                        key={`svc-node-${svc.id}`}
-                        className={[
-                          'px-3 py-2 rounded-lg border svc-node-active',
-                          isActive
-                            ? 'border-kpmg-outline-variant bg-white opacity-100'
-                            : 'border-transparent bg-kpmg-surface-container opacity-25',
-                        ].join(' ')}
-                      >
-                        <p className="text-xs font-medium text-kpmg-on-surface font-body">
-                          {svc.name}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
+                      )}
+                      <span className="text-xs font-medium text-kpmg-on-surface font-body">
+                        {svc.name}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -337,6 +381,22 @@ export default function ArchitectureCanvas() {
                 <p className="text-xs text-kpmg-outline font-body mt-1">{selectedCase.source}</p>
               </div>
 
+              {/* Reuse summary */}
+              <div className="p-3 rounded-lg bg-kpmg-accent-faster/5 border border-kpmg-accent-faster/20">
+                <p
+                  className="text-xs font-semibold text-kpmg-accent-faster uppercase tracking-widest font-body mb-1.5"
+                  style={{ fontSize: '10px' }}
+                >
+                  Foundation Reach
+                </p>
+                <p className="text-sm font-bold text-kpmg-on-surface font-display">
+                  {selectedCase.linkedFunctions.length} functions · {selectedCase.linkedServices.length} services
+                </p>
+                <p className="text-xs text-kpmg-on-surface-variant font-body mt-1 leading-snug">
+                  One architecture pattern — reused across all highlighted functions
+                </p>
+              </div>
+
               {/* Key value metrics */}
               <div>
                 <p
@@ -375,7 +435,7 @@ export default function ArchitectureCanvas() {
                     return (
                       <div
                         key={`reach-fn-${fn.id}`}
-                        className="p-2 rounded-lg bg-kpmg-surface-container-low"
+                        className="p-2 rounded-lg bg-kpmg-surface-container-low border border-kpmg-primary/10"
                       >
                         <div className="flex items-center gap-1.5 mb-1">
                           <span

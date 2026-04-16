@@ -118,7 +118,7 @@ export default function ValueSimulatorContent() {
       ['Avg Time Saved / Task (min)', inputs.avgTimeSavedMinutes],
       [],
       ['--- KEY ASSUMPTIONS ---'],
-      ['Hourly Cost Rate (£/hr)', HOURLY_COST],
+      ['Hourly Cost Rate (USD/hr)', HOURLY_COST],
       ['Working Days / Month', WORKING_DAYS_PER_MONTH],
       ['Working Hours / Day', WORKING_HOURS_PER_DAY],
       [],
@@ -128,11 +128,11 @@ export default function ValueSimulatorContent() {
       ['Active Users', outputs.activeUsers, scale2xOutputs.activeUsers, fullAdoptionOutputs.activeUsers],
       ['AI-Assisted Tasks / Month', outputs.tasksPerMonth, scale2xOutputs.tasksPerMonth, fullAdoptionOutputs.tasksPerMonth],
       ['Hours Recovered / Month', Math.round(outputs.hoursPerMonth), Math.round(scale2xOutputs.hoursPerMonth), Math.round(fullAdoptionOutputs.hoursPerMonth)],
-      ['Monthly Cost Savings (£)', Math.round(outputs.monthlyCostSavings), Math.round(scale2xOutputs.monthlyCostSavings), Math.round(fullAdoptionOutputs.monthlyCostSavings)],
-      ['Annualised Return (£)', Math.round(outputs.annualizedReturn), Math.round(scale2xOutputs.annualizedReturn), Math.round(fullAdoptionOutputs.annualizedReturn)],
+      ['Monthly Cost Savings (USD)', Math.round(outputs.monthlyCostSavings), Math.round(scale2xOutputs.monthlyCostSavings), Math.round(fullAdoptionOutputs.monthlyCostSavings)],
+      ['Annualised Return (USD)', Math.round(outputs.annualizedReturn), Math.round(scale2xOutputs.annualizedReturn), Math.round(fullAdoptionOutputs.annualizedReturn)],
       ['FTEs Freed / Month', outputs.ftesFreed.toFixed(1), scale2xOutputs.ftesFreed.toFixed(1), fullAdoptionOutputs.ftesFreed.toFixed(1)],
       ['Time Freed / User / Month (min)', Math.round(outputs.timePerUserPerMonth), Math.round(scale2xOutputs.timePerUserPerMonth), Math.round(fullAdoptionOutputs.timePerUserPerMonth)],
-      ['Value / User / Month (£)', Math.round(outputs.valuePerUserPerMonth), Math.round(scale2xOutputs.valuePerUserPerMonth), Math.round(fullAdoptionOutputs.valuePerUserPerMonth)],
+      ['Value / User / Month (USD)', Math.round(outputs.valuePerUserPerMonth), Math.round(scale2xOutputs.valuePerUserPerMonth), Math.round(fullAdoptionOutputs.valuePerUserPerMonth)],
       ['Daily AI Interactions', outputs.dailyInteractions, scale2xOutputs.dailyInteractions, fullAdoptionOutputs.dailyInteractions],
       ['Programme Penetration (%)', Math.round(outputs.penetration), Math.round(scale2xOutputs.penetration), Math.round(fullAdoptionOutputs.penetration)],
     ];
@@ -145,15 +145,15 @@ export default function ValueSimulatorContent() {
   function handleExportPDF() {
     // Build a self-contained HTML string and open it in a new tab for printing
     const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = SIM_CONSTANTS;
-    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const dateStr = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 
     const scenarioRows = [
       ['Active Use Cases', outputs.activeUseCases, scale2xOutputs.activeUseCases, fullAdoptionOutputs.activeUseCases],
       ['Active Users', outputs.activeUsers, scale2xOutputs.activeUsers, fullAdoptionOutputs.activeUsers],
       ['Tasks / Month', outputs.tasksPerMonth.toLocaleString(), scale2xOutputs.tasksPerMonth.toLocaleString(), fullAdoptionOutputs.tasksPerMonth.toLocaleString()],
       ['Hours Recovered / Month', Math.round(outputs.hoursPerMonth).toLocaleString(), Math.round(scale2xOutputs.hoursPerMonth).toLocaleString(), Math.round(fullAdoptionOutputs.hoursPerMonth).toLocaleString()],
-      ['Monthly Cost Savings', `£${Math.round(outputs.monthlyCostSavings).toLocaleString()}`, `£${Math.round(scale2xOutputs.monthlyCostSavings).toLocaleString()}`, `£${Math.round(fullAdoptionOutputs.monthlyCostSavings).toLocaleString()}`],
-      ['Annualised Return', `£${(outputs.annualizedReturn / 1000000).toFixed(2)}M`, `£${(scale2xOutputs.annualizedReturn / 1000000).toFixed(2)}M`, `£${(fullAdoptionOutputs.annualizedReturn / 1000000).toFixed(2)}M`],
+      ['Monthly Cost Savings', `$${Math.round(outputs.monthlyCostSavings).toLocaleString()}`, `$${Math.round(scale2xOutputs.monthlyCostSavings).toLocaleString()}`, `$${Math.round(fullAdoptionOutputs.monthlyCostSavings).toLocaleString()}`],
+      ['Annualised Return', `$${(outputs.annualizedReturn / 1000000).toFixed(2)}M`, `$${(scale2xOutputs.annualizedReturn / 1000000).toFixed(2)}M`, `$${(fullAdoptionOutputs.annualizedReturn / 1000000).toFixed(2)}M`],
       ['FTEs Freed / Month', outputs.ftesFreed.toFixed(1), scale2xOutputs.ftesFreed.toFixed(1), fullAdoptionOutputs.ftesFreed.toFixed(1)],
       ['Programme Penetration', `${Math.round(outputs.penetration)}%`, `${Math.round(scale2xOutputs.penetration)}%`, `${Math.round(fullAdoptionOutputs.penetration)}%`],
     ];
@@ -199,7 +199,7 @@ export default function ValueSimulatorContent() {
 <h2>Key Assumptions</h2>
 <table>
   <tr><th>Assumption</th><th>Value</th></tr>
-  <tr><td>Hourly cost rate</td><td>£${HOURLY_COST}/hr</td></tr>
+  <tr><td>Hourly cost rate (USD)</td><td>$${HOURLY_COST}/hr</td></tr>
   <tr><td>Working days / month</td><td>${WORKING_DAYS_PER_MONTH}</td></tr>
   <tr><td>Working hours / day</td><td>${WORKING_HOURS_PER_DAY}</td></tr>
 </table>
@@ -210,7 +210,7 @@ export default function ValueSimulatorContent() {
   ${tableRows}
 </table>
 
-<div class="footer">KPMG AI Architecture — Confidential. For internal use only.</div>
+<div class="footer">KPMG AI Architecture — Confidential. For internal use only. All figures are illustrative estimates based on modelled assumptions.</div>
 <script>window.onload = function(){ window.print(); }</script>
 </body>
 </html>`;
@@ -369,10 +369,10 @@ export default function ValueSimulatorContent() {
             Estimated Annualised Return
           </p>
           <p className="font-display text-4xl font-extrabold tabular-nums mb-1">
-            £{(displayOutputs.annualizedReturn / 1000000).toFixed(2)}M
+            ${(displayOutputs.annualizedReturn / 1000000).toFixed(2)}M
           </p>
           <p className="text-sm text-white/70 font-body">
-            £{Math.round(displayOutputs.monthlyCostSavings).toLocaleString()} per month · {displayOutputs.activeUsers.toLocaleString()} active users
+            ${Math.round(displayOutputs.monthlyCostSavings).toLocaleString()} per month · {displayOutputs.activeUsers.toLocaleString()} active users
           </p>
         </div>
 
@@ -431,7 +431,7 @@ export default function ValueSimulatorContent() {
               id: 'out-value-user',
               icon: <DollarSign size={15} />,
               label: 'Value / User / Month',
-              value: `£${Math.round(displayOutputs.valuePerUserPerMonth).toLocaleString()}`,
+              value: `$${Math.round(displayOutputs.valuePerUserPerMonth).toLocaleString()}`,
               suffix: '',
               color: '#F39C12',
             },
@@ -490,7 +490,7 @@ export default function ValueSimulatorContent() {
                     {isActive && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sv.color }} />}
                   </div>
                   <p className="font-display text-lg font-extrabold tabular-nums text-kpmg-on-surface">
-                    £{(svOutputs.annualizedReturn / 1000000).toFixed(2)}M
+                    ${(svOutputs.annualizedReturn / 1000000).toFixed(2)}M
                   </p>
                   <p className="text-xs text-kpmg-outline font-body mt-0.5">
                     {svOutputs.ftesFreed.toFixed(1)} FTEs · {svOutputs.activeUsers} users
@@ -505,7 +505,7 @@ export default function ValueSimulatorContent() {
           <h3 className="font-display text-sm font-bold text-kpmg-on-surface mb-3">Key Assumptions</h3>
           <div className="space-y-2">
             {[
-              { id: 'ka-cost', label: 'Hourly cost rate', value: `£${SIM_CONSTANTS.HOURLY_COST}/hr` },
+              { id: 'ka-cost', label: 'Hourly cost rate', value: `$${SIM_CONSTANTS.HOURLY_COST}/hr (USD)` },
               { id: 'ka-days', label: 'Working days/month', value: `${SIM_CONSTANTS.WORKING_DAYS_PER_MONTH}` },
               { id: 'ka-hrs', label: 'Working hours/day', value: `${SIM_CONSTANTS.WORKING_HOURS_PER_DAY}` },
               { id: 'ka-cases', label: 'Active use cases', value: `${outputs.activeUseCases} of ${inputs.targetUseCaseCount}` },

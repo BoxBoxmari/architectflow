@@ -9,10 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  BookOpen,
-  BarChart2,
-  FileText,
-  Rocket,
 } from 'lucide-react';
 
 interface NavItem {
@@ -25,11 +21,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: 'nav-overview', label: 'Executive Overview', icon: <LayoutDashboard size={18} />, route: '/executive-overview' },
   { id: 'nav-architecture', label: 'AI Architecture', icon: <Network size={18} />, route: '/ai-architecture-explorer' },
-  { id: 'nav-cases', label: 'Case Library', icon: <BookOpen size={18} />, route: '/case-library' },
   { id: 'nav-simulator', label: 'Value Simulator', icon: <Calculator size={18} />, route: '/value-simulator' },
-  { id: 'nav-comparison', label: 'Scenario Comparison', icon: <BarChart2 size={18} />, route: '/scenario-comparison' },
-  { id: 'nav-reports', label: 'Report Builder', icon: <FileText size={18} />, route: '/reports' },
-  { id: 'nav-pilot', label: 'Pilot Request', icon: <Rocket size={18} />, route: '/pilot-request' },
 ];
 
 interface SidebarProps {
@@ -109,21 +101,16 @@ export default function Sidebar({ collapsed, onToggleCollapse, activeRoute, onCl
         })}
       </nav>
 
-      {/* Footer */}
+      {/* Footer — neutral branding, no fake persona */}
       <div className={`px-3 py-4 border-t border-kpmg-outline-variant/40 flex-shrink-0 ${collapsed ? 'flex justify-center' : ''}`}>
         {!collapsed ? (
-          <div className="flex items-center gap-3 px-2">
-            <div className="w-8 h-8 rounded-full bg-kpmg-primary flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-xs font-bold font-display">SR</span>
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-kpmg-on-surface truncate">Sarah Reynolds</p>
-              <p className="text-xs text-kpmg-outline truncate">Partner, Tax Advisory</p>
-            </div>
+          <div className="px-2">
+            <p className="text-xs text-kpmg-outline font-body">KPMG Vietnam &amp; Cambodia</p>
+            <p className="text-xs text-kpmg-outline/60 font-body mt-0.5">Partner Briefing · Q2 2026</p>
           </div>
         ) : (
-          <div className="w-8 h-8 rounded-full bg-kpmg-primary flex items-center justify-center">
-            <span className="text-white text-xs font-bold font-display">SR</span>
+          <div className="w-8 h-8 rounded-lg bg-kpmg-primary/10 flex items-center justify-center">
+            <span className="text-kpmg-primary text-xs font-bold font-display">K</span>
           </div>
         )}
       </div>
