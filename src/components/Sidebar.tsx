@@ -106,7 +106,7 @@ export default function Sidebar({ collapsed, onToggleCollapse, activeRoute, onCl
         {!collapsed ? (
           <div className="px-2">
             <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body">KPMG Vietnam &amp; Cambodia</p>
-            <p className="text-xs text-kpmg-outline/60 dark:text-gray-600 font-body mt-0.5">Partner Briefing · Q2 2026</p>
+            <p className="text-xs font-body mt-0.5" style={{ color: '#767680' }}>Partner Briefing · Q2 2026</p>
           </div>
         ) : (
           <div className="w-8 h-8 rounded-lg bg-kpmg-primary/10 dark:bg-blue-900/30 flex items-center justify-center">

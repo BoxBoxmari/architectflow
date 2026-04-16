@@ -87,10 +87,15 @@ export default function ArchitectureCanvas() {
   return (
     <div className="flex flex-col gap-4">
       {/* Filter bar */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 px-5 py-3 flex items-center gap-3 flex-wrap">
+      <div
+        role="search"
+        aria-label="Filter AI cases"
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 px-5 py-3 flex items-center gap-3 flex-wrap"
+      >
         <div className="relative w-full sm:flex-1 sm:min-w-40 sm:max-w-56">
           <Search
             size={13}
+            aria-hidden="true"
             className="absolute left-3 top-1/2 -translate-y-1/2 text-kpmg-outline dark:text-gray-500 pointer-events-none"
           />
           <input
@@ -98,15 +103,18 @@ export default function ArchitectureCanvas() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search cases or techniques..."
+            aria-label="Search AI cases by name or technique"
             className="w-full pl-8 pr-3 py-1.5 text-sm bg-kpmg-surface-container dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-500 rounded-lg border border-transparent focus:border-kpmg-outline-variant dark:focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-kpmg-primary/10 placeholder:text-kpmg-outline transition-all font-body"
           />
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 font-body">Filter:</span>
+        <div role="group" aria-label="Filter by function" className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 font-body" aria-hidden="true">Filter:</span>
           {FUNCTIONS.map((fn) => (
             <button
               key={`filter-fn-${fn.id}`}
               onClick={() => setActiveFunction(activeFunction === fn.id ? null : fn.id)}
+              aria-pressed={activeFunction === fn.id}
+              aria-label={`Filter by ${fn.name} function${activeFunction === fn.id ? ' (active)' : ''}`}
               className={`kpmg-filter-chip ${activeFunction === fn.id ? 'active' : ''}`}
             >
               {fn.name}
@@ -116,9 +124,10 @@ export default function ArchitectureCanvas() {
         {(selectedCase || hoveredCase || activeFunction || searchQuery) && (
           <button
             onClick={reset}
+            aria-label="Reset all filters and selection"
             className="ml-auto flex items-center gap-1.5 text-xs text-kpmg-outline dark:text-gray-500 hover:text-kpmg-primary dark:hover:text-blue-400 transition-colors font-body"
           >
-            <RotateCcw size={12} />
+            <RotateCcw size={12} aria-hidden="true" />
             Reset
           </button>
         )}
@@ -126,16 +135,16 @@ export default function ArchitectureCanvas() {
 
       {/* Trace hint */}
       {!isTracing && (
-        <div className="flex items-center gap-2 px-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster flex-shrink-0" />
-          <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body">
+        <div className="flex items-center gap-2 px-1" aria-live="polite" aria-atomic="true">
+          <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster flex-shrink-0" aria-hidden="true" />
+          <p className="text-xs text-kpmg-on-surface dark:text-gray-400 font-body">
             Select a case to trace its architecture — which functions and services it reaches
           </p>
         </div>
       )}
       {isTracing && selectedCase && (
-        <div className="flex items-center gap-2 px-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster flex-shrink-0 animate-pulse" />
+        <div className="flex items-center gap-2 px-1" aria-live="polite" aria-atomic="true">
+          <span className="w-1.5 h-1.5 rounded-full bg-kpmg-accent-faster flex-shrink-0 animate-pulse" aria-hidden="true" />
           <p className="text-xs font-semibold text-kpmg-primary dark:text-blue-400 font-body">
             Tracing <span className="font-bold">{selectedCase.code}</span> — {activeFunctionIds.size} functions · {activeServiceIds.size} services reached
           </p>
@@ -146,7 +155,7 @@ export default function ArchitectureCanvas() {
       <div className="flex flex-col lg:flex-row gap-4 min-h-0">
         {/* Canvas */}
         <div className="flex-1 min-w-0 bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 overflow-hidden transition-all duration-300">
-          <div className="p-5 border-b border-kpmg-outline-variant/30 dark:border-gray-700 flex items-center gap-4">
+          <div className="p-5 border-b border-kpmg-outline-variant/30 dark:border-gray-700 flex items-center gap-4" aria-hidden="true">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-kpmg-accent-faster" />
               <span className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 font-body">
@@ -172,10 +181,11 @@ export default function ArchitectureCanvas() {
           <div className="p-4 overflow-x-auto">
             <div className="flex gap-0 w-full">
               {/* Cases column */}
-              <div className="flex flex-col gap-3 flex-1 min-w-0">
+              <div className="flex flex-col gap-3 flex-1 min-w-0" role="list" aria-label="AI Cases">
                 <p
-                  className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body mb-1"
+                  className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 uppercase tracking-widest font-body mb-1"
                   style={{ fontSize: '10px' }}
+                  aria-hidden="true"
                 >
                   AI Cases
                 </p>
@@ -187,16 +197,19 @@ export default function ArchitectureCanvas() {
                   return (
                     <button
                       key={`case-node-${c.id}`}
+                      role="listitem"
                       onClick={() => handleSelectCase(c)}
                       onMouseEnter={() => setHoveredCase(c.id)}
                       onMouseLeave={() => setHoveredCase(null)}
+                      aria-pressed={isSelected}
+                      aria-label={`${c.code}: ${c.title}. Technique: ${c.tech}. Status: ${c.status}. ${isSelected ? 'Selected — press to deselect' : 'Press to trace architecture'}`}
                       style={{
                         transition: 'border-color 250ms ease, background-color 250ms ease, box-shadow 250ms ease, opacity 200ms ease, transform 200ms ease',
                         transform: isSelecting ? 'scale(0.97)' : isSelected ? 'scale(1.01)' : 'scale(1)',
                         opacity: isTracing && !isSelected ? 0.55 : 1,
                       }}
                       className={[
-                        'text-left p-3 rounded-xl border-2 w-full node-card-hover',
+                        'text-left p-3 rounded-xl border-2 w-full node-card-hover focus:outline-none focus:ring-2 focus:ring-kpmg-accent-faster focus:ring-offset-1',
                         isSelected
                           ? 'border-kpmg-accent-faster bg-kpmg-accent-faster/5 shadow-card-hover'
                           : isHovered
@@ -207,13 +220,14 @@ export default function ArchitectureCanvas() {
                         .join(' ')}
                     >
                       <div className="flex items-start justify-between gap-2 mb-1.5">
-                        <span className="text-xs font-semibold text-kpmg-outline dark:text-gray-400 font-body flex-shrink-0">
+                        <span className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 font-body flex-shrink-0">
                           {c.code}
                         </span>
                         <span
                           className="kpmg-badge text-xs flex-shrink-0 max-w-[100px] truncate"
                           style={{ backgroundColor: `${techColor}15`, color: techColor }}
                           title={c.tech}
+                          aria-hidden="true"
                         >
                           {c.tech}
                         </span>
@@ -227,7 +241,11 @@ export default function ArchitectureCanvas() {
               </div>
 
               {/* Connector: Cases → Functions */}
-              <div className="relative w-12 flex-shrink-0 self-stretch">
+              <div
+                className="relative w-12 flex-shrink-0 self-stretch"
+                aria-hidden="true"
+                role="presentation"
+              >
                 <div className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30 dark:bg-gray-600" />
                 <div
                   className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-0.5"
@@ -240,23 +258,34 @@ export default function ArchitectureCanvas() {
               </div>
 
               {/* Functions column */}
-              <div className="flex flex-col gap-3 flex-1 min-w-0">
+              <div className="flex flex-col gap-3 flex-1 min-w-0" role="list" aria-label="Functions">
                 <p
-                  className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body mb-1"
+                  className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 uppercase tracking-widest font-body mb-1"
                   style={{ fontSize: '10px' }}
+                  aria-hidden="true"
                 >
                   Functions
                 </p>
                 {FUNCTIONS.map((fn) => {
                   const isActive = activeFunctionIds.has(fn.id);
+                  const caseCount = AI_CASES.filter((c) => c.linkedFunctions.includes(fn.id)).length;
                   return (
                     <div
                       key={`fn-node-${fn.id}`}
+                      role="listitem"
+                      tabIndex={0}
+                      aria-label={`${fn.name} function. ${caseCount} cases linked.${isTracing ? (isActive ? ' Reached by selected case.' : ' Not reached by selected case.') : ''}`}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setActiveFunction(activeFunction === fn.id ? null : fn.id);
+                        }
+                      }}
                       style={{
                         transition: 'opacity 350ms ease, border-color 300ms ease, background-color 300ms ease, box-shadow 300ms ease',
                       }}
                       className={[
-                        'p-3 rounded-xl border-2 fn-node-active',
+                        'p-3 rounded-xl border-2 fn-node-active cursor-default focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1',
                         isActive
                           ? isTracing
                             ? 'border-kpmg-primary bg-kpmg-primary/8 dark:bg-blue-900/20 dark:border-blue-500 opacity-100 shadow-card'
@@ -266,12 +295,13 @@ export default function ArchitectureCanvas() {
                       <div
                         className="w-2 h-2 rounded-full mb-2"
                         style={{ backgroundColor: fn.color ?? '#747683' }}
+                        aria-hidden="true"
                       />
                       <p className="text-sm font-semibold text-kpmg-on-surface dark:text-gray-200 font-body break-words">
                         {fn.name}
                       </p>
-                      <p className="text-xs text-kpmg-outline dark:text-gray-500 font-body mt-0.5">
-                        {AI_CASES.filter((c) => c.linkedFunctions.includes(fn.id)).length} cases
+                      <p className="text-xs text-kpmg-on-surface-variant dark:text-gray-400 font-body mt-0.5">
+                        {caseCount} cases
                       </p>
                       {isTracing && isActive && (
                         <span className="inline-block mt-1.5 text-xs font-semibold text-kpmg-primary dark:text-blue-400 font-body" style={{ fontSize: '10px' }}>
@@ -284,7 +314,11 @@ export default function ArchitectureCanvas() {
               </div>
 
               {/* Connector: Functions → Services */}
-              <div className="relative w-12 flex-shrink-0 self-stretch">
+              <div
+                className="relative w-12 flex-shrink-0 self-stretch"
+                aria-hidden="true"
+                role="presentation"
+              >
                 <div className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-px bg-kpmg-outline-variant/30 dark:bg-gray-600" />
                 <div
                   className="absolute inset-y-8 left-1/2 -translate-x-1/2 w-0.5"
@@ -297,10 +331,11 @@ export default function ArchitectureCanvas() {
               </div>
 
               {/* Services column */}
-              <div className="flex flex-col gap-2 flex-1 min-w-0">
+              <div className="flex flex-col gap-2 flex-1 min-w-0" role="list" aria-label="Services">
                 <p
-                  className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 uppercase tracking-widest font-body mb-1"
+                  className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 uppercase tracking-widest font-body mb-1"
                   style={{ fontSize: '10px' }}
+                  aria-hidden="true"
                 >
                   Services
                 </p>
@@ -310,11 +345,14 @@ export default function ArchitectureCanvas() {
                   return (
                     <div
                       key={`svc-node-${svc.id}`}
+                      role="listitem"
+                      tabIndex={0}
+                      aria-label={`${svc.name} service${parentFn ? `, under ${parentFn.name}` : ''}.${isTracing ? (isActive ? ' Reached by selected case.' : ' Not reached by selected case.') : ''}`}
                       style={{
                         transition: 'opacity 350ms ease 50ms, border-color 300ms ease, background-color 300ms ease, box-shadow 300ms ease',
                       }}
                       className={[
-                        'px-3 py-2 rounded-lg border svc-node-active',
+                        'px-3 py-2 rounded-lg border svc-node-active focus:outline-none focus:ring-2 focus:ring-kpmg-secondary focus:ring-offset-1',
                         isActive
                           ? isTracing
                             ? 'border-kpmg-outline-variant dark:border-gray-600 bg-white dark:bg-gray-700 opacity-100 shadow-card'
@@ -325,6 +363,7 @@ export default function ArchitectureCanvas() {
                         <span
                           className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 mb-0.5 align-middle"
                           style={{ backgroundColor: parentFn.color ?? '#747683' }}
+                          aria-hidden="true"
                         />
                       )}
                       <span className="text-xs font-medium text-kpmg-on-surface dark:text-gray-200 font-body">
@@ -338,13 +377,14 @@ export default function ArchitectureCanvas() {
           </div>
 
           {/* Legend */}
-          <div className="px-5 py-3 border-t border-kpmg-outline-variant/30 dark:border-gray-700 flex items-center gap-3 flex-wrap">
-            <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body flex-shrink-0">AI Technique:</span>
+          <div className="px-5 py-3 border-t border-kpmg-outline-variant/30 dark:border-gray-700 flex items-center gap-3 flex-wrap" aria-label="AI Technique legend" role="region">
+            <span className="text-xs text-kpmg-on-surface-variant dark:text-gray-400 font-body flex-shrink-0">AI Technique:</span>
             {Object.entries(TECHNIQUE_COLORS).map(([tech, color]) => (
               <div key={`legend-tech-${tech}`} className="flex items-center gap-1.5">
                 <span
                   className="w-2 h-2 rounded-sm flex-shrink-0"
                   style={{ backgroundColor: color }}
+                  aria-hidden="true"
                 />
                 <span className="text-xs text-kpmg-on-surface-variant dark:text-gray-400 font-body">{tech}</span>
               </div>
@@ -357,6 +397,8 @@ export default function ArchitectureCanvas() {
           <div
             key={selectedCase.id}
             ref={drawerRef}
+            role="complementary"
+            aria-label={`Case detail: ${selectedCase.title}`}
             style={{
               opacity: drawerVisible ? 1 : 0,
               transform: drawerVisible ? 'translateX(0)' : 'translateX(24px)',
@@ -379,10 +421,10 @@ export default function ArchitectureCanvas() {
                   setDrawerVisible(false);
                   setTimeout(() => setSelectedCase(null), 200);
                 }}
-                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-kpmg-surface-container dark:hover:bg-gray-700 transition-colors flex-shrink-0 ml-2"
-                aria-label="Close drawer"
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-kpmg-surface-container dark:hover:bg-gray-700 transition-colors flex-shrink-0 ml-2 focus:outline-none focus:ring-2 focus:ring-kpmg-primary"
+                aria-label={`Close detail panel for ${selectedCase.title}`}
               >
-                <X size={14} className="text-kpmg-outline dark:text-gray-500" />
+                <X size={14} className="text-kpmg-outline dark:text-gray-500" aria-hidden="true" />
               </button>
             </div>
 
@@ -397,6 +439,7 @@ export default function ArchitectureCanvas() {
                         STATUS_COLORS[selectedCase.status]?.bg ?? '#F0EDEC',
                       color: STATUS_COLORS[selectedCase.status]?.text ?? '#747683',
                     }}
+                    aria-label={`Status: ${selectedCase.status}`}
                   >
                     {selectedCase.status}
                   </span>
@@ -406,6 +449,7 @@ export default function ArchitectureCanvas() {
                       backgroundColor: `${TECHNIQUE_COLORS[selectedCase.tech] || '#747683'}15`,
                       color: TECHNIQUE_COLORS[selectedCase.tech] || '#747683',
                     }}
+                    aria-label={`Technique: ${selectedCase.tech}`}
                   >
                     {selectedCase.tech}
                   </span>
@@ -437,10 +481,10 @@ export default function ArchitectureCanvas() {
                 >
                   Key Value Metrics
                 </p>
-                <ul className="space-y-1.5">
+                <ul className="space-y-1.5" aria-label="Key value metrics">
                   {selectedCase.metrics.map((m, i) => (
                     <li key={`dm-${selectedCase.id}-${i}`} className="flex items-start gap-1.5">
-                      <span className="w-1 h-1 rounded-full bg-kpmg-primary dark:bg-blue-400 mt-1.5 flex-shrink-0" />
+                      <span className="w-1 h-1 rounded-full bg-kpmg-primary dark:bg-blue-400 mt-1.5 flex-shrink-0" aria-hidden="true" />
                       <span className="text-xs text-kpmg-on-surface-variant dark:text-gray-400 font-body">{m}</span>
                     </li>
                   ))}
@@ -455,7 +499,7 @@ export default function ArchitectureCanvas() {
                 >
                   Reaches
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-2" role="list" aria-label="Reached functions and services">
                   {FUNCTIONS.filter((fn) =>
                     selectedCase.linkedFunctions.includes(fn.id),
                   ).map((fn) => {
@@ -467,12 +511,14 @@ export default function ArchitectureCanvas() {
                     return (
                       <div
                         key={`reach-fn-${fn.id}`}
+                        role="listitem"
                         className="p-2 rounded-lg bg-kpmg-surface-container-low dark:bg-gray-700/50 border border-kpmg-primary/10 dark:border-blue-900/30"
                       >
                         <div className="flex items-center gap-1.5 mb-1">
                           <span
                             className="w-1.5 h-1.5 rounded-full"
                             style={{ backgroundColor: fn.color ?? '#747683' }}
+                            aria-hidden="true"
                           />
                           <span className="text-xs font-semibold text-kpmg-on-surface dark:text-gray-200 font-body">
                             {fn.name}
@@ -508,9 +554,9 @@ export default function ArchitectureCanvas() {
               {/* CTA */}
               <div className="pt-2">
                 <Link href="/value-simulator">
-                  <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer">
+                  <span className="kpmg-btn-primary w-full justify-center text-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1">
                     Model the Value
-                    <ChevronRight size={13} />
+                    <ChevronRight size={13} aria-hidden="true" />
                   </span>
                 </Link>
               </div>

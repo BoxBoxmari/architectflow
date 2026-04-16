@@ -13,7 +13,7 @@
     --surface-container-high: 20 8% 92%;
     --surface-container-low: 20 14% 96%;
     --surface-container-lowest: 0 0% 100%;
-    --outline: 237 4% 45%;
+    --outline: 237 4% 42%; /* darkened from 45% to 42% → ~#6B6C7A, passes 4.5:1 on #FCF9F8 */
     --outline-variant: 231 12% 80%;
     --on-surface: 0 2% 11%;
     --on-surface-variant: 234 9% 27%;
@@ -60,6 +60,13 @@
   html.dark .dark\:text-gray-300 {
     --tw-text-opacity: 1;
     color: rgb(229 231 235 / var(--tw-text-opacity)) !important; /* gray-200 equivalent */
+  }
+
+  /* WCAG 2.1 AA contrast fix: boost kpmg-outline (#747683) on light surfaces */
+  /* #747683 on #fcf9f8 = 4.29:1 (fail) → use #6B6C7A which passes 4.5:1 */
+  /* Applied via CSS variable override for outline color */
+  :root {
+    --outline: 237 4% 42%; /* darkened from 45% to 42% → ~#6B6C7A, passes 4.5:1 on #FCF9F8 */
   }
 
   body {

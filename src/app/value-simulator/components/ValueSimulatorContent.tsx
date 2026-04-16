@@ -29,15 +29,23 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="text-sm font-medium text-kpmg-on-surface dark:text-gray-200 font-body truncate">{label}</span>
+          <span id={`slider-label-${label.replace(/\s+/g, '-').toLowerCase()}`} className="text-sm font-medium text-kpmg-on-surface dark:text-gray-200 font-body truncate">{label}</span>
           <div className="group relative flex-shrink-0">
-            <Info size={12} className="text-kpmg-outline dark:text-gray-500 cursor-help" />
-            <div className="absolute left-0 bottom-full mb-1 w-48 px-2.5 py-1.5 bg-kpmg-on-surface dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-elevated font-body">
+            <Info size={12} className="text-kpmg-outline dark:text-gray-500 cursor-help" aria-hidden="true" />
+            <div
+              role="tooltip"
+              className="absolute left-0 bottom-full mb-1 w-48 px-2.5 py-1.5 bg-kpmg-on-surface dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-elevated font-body"
+            >
               {hint}
             </div>
           </div>
         </div>
-        <span className="font-display text-xl sm:text-base font-bold tabular-nums flex-shrink-0" style={{ color: trackColor }}>
+        <span
+          className="font-display text-xl sm:text-base font-bold tabular-nums flex-shrink-0"
+          style={{ color: trackColor }}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {format(value)}
         </span>
       </div>
@@ -55,11 +63,15 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
             background: `linear-gradient(to right, ${trackColor} 0%, ${trackColor} ${pct}%, #EBE7E7 ${pct}%, #EBE7E7 100%)`,
           } as React.CSSProperties}
           aria-label={label}
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={value}
+          aria-valuetext={`${format(value)} — range ${format(min)} to ${format(max)}`}
         />
       </div>
-      <div className="flex justify-between">
-        <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{format(min)}</span>
-        <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">{format(max)}</span>
+      <div className="flex justify-between" aria-hidden="true">
+        <span className="text-xs text-kpmg-on-surface-variant dark:text-gray-400 font-body">{format(min)}</span>
+        <span className="text-xs text-kpmg-on-surface-variant dark:text-gray-400 font-body">{format(max)}</span>
       </div>
     </div>
   );
@@ -339,18 +351,30 @@ export default function ValueSimulatorContent() {
         </div>
 
         <div className="border-t border-kpmg-outline-variant/30 dark:border-gray-700 pt-4 space-y-2">
-          <button onClick={handleSave} className="kpmg-btn-primary w-full justify-center text-sm">
-            <Save size={14} />
+          <button
+            onClick={handleSave}
+            className="kpmg-btn-primary w-full justify-center text-sm"
+            aria-label="Save current scenario to local storage for Scenario Comparison"
+          >
+            <Save size={14} aria-hidden="true" />
             Save Scenario
           </button>
           {/* Export split buttons */}
           <div className="flex gap-2">
-            <button onClick={handleExportCSV} className="kpmg-btn-secondary flex-1 justify-center text-sm">
-              <Download size={14} />
+            <button
+              onClick={handleExportCSV}
+              className="kpmg-btn-secondary flex-1 justify-center text-sm"
+              aria-label="Export scenario data as CSV file"
+            >
+              <Download size={14} aria-hidden="true" />
               CSV
             </button>
-            <button onClick={handleExportPDF} className="kpmg-btn-secondary flex-1 justify-center text-sm">
-              <FileText size={14} />
+            <button
+              onClick={handleExportPDF}
+              className="kpmg-btn-secondary flex-1 justify-center text-sm"
+              aria-label="Export scenario data as PDF report"
+            >
+              <FileText size={14} aria-hidden="true" />
               PDF
             </button>
           </div>
@@ -376,11 +400,17 @@ export default function ValueSimulatorContent() {
       {/* Center: Outputs panel */}
       <div className="order-2 lg:order-none lg:col-span-5 xl:col-span-6 space-y-5">
         {/* Scenario selector */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-2 flex gap-1">
+        <div
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-2 flex gap-1"
+          role="group"
+          aria-label="Select scenario view"
+        >
           {SCENARIO_VIEWS.map(sv => (
             <button
               key={`sv-${sv.id}`}
               onClick={() => setActiveScenario(sv.id)}
+              aria-pressed={activeScenario === sv.id}
+              aria-label={`View ${sv.label} scenario`}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-150 font-body ${
                 activeScenario === sv.id ? 'text-white shadow-elevated' : 'text-kpmg-on-surface-variant dark:text-gray-400 hover:bg-kpmg-surface-container dark:hover:bg-gray-700'
               }`}

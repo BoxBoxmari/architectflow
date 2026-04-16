@@ -13,7 +13,7 @@ export default function AIArchitectureExplorerPage() {
           <h1 className="font-display text-2xl font-bold text-kpmg-on-surface dark:text-gray-100 leading-tight">
             AI Architecture Explorer
           </h1>
-          <p className="text-sm text-kpmg-on-surface-variant dark:text-gray-400 mt-1 font-body">
+          <p className="text-sm text-kpmg-on-surface dark:text-gray-300 mt-1 font-body">
             Explore AI Case → Function → Service relationships across the portfolio
           </p>
         </div>
