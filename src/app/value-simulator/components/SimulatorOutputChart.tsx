@@ -12,14 +12,32 @@ import {
 } from 'recharts';
 import { calcScenarioVariants, type SimInputs } from '@/lib/simulator/calcOutputs';
 
+function fmtExecShort(value: number): string {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
+  return `$${Math.round(value)}`;
+}
+
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-elevated border border-kpmg-outline-variant/40 dark:border-gray-700 p-3">
-      <p className="text-xs font-semibold text-kpmg-on-surface-variant dark:text-gray-400 mb-1 font-body">{label}</p>
-      <p className="font-display text-base font-bold text-kpmg-primary dark:text-blue-400 tabular-nums">
-        ${(payload[0].value / 1000).toFixed(0)}k
+    <div
+      className="rounded-xl p-3"
+      style={{ background: '#FFFFFF', boxShadow: '0 4px 16px rgba(0,32,95,0.12)', border: 'none' }}
+    >
+      <p
+        className="uppercase font-bold mb-1"
+        style={{ fontSize: '10px', letterSpacing: '0.06em', color: '#9E9E9E', fontFamily: 'Inter, sans-serif' }}
+      >
+        {label}
       </p>
+      <p
+        className="tabular-nums font-bold"
+        style={{ fontFamily: 'Manrope, sans-serif', fontSize: '18px', color: '#00205F', letterSpacing: '-0.01em' }}
+      >
+        {fmtExecShort(payload[0].value)}
+      </p>
+      <p style={{ fontSize: '11px', color: '#9E9E9E', fontFamily: 'Inter, sans-serif' }}>Annualised Return</p>
     </div>
   );
 };
@@ -46,17 +64,37 @@ export default function SimulatorOutputChart({ inputs }: { inputs: SimInputs }) 
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card dark:shadow-none dark:border dark:border-gray-700 p-5">
+    <div className="rounded-2xl p-5" style={{ background: '#FFFFFF' }}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-display text-sm font-bold text-kpmg-on-surface dark:text-gray-100">Scenario Value Comparison</h3>
-        <span className="text-xs text-kpmg-outline dark:text-gray-500 font-body">Annualised return (USD)</span>
+        <h3
+          className="font-bold"
+          style={{ fontFamily: 'Manrope, sans-serif', fontSize: '14px', color: '#00205F' }}
+        >
+          Scenario Value Comparison
+        </h3>
+        <span
+          className="uppercase font-bold"
+          style={{ fontSize: '9px', letterSpacing: '0.07em', color: '#9E9E9E', fontFamily: 'Inter, sans-serif' }}
+        >
+          ANNUALISED RETURN
+        </span>
       </div>
       <ResponsiveContainer width="100%" height={160}>
         <BarChart data={data} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-          <CartesianGrid stroke="#C4C6D4" strokeDasharray="3 3" strokeOpacity={0.4} vertical={false} />
-          <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#747683', fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: '#747683', fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
-          <Tooltip content={<CustomTooltip />} />
+          <CartesianGrid stroke="#EBE7E7" strokeDasharray="3 3" strokeOpacity={0.8} vertical={false} />
+          <XAxis
+            dataKey="name"
+            tick={{ fontSize: 11, fill: '#9E9E9E', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: '#9E9E9E', fontFamily: 'Inter, sans-serif' }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={v => fmtExecShort(v)}
+          />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,32,95,0.04)' }} />
           <Bar dataKey="value" radius={[6, 6, 0, 0]}>
             {data.map((entry, index) => (
               <Cell key={`cell-bar-${index}`} fill={entry.color} />
