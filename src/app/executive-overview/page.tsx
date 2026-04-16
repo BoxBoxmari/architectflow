@@ -23,12 +23,6 @@ export default function ExecutiveOverviewPage() {
           <h1 className="font-display text-4xl font-extrabold text-kpmg-on-surface dark:text-gray-100 leading-tight mb-4" style={{ letterSpacing: '-0.02em' }}>
             One AI Foundation.<br />Every Function.
           </h1>
-          <p className="text-base text-kpmg-on-surface-variant dark:text-gray-400 font-body leading-relaxed">
-            Six AI cases. Five functions. One shared architecture. Each case is a reusable engine —
-            not a one-off tool. Value compounds through two levers:{' '}
-            <strong className="text-kpmg-on-surface dark:text-gray-200 font-semibold">Faster</strong> (activate more use cases) and{' '}
-            <strong className="text-kpmg-on-surface dark:text-gray-200 font-semibold">Deeper</strong> (reach more users).
-          </p>
         </div>
 
         {/* ── Two core stories ────────────────────────────────────────────── */}
