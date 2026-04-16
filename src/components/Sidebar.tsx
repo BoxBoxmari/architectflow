@@ -46,12 +46,6 @@ export default function Sidebar({ collapsed, onToggleCollapse, activeRoute, onCl
               <span className="font-display text-sm font-bold text-kpmg-primary dark:text-blue-400 tracking-tight block leading-tight">
                 ArchitectFlow
               </span>
-              <span
-                className="font-body text-kpmg-outline dark:text-gray-500"
-                style={{ fontSize: '10px', letterSpacing: '0.05em', fontWeight: 700, textTransform: 'uppercase' }}
-              >
-                PARTNER MVP · KPMG
-              </span>
             </div>
           </div>
         )}
