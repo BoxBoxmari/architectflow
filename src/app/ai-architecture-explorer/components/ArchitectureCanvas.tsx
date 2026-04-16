@@ -7,12 +7,10 @@ import Link from 'next/link';
 type SelectedCase = (typeof AI_CASES)[0] | null;
 
 const TECHNIQUE_COLORS: Record<string, string> = {
-  'RAG + LLM Re-ranking': '#00205F',
-  'RAG-based GenAI Drafting': '#006397',
-  'Doc Parsing + LLM + Anomaly Flag': '#0F6E56',
-  'LLM Extraction + Template Gen': '#007A73',
-  'LLM Clause Extraction + Risk Class': '#45004F',
-  'Multi-doc Parsing + Risk Scoring': '#F39C12',
+  'RAG + LLM (Knowledge Agent)': '#00205F',
+  'LLM + Document Translation + Layout Preservation': '#006397',
+  'Document Extraction + Semi-structured Parsing': '#0F6E56',
+  'LLM Simulation + Scenario Reasoning': '#45004F',
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
@@ -23,42 +21,36 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   Scaled: { bg: '#E0E7FF', text: '#00205F' },
 };
 
-// Value chips per case (ROI, time saved, etc.)
+// Value chips per case
 const VALUE_CHIPS: Record<string, { label: string; value: string; color: string }[]> = {
   'TAX-001': [
-    { label: 'ROI', value: '+$1.24M', color: '#0F6E56' },
-    { label: 'Time Saved', value: '860 hrs/mo', color: '#006397' },
-    { label: 'FTEs Freed', value: '5.1', color: '#00B8A9' },
+    { label: 'Value', value: '~5 FTE', color: '#0F6E56' },
+    { label: 'Maturity', value: 'SCALE', color: '#006397' },
+    { label: 'Functions', value: '4', color: '#00B8A9' },
   ],
-  'AUD-001': [
-    { label: 'ROI', value: '+$980K', color: '#0F6E56' },
-    { label: 'Time Saved', value: '720 hrs/mo', color: '#006397' },
-    { label: 'Adoption', value: '68%', color: '#F39C12' },
+  'KDC-001': [
+    { label: 'Value', value: 'Cost / Cycle', color: '#0F6E56' },
+    { label: 'Maturity', value: 'SCALE', color: '#006397' },
+    { label: 'Functions', value: '5', color: '#00B8A9' },
   ],
-  'LAW-001': [
-    { label: 'ROI', value: '+$1.1M', color: '#0F6E56' },
-    { label: 'Time Saved', value: '540 hrs/mo', color: '#006397' },
-    { label: 'FTEs Freed', value: '3.8', color: '#00B8A9' },
+  'KDC-002': [
+    { label: 'Value', value: 'Accuracy', color: '#0F6E56' },
+    { label: 'Maturity', value: 'APPLY → SCALE', color: '#006397' },
+    { label: 'Functions', value: '4', color: '#00B8A9' },
   ],
-  'DEAL-001': [
-    { label: 'ROI', value: '+$2.3M', color: '#0F6E56' },
-    { label: 'Time Saved', value: '1.2k hrs/mo', color: '#006397' },
-    { label: 'Adoption', value: '82%', color: '#F39C12' },
-  ],
-  'CON-001': [
-    { label: 'ROI', value: '+$760K', color: '#0F6E56' },
-    { label: 'Time Saved', value: '4.5k hrs', color: '#006397' },
-    { label: 'FTEs Freed', value: '6.2', color: '#00B8A9' },
+  'CONS-001': [
+    { label: 'Value', value: 'New Revenue', color: '#0F6E56' },
+    { label: 'Maturity', value: 'INSPIRE → APPLY', color: '#006397' },
+    { label: 'Functions', value: '5', color: '#00B8A9' },
   ],
 };
 
-// Annualized return per case for business value filter
-const CASE_VALUE: Record<string, number> = {
-  'TAX-001': 1240000,
-  'AUD-001': 980000,
-  'LAW-001': 1100000,
-  'DEAL-001': 2300000,
-  'CON-001': 760000,
+// Maturity scale for filter ordering
+const MATURITY_LABELS: Record<string, string> = {
+  'TAX-001': 'SCALE',
+  'KDC-001': 'SCALE',
+  'KDC-002': 'APPLY → SCALE',
+  'CONS-001': 'INSPIRE → APPLY',
 };
 
 // Node position refs for Bezier connectors
@@ -79,7 +71,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
   const [searchQuery, setSearchQuery] = useState('');
   const [selectingId, setSelectingId] = useState<string | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [valueFilter, setValueFilter] = useState<boolean>(false);
+  const [scaleFilter, setScaleFilter] = useState<boolean>(false);
   const [liveMessage, setLiveMessage] = useState('');
   const drawerRef = useRef<HTMLDivElement>(null);
   const drawerCloseRef = useRef<HTMLButtonElement>(null);
@@ -105,8 +97,8 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
       c.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.tech.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFunction = !activeFunction || c.linkedFunctions.includes(activeFunction);
-    const matchesValue = !valueFilter || (CASE_VALUE[c.id] ?? 0) >= 1000000;
-    return matchesSearch && matchesFunction && matchesValue;
+    const matchesScale = !scaleFilter || MATURITY_LABELS[c.id] === 'SCALE';
+    return matchesSearch && matchesFunction && matchesScale;
   });
 
   // Notify parent of live canvas state changes
@@ -134,12 +126,10 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
       setTimeout(() => {
         setSelectedCase(null);
         setSelectingId(null);
-        // Return focus to the case node that was active
         lastFocusedCaseRef.current?.focus();
       }, 200);
       setLiveMessage('');
     } else {
-      // Remember which case node triggered the drawer
       lastFocusedCaseRef.current = caseNodeRefs.current[c.id] ?? null;
       setSelectingId(c.id);
       setSelectedCase(c);
@@ -160,7 +150,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
       setActiveFunction(null);
       setSearchQuery('');
       setSelectingId(null);
-      setValueFilter(false);
+      setScaleFilter(false);
     }, 200);
     setLiveMessage('All filters and selections cleared.');
   }
@@ -262,7 +252,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
 
   return (
     <div className="flex flex-col gap-4">
-      {/* ARIA live region — announces trace updates to screen readers */}
+      {/* ARIA live region */}
       <div
         role="status"
         aria-live="assertive"
@@ -318,26 +308,26 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
             </button>
           ))}
         </div>
-        {/* Business Value filter */}
+        {/* Maturity filter */}
         <div className="flex items-center gap-2">
           <span
             className="font-body text-kpmg-outline"
             style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
             aria-hidden="true"
           >
-            Value:
+            Maturity:
           </span>
           <button
-            onClick={() => setValueFilter(!valueFilter)}
-            aria-pressed={valueFilter}
-            aria-label={`Show only cases with business value over $1M${valueFilter ? ' (active)' : ''}`}
-            className={`kpmg-filter-chip flex items-center gap-1 ${valueFilter ? 'active' : ''}`}
+            onClick={() => setScaleFilter(!scaleFilter)}
+            aria-pressed={scaleFilter}
+            aria-label={`Show only cases at SCALE maturity${scaleFilter ? ' (active)' : ''}`}
+            className={`kpmg-filter-chip flex items-center gap-1 ${scaleFilter ? 'active' : ''}`}
           >
             <TrendingUp size={10} aria-hidden="true" />
-            &gt;$1M
+            SCALE
           </button>
         </div>
-        {(selectedCase || activeFunction || searchQuery || valueFilter) && (
+        {(selectedCase || activeFunction || searchQuery || scaleFilter) && (
           <button
             onClick={reset}
             aria-label="Reset all filters and selection"
@@ -369,7 +359,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
 
       {/* Canvas + Drawer */}
       <div className="flex flex-col lg:flex-row gap-4 min-h-0">
-        {/* Canvas — Paper on Stone */}
+        {/* Canvas */}
         <div
           className="flex-1 min-w-0 rounded-2xl overflow-hidden transition-all duration-300"
           role="region"
@@ -416,7 +406,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
             </div>
           </div>
 
-          {/* Main canvas area with SVG overlay for Bezier connectors */}
+          {/* Main canvas area with SVG overlay */}
           <div className="p-4 overflow-x-auto">
             <div ref={canvasRef} className="relative flex gap-0 w-full" style={{ minHeight: 320 }}>
               {/* SVG Bezier connector overlay */}
@@ -425,7 +415,6 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                 aria-hidden="true"
                 style={{ overflow: 'visible', zIndex: 0 }}
               >
-                {/* Case → Function paths */}
                 {caseFnPaths.map(({ path, caseId, fnId, active }) => (
                   <path
                     key={`cf-${caseId}-${fnId}`}
@@ -437,7 +426,6 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                     style={{ transition: 'stroke 300ms ease, stroke-opacity 300ms ease, stroke-width 300ms ease' }}
                   />
                 ))}
-                {/* Function → Service paths */}
                 {fnSvcPaths.map(({ path, fnId, svcId, active }) => (
                   <path
                     key={`fs-${fnId}-${svcId}`}
@@ -451,7 +439,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                 ))}
               </svg>
 
-              {/* Cases column — Paper lane */}
+              {/* Cases column */}
               <div
                 ref={caseColRef}
                 className="flex flex-col gap-3 flex-1 min-w-0 rounded-xl px-3 py-3"
@@ -529,10 +517,10 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                 })}
               </div>
 
-              {/* Gap for SVG connectors — Cases→Functions */}
+              {/* Gap for SVG connectors */}
               <div className="w-10 flex-shrink-0" aria-hidden="true" />
 
-              {/* Functions column — Stone lane */}
+              {/* Functions column */}
               <div
                 ref={fnColRef}
                 className="flex flex-col gap-3 flex-1 min-w-0 rounded-xl px-3 py-3"
@@ -604,10 +592,10 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                 })}
               </div>
 
-              {/* Gap for SVG connectors — Functions→Services */}
+              {/* Gap for SVG connectors */}
               <div className="w-10 flex-shrink-0" aria-hidden="true" />
 
-              {/* Services column — Paper lane */}
+              {/* Services column */}
               <div
                 ref={svcColRef}
                 className="flex flex-col gap-2 flex-1 min-w-0 rounded-xl px-3 py-3"
@@ -775,7 +763,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                     className="font-body mb-2"
                     style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#747683' }}
                   >
-                    Business Value
+                    Portfolio Value
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {chips.map((chip, i) => (
@@ -792,7 +780,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                         </span>
                         <span
                           className="font-display font-bold mt-0.5"
-                          style={{ fontSize: '15px', color: chip.color }}
+                          style={{ fontSize: '13px', color: chip.color }}
                         >
                           {chip.value}
                         </span>
