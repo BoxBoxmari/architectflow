@@ -49,8 +49,8 @@ export default function AIArchitectureExplorerPage() {
       <main id="main-content" aria-label="AI Architecture Explorer">
       <div className="space-y-6 animate-fade-in">
         {/* Page header — Paper on Stone */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
             <p
               className="font-body mb-1"
               style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#747683' }}
@@ -69,11 +69,12 @@ export default function AIArchitectureExplorerPage() {
             disabled={exporting}
             aria-label="Export PDF Analysis for meeting use"
             aria-busy={exporting}
-            className="flex-shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold font-body transition-all focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="flex-shrink-0 self-start flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold font-body transition-all focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1 disabled:opacity-70 disabled:cursor-not-allowed"
             style={{
               background: 'linear-gradient(135deg, #00205F 0%, #00338D 100%)',
               color: '#FFFFFF',
               boxShadow: '0px 4px 16px rgba(0,32,95,0.18)',
+              whiteSpace: 'nowrap',
             }}
           >
             {exporting ? (

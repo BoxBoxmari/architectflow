@@ -282,11 +282,11 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
       <div
         role="search"
         aria-label="Filter AI cases"
-        className="rounded-2xl px-5 py-3 flex items-center gap-3 flex-wrap"
+        className="rounded-2xl px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap"
         style={{ background: '#FFFFFF', boxShadow: '0px 1px 3px rgba(0,32,95,0.04), 0px 0px 0px 1px rgba(196,198,212,0.25)' }}
       >
         {/* Search */}
-        <div className="relative w-full sm:flex-1 sm:min-w-40 sm:max-w-56">
+        <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-36 sm:max-w-56">
           <Search size={13} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#747683' }} />
           <input
             type="text"
@@ -300,9 +300,9 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
         </div>
 
         {/* Function filter */}
-        <div role="group" aria-label="Filter by function" className="flex items-center gap-2 flex-wrap">
+        <div role="group" aria-label="Filter by function" className="flex items-center gap-1.5 flex-wrap">
           <span
-            style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)' }}
+            style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', flexShrink: 0 }}
             aria-hidden="true"
           >
             Function
@@ -314,7 +314,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               aria-pressed={activeFunction === fn.id}
               aria-label={`Filter by ${fn.name} function${activeFunction === fn.id ? ' (active)' : ''}`}
               className={`kpmg-filter-chip ${activeFunction === fn.id ? 'active' : ''}`}
-              style={{ fontSize: '11px' }}
+              style={{ fontSize: '10px', whiteSpace: 'nowrap' }}
             >
               {fn.name}
             </button>
@@ -322,9 +322,9 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
         </div>
 
         {/* Maturity filter */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <span
-            style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)' }}
+            style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', flexShrink: 0 }}
             aria-hidden="true"
           >
             Maturity
@@ -334,7 +334,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
             aria-pressed={scaleFilter}
             aria-label={`Show only cases at SCALE maturity${scaleFilter ? ' (active)' : ''}`}
             className={`kpmg-filter-chip flex items-center gap-1 ${scaleFilter ? 'active' : ''}`}
-            style={{ fontSize: '11px' }}
+            style={{ fontSize: '10px', whiteSpace: 'nowrap' }}
           >
             <TrendingUp size={10} aria-hidden="true" />
             SCALE
@@ -345,7 +345,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
           <button
             onClick={reset}
             aria-label="Reset all filters and selection"
-            className="ml-auto flex items-center gap-1.5 transition-colors"
+            className="sm:ml-auto flex items-center gap-1.5 transition-colors"
             style={{ fontSize: '11px', color: '#747683', fontFamily: 'var(--font-body)', fontWeight: 500 }}
           >
             <RotateCcw size={11} aria-hidden="true" />
@@ -356,16 +356,16 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
 
       {/* ── Trace hint ─────────────────────────────────────────────────────── */}
       {!isTracing && (
-        <div className="flex items-center gap-2 px-1" aria-live="polite" aria-atomic="true">
-          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#00B8A9' }} aria-hidden="true" />
+        <div className="flex items-start gap-2 px-1" aria-live="polite" aria-atomic="true">
+          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-0.5" style={{ backgroundColor: '#00B8A9' }} aria-hidden="true" />
           <p style={{ fontSize: '11px', color: '#747683', fontFamily: 'var(--font-body)', fontWeight: 400 }}>
             Select a case to trace its architecture — which functions and services it reaches
           </p>
         </div>
       )}
       {isTracing && selectedCase && (
-        <div className="flex items-center gap-2 px-1" aria-live="polite" aria-atomic="true">
-          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse" style={{ backgroundColor: '#00B8A9' }} aria-hidden="true" />
+        <div className="flex items-start gap-2 px-1" aria-live="polite" aria-atomic="true">
+          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-0.5 animate-pulse" style={{ backgroundColor: '#00B8A9' }} aria-hidden="true" />
           <p style={{ fontSize: '11px', fontWeight: 600, color: '#00205F', fontFamily: 'var(--font-body)' }} aria-hidden="true">
             Tracing <span style={{ fontWeight: 700 }}>{selectedCase.code}</span> — {activeFunctionIds.size} functions · {activeServiceIds.size} services reached
           </p>
@@ -384,35 +384,35 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
         >
           {/* Column header bar */}
           <div
-            className="px-5 py-2.5 flex items-center gap-4 border-b"
+            className="px-4 py-2.5 flex items-center gap-2 border-b overflow-x-auto"
             style={{ background: '#F0EDEC', borderColor: 'rgba(196,198,212,0.3)' }}
             aria-hidden="true"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 flex-shrink-0">
               <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#00B8A9' }} />
-              <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444652', fontFamily: 'var(--font-body)' }}>
+              <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444652', fontFamily: 'var(--font-body)', whiteSpace: 'nowrap' }}>
                 AI Cases ({filteredCases.length})
               </span>
             </div>
-            <div className="flex-1 h-px" style={{ background: 'rgba(196,198,212,0.4)' }} />
-            <div className="flex items-center gap-2">
+            <div className="flex-1 h-px min-w-4" style={{ background: 'rgba(196,198,212,0.4)' }} />
+            <div className="flex items-center gap-1.5 flex-shrink-0">
               <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#00205F' }} />
-              <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444652', fontFamily: 'var(--font-body)' }}>
+              <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444652', fontFamily: 'var(--font-body)', whiteSpace: 'nowrap' }}>
                 Business Functions
               </span>
             </div>
-            <div className="flex-1 h-px" style={{ background: 'rgba(196,198,212,0.4)' }} />
-            <div className="flex items-center gap-2">
+            <div className="flex-1 h-px min-w-4" style={{ background: 'rgba(196,198,212,0.4)' }} />
+            <div className="flex items-center gap-1.5 flex-shrink-0">
               <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#C4C6D4' }} />
-              <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444652', fontFamily: 'var(--font-body)' }}>
+              <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#444652', fontFamily: 'var(--font-body)', whiteSpace: 'nowrap' }}>
                 Service Solutions
               </span>
             </div>
           </div>
 
           {/* Main canvas area */}
-          <div className="p-4 overflow-x-auto">
-            <div ref={canvasRef} className="relative flex gap-0 w-full" style={{ minHeight: 320 }}>
+          <div className="p-3 overflow-x-auto">
+            <div ref={canvasRef} className="relative flex gap-0" style={{ minHeight: 320, minWidth: 520 }}>
               {/* SVG Bezier connector overlay */}
               <svg
                 className="absolute inset-0 w-full h-full pointer-events-none"
@@ -446,8 +446,8 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               {/* ── Cases column ─────────────────────────────────────────── */}
               <div
                 ref={caseColRef}
-                className="flex flex-col gap-2.5 flex-1 min-w-0 rounded-xl px-3 py-3"
-                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)' }}
+                className="flex flex-col gap-2.5 rounded-xl px-2.5 py-3"
+                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)', width: '34%', minWidth: 140, flexShrink: 0 }}
                 role="list"
                 aria-label="AI Cases"
               >
@@ -480,7 +480,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                           : '0px 0px 0px 1px rgba(196,198,212,0.35)',
                         borderRadius: '10px',
                         border: 'none',
-                        padding: '11px 12px',
+                        padding: '10px 10px',
                         width: '100%',
                         textAlign: 'left',
                         cursor: 'pointer',
@@ -488,7 +488,7 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                       className="focus:outline-none focus:ring-2 focus:ring-kpmg-accent-faster focus:ring-offset-1"
                     >
                       {/* Case ID row */}
-                      <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-start justify-between gap-1.5 mb-1.5">
                         <span
                           style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', flexShrink: 0, paddingTop: '2px' }}
                         >
@@ -499,18 +499,18 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                           style={{
                             backgroundColor: `${techColor}12`,
                             color: techColor,
-                            fontSize: '9px',
+                            fontSize: '8px',
                             fontWeight: 600,
                             letterSpacing: '0.01em',
                             fontFamily: 'var(--font-body)',
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
                             textAlign: 'center',
-                            maxWidth: '108px',
+                            maxWidth: '90px',
                             lineHeight: '1.35',
                             display: 'inline-block',
-                            padding: '3px 7px',
-                            borderRadius: '6px',
+                            padding: '2px 5px',
+                            borderRadius: '5px',
                             border: `1px solid ${techColor}22`,
                           }}
                           aria-hidden="true"
@@ -519,13 +519,13 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                         </span>
                       </div>
                       {/* Case title */}
-                      <p style={{ fontSize: '12px', fontWeight: 600, color: '#1C1B1B', fontFamily: 'var(--font-display)', lineHeight: '1.4', letterSpacing: '-0.01em' }}>
+                      <p style={{ fontSize: '11px', fontWeight: 600, color: '#1C1B1B', fontFamily: 'var(--font-display)', lineHeight: '1.4', letterSpacing: '-0.01em' }}>
                         {c.title}
                       </p>
                       {isSelected && (
-                        <div className="mt-2">
+                        <div className="mt-1.5">
                           <span
-                            style={{ display: 'inline-block', borderRadius: '4px', padding: '2px 7px', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', background: 'rgba(0,184,169,0.1)', color: '#00B8A9', fontFamily: 'var(--font-body)' }}
+                            style={{ display: 'inline-block', borderRadius: '4px', padding: '2px 6px', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', background: 'rgba(0,184,169,0.1)', color: '#00B8A9', fontFamily: 'var(--font-body)' }}
                           >
                             ✓ Tracing
                           </span>
@@ -537,13 +537,13 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               </div>
 
               {/* Gap for SVG connectors */}
-              <div className="w-10 flex-shrink-0" aria-hidden="true" />
+              <div className="w-8 flex-shrink-0" aria-hidden="true" />
 
               {/* ── Functions column ─────────────────────────────────────── */}
               <div
                 ref={fnColRef}
-                className="flex flex-col gap-2.5 flex-1 min-w-0 rounded-xl px-3 py-3"
-                style={{ background: '#F6F3F2', position: 'relative', zIndex: 1 }}
+                className="flex flex-col gap-2.5 rounded-xl px-2.5 py-3"
+                style={{ background: '#F6F3F2', position: 'relative', zIndex: 1, width: '28%', minWidth: 120, flexShrink: 0 }}
                 role="list"
                 aria-label="Functions"
               >
@@ -577,27 +577,27 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                           ? `0px 0px 0px 1.5px ${fn.color ?? '#747683'}40, 0px 4px 12px rgba(0,32,95,0.07)`
                           : '0px 0px 0px 1px rgba(196,198,212,0.25)',
                         borderRadius: '10px',
-                        padding: '11px 12px',
+                        padding: '10px 10px',
                         cursor: 'default',
                       }}
                       className="focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1"
                     >
-                      <div className="flex items-center gap-2 mb-1.5">
+                      <div className="flex items-center gap-1.5 mb-1">
                         <div
                           className="w-2 h-2 rounded-full flex-shrink-0"
                           style={{ backgroundColor: fn.color ?? '#747683' }}
                           aria-hidden="true"
                         />
-                        <p style={{ fontSize: '12px', fontWeight: 600, color: '#1C1B1B', fontFamily: 'var(--font-display)', letterSpacing: '-0.01em', lineHeight: '1.3' }}>
+                        <p style={{ fontSize: '11px', fontWeight: 600, color: '#1C1B1B', fontFamily: 'var(--font-display)', letterSpacing: '-0.01em', lineHeight: '1.3' }}>
                           {fn.name}
                         </p>
                       </div>
-                      <p style={{ fontSize: '10px', color: '#747683', fontFamily: 'var(--font-body)', fontWeight: 400, paddingLeft: '16px' }}>
+                      <p style={{ fontSize: '10px', color: '#747683', fontFamily: 'var(--font-body)', fontWeight: 400, paddingLeft: '14px' }}>
                         {caseCount} {caseCount === 1 ? 'case' : 'cases'}
                       </p>
                       {isTracing && isActive && (
                         <span
-                          style={{ display: 'inline-block', marginTop: '6px', marginLeft: '16px', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#00205F', fontFamily: 'var(--font-body)' }}
+                          style={{ display: 'inline-block', marginTop: '5px', marginLeft: '14px', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#00205F', fontFamily: 'var(--font-body)' }}
                         >
                           ✓ Reached
                         </span>
@@ -608,13 +608,13 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               </div>
 
               {/* Gap for SVG connectors */}
-              <div className="w-10 flex-shrink-0" aria-hidden="true" />
+              <div className="w-8 flex-shrink-0" aria-hidden="true" />
 
               {/* ── Services column ──────────────────────────────────────── */}
               <div
                 ref={svcColRef}
-                className="flex flex-col gap-1.5 flex-1 min-w-0 rounded-xl px-3 py-3"
-                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)' }}
+                className="flex flex-col gap-1.5 rounded-xl px-2.5 py-3"
+                style={{ background: '#FFFFFF', position: 'relative', zIndex: 1, boxShadow: '0px 0px 0px 1px rgba(196,198,212,0.2)', flex: 1, minWidth: 120 }}
                 role="list"
                 aria-label="Services"
               >
@@ -640,14 +640,14 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                         background: isActive && isTracing ? '#F0EDEC' : 'transparent',
                         boxShadow: isActive && isTracing ? '0px 1px 4px rgba(0,32,95,0.06)' : 'none',
                         borderRadius: '7px',
-                        padding: '6px 10px',
+                        padding: '5px 8px',
                         cursor: 'default',
                         borderLeft: isActive && isTracing && parentFn ? `2px solid ${parentFn.color ?? '#747683'}` : '2px solid transparent',
                       }}
                       className="focus:outline-none focus:ring-2 focus:ring-kpmg-secondary focus:ring-offset-1"
                     >
                       <span
-                        style={{ fontSize: '11px', fontWeight: isActive && isTracing ? 500 : 400, color: isActive && isTracing ? '#1C1B1B' : '#747683', fontFamily: 'var(--font-body)', lineHeight: '1.35', display: 'block' }}
+                        style={{ fontSize: '10px', fontWeight: isActive && isTracing ? 500 : 400, color: isActive && isTracing ? '#1C1B1B' : '#747683', fontFamily: 'var(--font-body)', lineHeight: '1.35', display: 'block', wordBreak: 'break-word' }}
                       >
                         {svc.name}
                       </span>
@@ -660,24 +660,26 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
 
           {/* ── Legend ─────────────────────────────────────────────────────── */}
           <div
-            className="px-5 py-3 flex items-center gap-3 flex-wrap border-t"
+            className="px-4 py-3 flex items-start gap-2 flex-wrap border-t"
             style={{ background: '#F6F3F2', borderColor: 'rgba(196,198,212,0.25)' }}
             aria-label="AI Technique legend"
             role="region"
           >
-            <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)' }}>
+            <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#747683', fontFamily: 'var(--font-body)', flexShrink: 0, paddingTop: '2px' }}>
               AI Technique
             </span>
-            {Object.entries(TECHNIQUE_COLORS).map(([tech, color]) => (
-              <div key={`legend-tech-${tech}`} className="flex items-center gap-1.5">
-                <span
-                  className="w-2 h-2 rounded-sm flex-shrink-0"
-                  style={{ backgroundColor: color }}
-                  aria-hidden="true"
-                />
-                <span style={{ fontSize: '10px', color: '#444652', fontFamily: 'var(--font-body)', fontWeight: 400 }}>{tech}</span>
-              </div>
-            ))}
+            <div className="flex flex-wrap gap-x-3 gap-y-1.5">
+              {Object.entries(TECHNIQUE_COLORS).map(([tech, color]) => (
+                <div key={`legend-tech-${tech}`} className="flex items-center gap-1.5">
+                  <span
+                    className="w-2 h-2 rounded-sm flex-shrink-0"
+                    style={{ backgroundColor: color }}
+                    aria-hidden="true"
+                  />
+                  <span style={{ fontSize: '10px', color: '#444652', fontFamily: 'var(--font-body)', fontWeight: 400, lineHeight: '1.3' }}>{tech}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
