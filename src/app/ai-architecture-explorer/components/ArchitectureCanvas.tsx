@@ -459,9 +459,8 @@ export default function ArchitectureCanvas() {
                           {c.code}
                         </span>
                         <span
-                          className="kpmg-badge text-xs flex-shrink-0 max-w-[100px] truncate"
-                          style={{ backgroundColor: `${techColor}15`, color: techColor }}
-                          title={c.tech}
+                          className="kpmg-badge text-xs flex-shrink-0"
+                          style={{ backgroundColor: `${techColor}15`, color: techColor, whiteSpace: 'normal', wordBreak: 'break-word', textAlign: 'right', maxWidth: '120px' }}
                           aria-hidden="true"
                         >
                           {c.tech}
