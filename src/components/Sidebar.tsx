@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  BookMarked,
 } from 'lucide-react';
 
 interface NavItem {
@@ -22,6 +23,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'nav-overview', label: 'Executive Overview', icon: <LayoutDashboard size={18} />, route: '/executive-overview' },
   { id: 'nav-architecture', label: 'AI Architecture', icon: <Network size={18} />, route: '/ai-architecture-explorer' },
   { id: 'nav-simulator', label: 'Value Simulator', icon: <Calculator size={18} />, route: '/value-simulator' },
+  { id: 'nav-scenarios', label: 'My Scenarios', icon: <BookMarked size={18} />, route: '/my-scenarios' },
 ];
 
 interface SidebarProps {
