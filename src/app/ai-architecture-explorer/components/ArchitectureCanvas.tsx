@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
 import { AI_CASES, FUNCTIONS, SERVICES } from '@/lib/mockData';
-import { X, RotateCcw, Search, Mail, TrendingUp } from 'lucide-react';
+import { X, RotateCcw, Search, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 
 type SelectedCase = (typeof AI_CASES)[0] | null;
@@ -874,15 +874,6 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
               <div className="pt-1 space-y-2">
                 <Link href="/value-simulator">
                 </Link>
-                <button
-                  className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 transition-colors focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1"
-                  style={{ background: '#F0EDEC', color: '#00205F', fontSize: '12px', fontWeight: 600, fontFamily: 'var(--font-body)' }}
-                  onClick={() => window.open('mailto:ai-innovation@kpmg.com?subject=AI Architecture Inquiry: ' + selectedCase.code, '_blank')}
-                  aria-label={`Contact AI Innovation team about ${selectedCase.code}`}
-                >
-                  <Mail size={13} aria-hidden="true" />
-                  Contact AI Innovation
-                </button>
               </div>
             </div>
           </div>
