@@ -80,7 +80,7 @@ export default function ScalingAIFrameworkPage() {
             style={{ boxShadow: '0px 1px 4px rgba(0,32,95,0.08), 0px 0px 0px 1px rgba(196,198,212,0.3)' }}
           >
             {/* Column Headers */}
-            <div className="grid grid-cols-1 md:grid-cols-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3">
               {/* FOCUS header */}
               <div
                 className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
@@ -108,7 +108,7 @@ export default function ScalingAIFrameworkPage() {
             </div>
 
             {/* Column Bodies */}
-            <div className="grid grid-cols-1 md:grid-cols-3 min-h-[340px]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 min-h-[340px]">
 
               {/* FOCUS body */}
               <div
