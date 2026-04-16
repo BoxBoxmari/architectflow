@@ -18,7 +18,7 @@ export default function ExecutiveOverviewPage() {
             className="font-body text-kpmg-outline dark:text-gray-500 mb-3"
             style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
           >
-            KPMG Vietnam &amp; Cambodia · Partner Briefing
+            KPMG VIETNAM &amp; CAMBODIA ·
           </p>
           <h1 className="font-display text-4xl font-extrabold text-kpmg-on-surface dark:text-gray-100 leading-tight mb-4" style={{ letterSpacing: '-0.02em' }}>
             One AI Foundation.<br />Every Function.
@@ -33,12 +33,6 @@ export default function ExecutiveOverviewPage() {
 
         {/* ── Two core stories ────────────────────────────────────────────── */}
         <div>
-          <p
-            className="font-body text-kpmg-outline dark:text-gray-500 mb-4"
-            style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
-          >
-            Two stories to explore
-          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
 
             {/* Pure Paper card on Stone canvas — natural lift via shadow */}
