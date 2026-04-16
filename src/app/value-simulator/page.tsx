@@ -14,7 +14,7 @@ export default function ValueSimulatorPage() {
           <h1 className="font-display text-2xl font-bold text-kpmg-on-surface dark:text-gray-100 leading-tight">
             Value Simulator
           </h1>
-          <p className="text-sm text-kpmg-on-surface-variant dark:text-gray-400 mt-1 font-body">
+          <p className="text-sm dark:text-gray-400 mt-1 font-body font-semibold text-black">
             Model AI portfolio ROI in real time using the Faster × Deeper activation framework
           </p>
         </div>
