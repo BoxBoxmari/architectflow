@@ -66,7 +66,6 @@ interface NodePos { top: number; height: number }
 
 export default function ArchitectureCanvas() {
   const [selectedCase, setSelectedCase] = useState<SelectedCase>(null);
-  const [hoveredCase, setHoveredCase] = useState<string | null>(null);
   const [activeFunction, setActiveFunction] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectingId, setSelectingId] = useState<string | null>(null);
@@ -99,7 +98,7 @@ export default function ArchitectureCanvas() {
   });
 
   const activeCase =
-    selectedCase || (hoveredCase ? AI_CASES.find((c) => c.id === hoveredCase) : null);
+    selectedCase || null;
 
   const activeFunctionIds = activeCase
     ? new Set(activeCase.linkedFunctions)
@@ -109,7 +108,7 @@ export default function ArchitectureCanvas() {
     ? new Set(activeCase.linkedServices)
     : new Set(filteredCases.flatMap((c) => c.linkedServices));
 
-  const isTracing = !!(selectedCase || hoveredCase);
+  const isTracing = !!selectedCase;
 
   function handleSelectCase(c: (typeof AI_CASES)[0]) {
     const isSelected = selectedCase?.id === c.id;
@@ -133,7 +132,6 @@ export default function ArchitectureCanvas() {
     setDrawerVisible(false);
     setTimeout(() => {
       setSelectedCase(null);
-      setHoveredCase(null);
       setActiveFunction(null);
       setSearchQuery('');
       setSelectingId(null);
@@ -203,7 +201,7 @@ export default function ArchitectureCanvas() {
       const cx = (x1 + x2) / 2;
       const path = `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
       const active = isTracing
-        ? (selectedCase?.id === c.id || hoveredCase === c.id) && activeFunctionIds.has(fnId)
+        ? selectedCase?.id === c.id && activeFunctionIds.has(fnId)
         : true;
       caseFnPaths.push({ path, caseId: c.id, fnId, active });
     });
@@ -296,7 +294,7 @@ export default function ArchitectureCanvas() {
             &gt;$1M
           </button>
         </div>
-        {(selectedCase || hoveredCase || activeFunction || searchQuery || valueFilter) && (
+        {(selectedCase || activeFunction || searchQuery || valueFilter) && (
           <button
             onClick={reset}
             aria-label="Reset all filters and selection"
@@ -425,7 +423,6 @@ export default function ArchitectureCanvas() {
                 </p>
                 {filteredCases.map((c) => {
                   const isSelected = selectedCase?.id === c.id;
-                  const isHovered = hoveredCase === c.id;
                   const isSelecting = selectingId === c.id;
                   const techColor = TECHNIQUE_COLORS[c.tech] || '#747683';
                   const dimmed = isTracing && !isSelected;
@@ -435,20 +432,16 @@ export default function ArchitectureCanvas() {
                       ref={(el) => { caseNodeRefs.current[c.id] = el; }}
                       role="listitem"
                       onClick={() => handleSelectCase(c)}
-                      onMouseEnter={() => { setHoveredCase(c.id); measurePositions(); }}
-                      onMouseLeave={() => setHoveredCase(null)}
                       aria-pressed={isSelected}
                       aria-label={`${c.code}: ${c.title}. Technique: ${c.tech}. Status: ${c.status}. ${isSelected ? 'Selected — press to deselect' : 'Press to trace architecture'}`}
                       style={{
                         transition: 'border-color 250ms ease, background-color 250ms ease, box-shadow 250ms ease, opacity 200ms ease, transform 200ms ease',
                         transform: isSelecting ? 'scale(0.97)' : isSelected ? 'scale(1.01)' : 'scale(1)',
                         opacity: dimmed ? 0.45 : 1,
-                        background: isSelected ? '#FFFFFF' : isHovered ? '#F0EDEC' : '#FCF9F8',
+                        background: isSelected ? '#FFFFFF' : '#FCF9F8',
                         boxShadow: isSelected
                           ? '0px 0px 0px 2px #00B8A9, 0px 24px 48px rgba(0,32,95,0.10)'
-                          : isHovered
-                            ? '0px 4px 16px rgba(0,32,95,0.08)'
-                            : 'none',
+                          : 'none',
                         borderRadius: '12px',
                         border: 'none',
                         padding: '12px',
