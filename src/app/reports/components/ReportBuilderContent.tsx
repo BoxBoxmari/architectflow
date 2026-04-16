@@ -37,6 +37,9 @@ export default function ReportBuilderContent() {
   const [selectedScenario, setSelectedScenario] = useState<'current' | 'scale2x' | 'full'>('scale2x');
   const [reportTitle, setReportTitle] = useState(DEMO_CONTEXT.defaults.reportTitle);
   const [exporting, setExporting] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [readyToBrief, setReadyToBrief] = useState(false);
+  const [lastAction, setLastAction] = useState('');
 
   function toggleSection(id: string) {
     setSections(prev => prev.map(s => s.id === id ? { ...s, included: !s.included } : s));
@@ -282,6 +285,10 @@ ${sectionHTML}
       toast.error('Pop-up blocked', { description: 'Please allow pop-ups to export PDF' });
     } else {
       toast.success('PDF ready', { description: 'Print dialog opened — save as PDF' });
+      const now = new Date();
+      setLastSavedAt(now);
+      setReadyToBrief(true);
+      setLastAction('Report exported as PDF');
     }
     setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
@@ -290,6 +297,10 @@ ${sectionHTML}
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
       toast.success('Link copied to clipboard', { description: url });
+      const now = new Date();
+      setLastSavedAt(now);
+      setReadyToBrief(true);
+      setLastAction('Share link copied');
     }).catch(() => {
       toast.error('Could not copy link');
     });
@@ -419,6 +430,22 @@ ${sectionHTML}
             <Share2 size={14} />
             Copy Share Link
           </button>
+
+          {/* Ready to Brief confirmation */}
+          {readyToBrief && lastSavedAt && (
+            <div className="mt-3 p-3 rounded-lg border border-emerald-200 bg-emerald-50 transition-all duration-300">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                <span className="text-xs font-bold text-emerald-700 font-body uppercase tracking-wider">Ready to Brief</span>
+              </div>
+              <p className="text-xs text-emerald-600 font-body">{lastAction}</p>
+              <p className="text-xs text-emerald-500 font-body mt-0.5 tabular-nums">
+                {lastSavedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                {' · '}
+                {lastSavedAt.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

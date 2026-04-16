@@ -68,6 +68,9 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
 export default function ValueSimulatorContent() {
   const [inputs, setInputs] = useState<SimInputs>(SIM_DEFAULTS);
   const [activeScenario, setActiveScenario] = useState<'current' | 'scale2x' | 'fulladoption'>('current');
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [readyToBrief, setReadyToBrief] = useState(false);
+  const [lastAction, setLastAction] = useState<string>('');
 
   const set = useCallback(<K extends keyof SimInputs>(key: K, val: SimInputs[K]) => {
     setInputs(prev => ({ ...prev, [key]: val }));
@@ -97,6 +100,10 @@ export default function ValueSimulatorContent() {
       existing.unshift(saved);
       localStorage.setItem('savedScenarios', JSON.stringify(existing.slice(0, 10)));
       toast.success('Scenario saved', { description: 'Stored locally — available in Scenario Comparison' });
+      const now = new Date();
+      setLastSavedAt(now);
+      setReadyToBrief(true);
+      setLastAction('Scenario saved');
     } catch {
       toast.error('Could not save scenario');
     }
@@ -140,6 +147,10 @@ export default function ValueSimulatorContent() {
     const dateStr = new Date().toISOString().slice(0, 10);
     downloadFile(csv, `kpmg-ai-value-simulator-${dateStr}.csv`, 'text/csv;charset=utf-8;');
     toast.success('CSV downloaded', { description: 'All three scenario variants included' });
+    const now = new Date();
+    setLastSavedAt(now);
+    setReadyToBrief(true);
+    setLastAction('CSV exported');
   }
 
   function handleExportPDF() {
@@ -222,6 +233,10 @@ export default function ValueSimulatorContent() {
       toast.error('Pop-up blocked', { description: 'Please allow pop-ups to export PDF' });
     } else {
       toast.success('PDF ready', { description: 'Print dialog opened — save as PDF' });
+      const now = new Date();
+      setLastSavedAt(now);
+      setReadyToBrief(true);
+      setLastAction('PDF exported');
     }
     setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
@@ -339,6 +354,22 @@ export default function ValueSimulatorContent() {
               PDF
             </button>
           </div>
+
+          {/* Ready to Brief confirmation */}
+          {readyToBrief && lastSavedAt && (
+            <div className="mt-3 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 transition-all duration-300">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 font-body uppercase tracking-wider">Ready to Brief</span>
+              </div>
+              <p className="text-xs text-emerald-600 dark:text-emerald-500 font-body">{lastAction}</p>
+              <p className="text-xs text-emerald-500 dark:text-emerald-600 font-body mt-0.5 tabular-nums">
+                {lastSavedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                {' · '}
+                {lastSavedAt.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
