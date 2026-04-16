@@ -37,7 +37,6 @@ export const SERVICES = [
   { id: 'fs-reg',      functionId: 'fn-consulting', name: 'FS Regulatory / GRC' },
   { id: 'people',      functionId: 'fn-consulting', name: 'People & Change' },
   { id: 'fs-trans',    functionId: 'fn-consulting', name: 'FS Transform' },
-  { id: 'prof-train-law', functionId: 'fn-law',     name: 'Professional Training' },
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -62,6 +61,8 @@ export interface AICase {
   reusabilityScore: number;
   linkedFunctions: string[];
   linkedServices: string[];
+  /** Exact fn→svc reach pairs for accurate graph edge drawing */
+  reach: { fnId: string; svcId: string }[];
   metrics: string[];
   /** Legacy numeric metrics — kept for screens that still reference them */
   numericMetrics: {
@@ -96,6 +97,16 @@ export const AI_CASES: AICase[] = [
     reusabilityScore: 85,
     linkedFunctions: ['fn-tax', 'fn-law', 'fn-audit', 'fn-deal'],
     linkedServices: ['tax-adv-dr', 'tp', 'gtc', 'gms', 'corp-comp', 'contracts', 'acct-adv', 'ma-adv'],
+    reach: [
+      { fnId: 'fn-tax',  svcId: 'tax-adv-dr' },
+      { fnId: 'fn-tax',  svcId: 'tp' },
+      { fnId: 'fn-tax',  svcId: 'gtc' },
+      { fnId: 'fn-tax',  svcId: 'gms' },
+      { fnId: 'fn-law',  svcId: 'corp-comp' },
+      { fnId: 'fn-law',  svcId: 'contracts' },
+      { fnId: 'fn-audit', svcId: 'acct-adv' },
+      { fnId: 'fn-deal', svcId: 'ma-adv' },
+    ],
     metrics: [
       '~5 FTE capacity released',
       'Covers Tax, Law, Audit, Deal Advisory',
@@ -130,6 +141,14 @@ export const AI_CASES: AICase[] = [
     reusabilityScore: 92,
     linkedFunctions: ['fn-audit', 'fn-law', 'fn-tax', 'fn-deal', 'fn-consulting'],
     linkedServices: ['fin-audit', 'aud-data', 'corp-comp', 'tax-adv-svc', 'ma-adv', 'people-fs'],
+    reach: [
+      { fnId: 'fn-audit',      svcId: 'fin-audit' },
+      { fnId: 'fn-audit',      svcId: 'aud-data' },
+      { fnId: 'fn-law',        svcId: 'corp-comp' },
+      { fnId: 'fn-tax',        svcId: 'tax-adv-svc' },
+      { fnId: 'fn-deal',       svcId: 'ma-adv' },
+      { fnId: 'fn-consulting', svcId: 'people-fs' },
+    ],
     metrics: [
       'Cost and cycle time reduction',
       'Layout preserved across document types',
@@ -164,6 +183,14 @@ export const AI_CASES: AICase[] = [
     reusabilityScore: 80,
     linkedFunctions: ['fn-audit', 'fn-deal', 'fn-consulting', 'fn-tax'],
     linkedServices: ['fin-audit', 'aud-data', 'trans-svc', 'val-mod', 'fs-reg', 'tax-comp'],
+    reach: [
+      { fnId: 'fn-audit',      svcId: 'fin-audit' },
+      { fnId: 'fn-audit',      svcId: 'aud-data' },
+      { fnId: 'fn-deal',       svcId: 'trans-svc' },
+      { fnId: 'fn-deal',       svcId: 'val-mod' },
+      { fnId: 'fn-consulting', svcId: 'fs-reg' },
+      { fnId: 'fn-tax',        svcId: 'tax-comp' },
+    ],
     metrics: [
       'Accuracy and efficiency improvement',
       'Semi-structured parsing across statement formats',
@@ -197,7 +224,15 @@ export const AI_CASES: AICase[] = [
     readinessScore: 65,
     reusabilityScore: 78,
     linkedFunctions: ['fn-consulting', 'fn-audit', 'fn-tax', 'fn-law', 'fn-deal'],
-    linkedServices: ['people', 'fs-trans', 'risk-cons', 'prof-train-tax', 'prof-train-law', 'strat-ma'],
+    linkedServices: ['people', 'fs-trans', 'risk-cons', 'prof-train-tax', 'strat-ma'],
+    reach: [
+      { fnId: 'fn-consulting', svcId: 'people' },
+      { fnId: 'fn-consulting', svcId: 'fs-trans' },
+      { fnId: 'fn-audit',      svcId: 'risk-cons' },
+      { fnId: 'fn-tax',        svcId: 'prof-train-tax' },
+      { fnId: 'fn-law',        svcId: 'prof-train-tax' },
+      { fnId: 'fn-deal',       svcId: 'strat-ma' },
+    ],
     metrics: [
       'New revenue and capability creation',
       'Scenario-based learning across functions',

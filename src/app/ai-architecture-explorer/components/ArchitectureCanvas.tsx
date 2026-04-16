@@ -218,20 +218,55 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
   });
 
   const fnSvcPaths: { path: string; fnId: string; svcId: string; active: boolean }[] = [];
-  FUNCTIONS.forEach((fn) => {
-    SERVICES.filter((s) => s.functionId === fn.id).forEach((svc) => {
-      const fnPos = fnPositions[fn.id];
-      const svcPos = svcPositions[svc.id];
-      if (!fnPos || !svcPos) return;
-      const x1 = colLayout.fnRight;
-      const y1 = fnPos.top + fnPos.height / 2;
-      const x2 = colLayout.svcLeft;
-      const y2 = svcPos.top + svcPos.height / 2;
-      const cx = (x1 + x2) / 2;
-      const path = `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
-      const active = isTracing ? activeFunctionIds.has(fn.id) && activeServiceIds.has(svc.id) : true;
-      fnSvcPaths.push({ path, fnId: fn.id, svcId: svc.id, active });
+
+  // Build fn→svc edge pairs from exact reach data to correctly handle shared service nodes
+  // (e.g. "Professional Training" reached from both fn-tax and fn-law in CONS-001)
+  const fnSvcEdgeSet = new Set<string>();
+  const fnSvcEdges: { fnId: string; svcId: string; active: boolean }[] = [];
+
+  if (isTracing && selectedCase) {
+    // Active edges: exact reach pairs from the selected case
+    (selectedCase.reach ?? []).forEach(({ fnId, svcId }) => {
+      const key = `${fnId}::${svcId}`;
+      if (!fnSvcEdgeSet.has(key)) {
+        fnSvcEdgeSet.add(key);
+        fnSvcEdges.push({ fnId, svcId, active: true });
+      }
     });
+    // Inactive edges: all other reach pairs in the full dataset
+    AI_CASES.forEach((c) => {
+      (c.reach ?? []).forEach(({ fnId, svcId }) => {
+        const key = `${fnId}::${svcId}`;
+        if (!fnSvcEdgeSet.has(key)) {
+          fnSvcEdgeSet.add(key);
+          fnSvcEdges.push({ fnId, svcId, active: false });
+        }
+      });
+    });
+  } else {
+    // Not tracing: draw all reach pairs from visible cases
+    filteredCases.forEach((c) => {
+      (c.reach ?? []).forEach(({ fnId, svcId }) => {
+        const key = `${fnId}::${svcId}`;
+        if (!fnSvcEdgeSet.has(key)) {
+          fnSvcEdgeSet.add(key);
+          fnSvcEdges.push({ fnId, svcId, active: true });
+        }
+      });
+    });
+  }
+
+  fnSvcEdges.forEach(({ fnId, svcId, active }) => {
+    const fnPos = fnPositions[fnId];
+    const svcPos = svcPositions[svcId];
+    if (!fnPos || !svcPos) return;
+    const x1 = colLayout.fnRight;
+    const y1 = fnPos.top + fnPos.height / 2;
+    const x2 = colLayout.svcLeft;
+    const y2 = svcPos.top + svcPos.height / 2;
+    const cx = (x1 + x2) / 2;
+    const path = `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
+    fnSvcPaths.push({ path, fnId, svcId, active });
   });
 
   const chips = selectedCase ? buildValueChips(selectedCase.id) : [];
@@ -791,9 +826,11 @@ export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvas
                 </p>
                 <div className="space-y-2" role="list" aria-label="Reached functions and services">
                   {FUNCTIONS.filter((fn) => selectedCase.linkedFunctions.includes(fn.id)).map((fn) => {
-                    const fnSvcs = SERVICES.filter(
-                      (s) => s.functionId === fn.id && selectedCase.linkedServices.includes(s.id),
-                    );
+                    // Use reach pairs for accurate fn→svc mapping (handles shared service nodes)
+                    const fnSvcIds = (selectedCase.reach ?? [])
+                      .filter((r) => r.fnId === fn.id)
+                      .map((r) => r.svcId);
+                    const fnSvcs = SERVICES.filter((s) => fnSvcIds.includes(s.id));
                     return (
                       <div
                         key={`reach-fn-${fn.id}`}
