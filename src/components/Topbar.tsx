@@ -28,11 +28,11 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
 
       {/* Context label — editorial micro-labels */}
       <div className="hidden md:flex items-center gap-2">
-        <span className="font-body text-kpmg-outline dark:text-gray-400" style={{ fontSize: '11px' }}>Partner Demo</span>
+        <span className="font-body text-kpmg-outline dark:text-gray-400" style={{ fontSize: '11px' }}></span>
         <span className="text-kpmg-outline-variant dark:text-gray-600" style={{ fontSize: '11px' }}>·</span>
         <span className="font-body font-semibold text-kpmg-on-surface-variant dark:text-gray-300" style={{ fontSize: '11px' }}>Vietnam &amp; Cambodia</span>
         <span className="text-kpmg-outline-variant dark:text-gray-600" style={{ fontSize: '11px' }}>·</span>
-        <span className="font-body text-kpmg-outline dark:text-gray-400" style={{ fontSize: '11px' }}>Q2 2026</span>
+        <span className="font-body text-kpmg-outline dark:text-gray-400" style={{ fontSize: '11px' }}></span>
       </div>
 
       {/* Theme toggle — tonal surface, no harsh border */}

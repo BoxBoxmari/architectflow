@@ -64,7 +64,16 @@ const CASE_VALUE: Record<string, number> = {
 // Node position refs for Bezier connectors
 interface NodePos { top: number; height: number }
 
-export default function ArchitectureCanvas() {
+interface ArchitectureCanvasProps {
+  onStateChange?: (state: {
+    selectedCase: SelectedCase;
+    activeFunction: string | null;
+    searchQuery: string;
+    filteredCases: typeof AI_CASES;
+  }) => void;
+}
+
+export default function ArchitectureCanvas({ onStateChange }: ArchitectureCanvasProps) {
   const [selectedCase, setSelectedCase] = useState<SelectedCase>(null);
   const [activeFunction, setActiveFunction] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,6 +108,11 @@ export default function ArchitectureCanvas() {
     const matchesValue = !valueFilter || (CASE_VALUE[c.id] ?? 0) >= 1000000;
     return matchesSearch && matchesFunction && matchesValue;
   });
+
+  // Notify parent of live canvas state changes
+  useEffect(() => {
+    onStateChange?.({ selectedCase, activeFunction, searchQuery, filteredCases });
+  }, [selectedCase, activeFunction, searchQuery, filteredCases.length]);
 
   const activeCase =
     selectedCase || null;

@@ -46,12 +46,6 @@ export default function Sidebar({ collapsed, onToggleCollapse, activeRoute, onCl
               <span className="font-display text-sm font-bold text-kpmg-primary dark:text-blue-400 tracking-tight block leading-tight">
                 ArchitectFlow
               </span>
-              <span
-                className="font-body text-kpmg-outline dark:text-gray-500"
-                style={{ fontSize: '10px', letterSpacing: '0.05em', fontWeight: 700, textTransform: 'uppercase' }}
-              >
-                PARTNER MVP · KPMG
-              </span>
             </div>
           </div>
         )}
@@ -122,7 +116,6 @@ export default function Sidebar({ collapsed, onToggleCollapse, activeRoute, onCl
         {!collapsed ? (
           <div className="px-2">
             <p className="font-body text-kpmg-outline dark:text-gray-500" style={{ fontSize: '11px' }}>KPMG Vietnam &amp; Cambodia</p>
-            <p className="font-body mt-0.5" style={{ fontSize: '11px', color: '#767680' }}>Partner Briefing · Q2 2026</p>
           </div>
         ) : (
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(0,32,95,0.10) 0%, rgba(0,51,141,0.08) 100%)' }}>

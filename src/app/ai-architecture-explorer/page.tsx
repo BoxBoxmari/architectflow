@@ -1,13 +1,46 @@
 'use client';
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import AppLayout from '@/components/AppLayout';
 import ArchitectureCanvas from './components/ArchitectureCanvas';
-import { FileDown } from 'lucide-react';
+import { FileDown, Loader2 } from 'lucide-react';
+import { AI_CASES } from '@/lib/mockData';
+import type { AICase } from '@/lib/mockData';
+
+interface CanvasState {
+  selectedCase: AICase | null;
+  activeFunction: string | null;
+  searchQuery: string;
+  filteredCases: typeof AI_CASES;
+}
 
 export default function AIArchitectureExplorerPage() {
-  function handleExportPDF() {
-    if (typeof window !== 'undefined') {
-      window.print();
+  const [exporting, setExporting] = useState(false);
+  const canvasStateRef = useRef<CanvasState>({
+    selectedCase: null,
+    activeFunction: null,
+    searchQuery: '',
+    filteredCases: AI_CASES,
+  });
+
+  function handleCanvasStateChange(state: CanvasState) {
+    canvasStateRef.current = state;
+  }
+
+  async function handleExportPDF() {
+    setExporting(true);
+    try {
+      const { exportArchitecturePDF } = await import('@/lib/pdfExport');
+      const { selectedCase, activeFunction, searchQuery, filteredCases } = canvasStateRef.current;
+      await exportArchitecturePDF({
+        cases: filteredCases.length > 0 ? filteredCases : AI_CASES,
+        selectedCase,
+        activeFunction,
+        searchQuery,
+      });
+    } catch (err) {
+      console.error('PDF export failed:', err);
+    } finally {
+      setExporting(false);
     }
   }
 
@@ -33,19 +66,25 @@ export default function AIArchitectureExplorerPage() {
           </div>
           <button
             onClick={handleExportPDF}
+            disabled={exporting}
             aria-label="Export PDF Analysis for meeting use"
-            className="flex-shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold font-body transition-all focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1"
+            aria-busy={exporting}
+            className="flex-shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold font-body transition-all focus:outline-none focus:ring-2 focus:ring-kpmg-primary focus:ring-offset-1 disabled:opacity-70 disabled:cursor-not-allowed"
             style={{
               background: 'linear-gradient(135deg, #00205F 0%, #00338D 100%)',
               color: '#FFFFFF',
               boxShadow: '0px 4px 16px rgba(0,32,95,0.18)',
             }}
           >
-            <FileDown size={14} aria-hidden="true" />
-            Export PDF Analysis
+            {exporting ? (
+              <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <FileDown size={14} aria-hidden="true" />
+            )}
+            {exporting ? 'Generating PDF…' : 'Export PDF Analysis'}
           </button>
         </div>
-        <ArchitectureCanvas />
+        <ArchitectureCanvas onStateChange={handleCanvasStateChange} />
       </div>
       </main>
     </AppLayout>
