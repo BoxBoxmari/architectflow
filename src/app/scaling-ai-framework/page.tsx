@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import AppLayout from '@/components/AppLayout';
-import { Download, Share2, ArrowUpRight, TrendingDown, Layers, HelpCircle, Zap, Target } from 'lucide-react';
+import { Download, ArrowUpRight, TrendingDown, Layers, HelpCircle, Zap, Target } from 'lucide-react';
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 const FOCUS_ITEMS = [
@@ -57,13 +57,6 @@ export default function ScalingAIFrameworkPage() {
               </h1>
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">
-              <button
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-body font-semibold transition-colors"
-                style={{ fontSize: '13px', background: 'rgba(196,198,212,0.15)', color: '#6B7280' }}
-              >
-                <Share2 size={15} />
-                Share
-              </button>
               <button
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-body font-semibold text-white transition-all hover:opacity-90"
                 style={{ fontSize: '13px', background: 'linear-gradient(135deg, #00205F 0%, #003380 100%)', boxShadow: '0 2px 8px rgba(0,32,95,0.25)' }}
