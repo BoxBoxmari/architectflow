@@ -1,21 +1,14 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import { Manrope, Inter } from 'next/font/google';
+import { Inter } from 'next/font/google';
 
 import ToasterProvider from '@/components/ToasterProvider';
 import { ThemeProvider } from '@/context/ThemeContext';
 import '../styles/tailwind.css';
 
-const manrope = Manrope({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
 const inter = Inter({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700', '800'],
   variable: '--font-body',
   display: 'swap',
 });
@@ -37,7 +30,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
+    <html lang="en" className={`${inter.variable}`} style={{ '--font-display': 'var(--font-body)' } as React.CSSProperties}>
       <body className="bg-kpmg-background dark:bg-gray-950 font-body antialiased transition-colors duration-200">
         <ThemeProvider>
           {children}

@@ -50,7 +50,7 @@ function SliderRow({ label, hint, value, min, max, step, format, color, onChange
         </div>
         <span
           className="font-bold tabular-nums flex-shrink-0"
-          style={{ color: trackColor, fontFamily: 'Manrope, sans-serif', fontSize: '22px', letterSpacing: '-0.01em' }}
+          style={{ color: trackColor, fontFamily: 'Inter, sans-serif', fontSize: '22px', letterSpacing: '-0.01em' }}
           aria-live="polite"
           aria-atomic="true"
         >
@@ -322,7 +322,7 @@ export default function ValueSimulatorContent() {
           ))}
         </div>
 
-        {/* Hero metric — 56px Manrope Bold */}
+        {/* Hero metric — 56px Inter Bold */}
         <div className="mb-2">
           <p
             className="uppercase font-bold mb-3"
@@ -333,7 +333,7 @@ export default function ValueSimulatorContent() {
           <div className="flex items-baseline gap-3 flex-wrap">
             <span
               className="tabular-nums font-bold"
-              style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(36px, 8vw, 56px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1 }}
+              style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 8vw, 56px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1 }}
             >
               {fmtExec(displayOutputs.annualizedReturn)}
             </span>
@@ -350,25 +350,25 @@ export default function ValueSimulatorContent() {
         <div className="flex flex-wrap gap-6 mt-5 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.12)' }}>
           <div>
             <p className="uppercase font-bold mb-1" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.07em', fontFamily: 'Inter, sans-serif' }}>MONTHLY SAVINGS</p>
-            <p className="tabular-nums font-bold" style={{ fontFamily: 'Manrope, sans-serif', fontSize: '26px', color: '#00B8A9', letterSpacing: '-0.02em' }}>
+            <p className="tabular-nums font-bold" style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', color: '#00B8A9', letterSpacing: '-0.02em' }}>
               {fmtExec(displayOutputs.monthlyCostSavings)}
             </p>
           </div>
           <div>
             <p className="uppercase font-bold mb-1" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.07em', fontFamily: 'Inter, sans-serif' }}>ACTIVE USERS</p>
-            <p className="tabular-nums font-bold" style={{ fontFamily: 'Manrope, sans-serif', fontSize: '26px', color: '#F39C12', letterSpacing: '-0.02em' }}>
+            <p className="tabular-nums font-bold" style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', color: '#F39C12', letterSpacing: '-0.02em' }}>
               {displayOutputs.activeUsers.toLocaleString()}
             </p>
           </div>
           <div>
             <p className="uppercase font-bold mb-1" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.07em', fontFamily: 'Inter, sans-serif' }}>FTES FREED / MO</p>
-            <p className="tabular-nums font-bold" style={{ fontFamily: 'Manrope, sans-serif', fontSize: '26px', color: '#0F6E56', letterSpacing: '-0.02em' }}>
+            <p className="tabular-nums font-bold" style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', color: '#0F6E56', letterSpacing: '-0.02em' }}>
               {displayOutputs.ftesFreed.toFixed(1)}
             </p>
           </div>
           <div>
             <p className="uppercase font-bold mb-1" style={{ color: 'rgba(255,255,255,0.45)', fontSize: '10px', letterSpacing: '0.07em', fontFamily: 'Inter, sans-serif' }}>ACTIVE USE CASES</p>
-            <p className="tabular-nums font-bold" style={{ fontFamily: 'Manrope, sans-serif', fontSize: '26px', color: '#00B8A9', letterSpacing: '-0.02em' }}>
+            <p className="tabular-nums font-bold" style={{ fontFamily: 'Inter, sans-serif', fontSize: '26px', color: '#00B8A9', letterSpacing: '-0.02em' }}>
               {displayOutputs.activeUseCases}
             </p>
           </div>
@@ -386,7 +386,7 @@ export default function ValueSimulatorContent() {
           <div>
             <h2
               className="font-bold mb-1"
-              style={{ fontFamily: 'Manrope, sans-serif', fontSize: '16px', color: '#00205F' }}
+              style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', color: '#00205F' }}
             >
               Assumptions
             </h2>
@@ -627,7 +627,7 @@ export default function ValueSimulatorContent() {
                 <div className="flex items-baseline gap-1 flex-wrap">
                   <span
                     className="tabular-nums font-bold"
-                    style={{ fontFamily: 'Manrope, sans-serif', fontSize: '28px', color, letterSpacing: '-0.02em', lineHeight: 1.1 }}
+                    style={{ fontFamily: 'Inter, sans-serif', fontSize: '28px', color, letterSpacing: '-0.02em', lineHeight: 1.1 }}
                   >
                     {value}
                   </span>
@@ -654,7 +654,7 @@ export default function ValueSimulatorContent() {
           <div className="rounded-2xl p-5" style={{ background: '#FFFFFF' }}>
             <h3
               className="font-bold mb-4"
-              style={{ fontFamily: 'Manrope, sans-serif', fontSize: '14px', color: '#00205F' }}
+              style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: '#00205F' }}
             >
               Scenario Summary
             </h3>
@@ -684,7 +684,7 @@ export default function ValueSimulatorContent() {
                     </div>
                     <p
                       className="tabular-nums font-bold"
-                      style={{ fontFamily: 'Manrope, sans-serif', fontSize: '22px', color: '#00205F', letterSpacing: '-0.02em' }}
+                      style={{ fontFamily: 'Inter, sans-serif', fontSize: '22px', color: '#00205F', letterSpacing: '-0.02em' }}
                     >
                       {fmtExec(svOutputs.annualizedReturn)}
                     </p>
@@ -701,7 +701,7 @@ export default function ValueSimulatorContent() {
           <div className="rounded-2xl p-5" style={{ background: '#FFFFFF' }}>
             <h3
               className="font-bold mb-3"
-              style={{ fontFamily: 'Manrope, sans-serif', fontSize: '14px', color: '#00205F' }}
+              style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: '#00205F' }}
             >
               Key Assumptions
             </h3>

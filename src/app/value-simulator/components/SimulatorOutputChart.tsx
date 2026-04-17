@@ -33,7 +33,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
       </p>
       <p
         className="tabular-nums font-bold"
-        style={{ fontFamily: 'Manrope, sans-serif', fontSize: '18px', color: '#00205F', letterSpacing: '-0.01em' }}
+        style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', color: '#00205F', letterSpacing: '-0.01em' }}
       >
         {fmtExecShort(payload[0].value)}
       </p>
@@ -68,7 +68,7 @@ export default function SimulatorOutputChart({ inputs }: { inputs: SimInputs }) 
       <div className="flex items-center justify-between mb-4">
         <h3
           className="font-bold"
-          style={{ fontFamily: 'Manrope, sans-serif', fontSize: '14px', color: '#00205F' }}
+          style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: '#00205F' }}
         >
           Scenario Value Comparison
         </h3>

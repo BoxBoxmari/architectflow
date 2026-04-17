@@ -76,7 +76,7 @@
     font-synthesis: none;
   }
 
-  /* Typography: Manrope for display, Inter for body */
+  /* Typography: Inter for all text — single unified sans-serif font */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     color: #1C1B1B;
