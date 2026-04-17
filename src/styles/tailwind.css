@@ -35,6 +35,9 @@
     font-family: var(--font-body);
     background-color: #FCF9F8;
     color: #1C1B1B;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   html.dark {
@@ -65,6 +68,13 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+  }
+
+  /* Ensure all form controls inherit the custom font */
+  input, button, textarea, select {
+    font-family: inherit;
+    font-synthesis: none;
   }
 
   /* Typography: Manrope for display, Inter for body */
