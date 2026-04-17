@@ -23,8 +23,7 @@
     --accent-deeper: 37 89% 51%;
     --accent-positive: 162 73% 24%;
     --accent-negative: 351 59% 54%;
-    --font-display: var(--font-display, 'Manrope', sans-serif);
-    --font-body: var(--font-body, 'Inter', sans-serif);
+    /* --font-display and --font-body are injected by next/font on <html> — do not redeclare here */
   }
 
   * {
