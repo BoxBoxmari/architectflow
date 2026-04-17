@@ -11,7 +11,7 @@ export default function ValueSimulatorPage() {
           <p className="text-xs font-semibold text-kpmg-outline dark:text-gray-500 tracking-widest uppercase mb-1 font-body" style={{ fontSize: '10px' }}>
             Strategic Modelling
           </p>
-          <h1 className="font-display text-2xl font-bold text-kpmg-on-surface dark:text-gray-100 leading-tight">
+          <h1 className="font-display text-2xl font-bold text-kpmg-on-surface dark:text-gray-100 leading-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
             Value Simulator
           </h1>
           <p className="text-sm dark:text-gray-400 mt-1 font-body font-semibold text-black">

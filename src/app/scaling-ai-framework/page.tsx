@@ -266,7 +266,7 @@ export default function ScalingAIFrameworkPage() {
             <div>
               <h1
                 className="font-display font-extrabold leading-tight"
-                style={{ fontSize: '2rem', color: '#00205F', letterSpacing: '-0.01em' }}
+                style={{ fontSize: '2rem', color: '#00205F', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}
               >
                 Scaling AI Implementation Framework
               </h1>
