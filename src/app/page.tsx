@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function HomePage() {
-  redirect('/ai-architecture-explorer');
+  redirect('/value-simulator');
 }
