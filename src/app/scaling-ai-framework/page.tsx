@@ -289,107 +289,103 @@ export default function ScalingAIFrameworkPage() {
             className="rounded-2xl overflow-hidden"
             style={{ boxShadow: '0px 1px 4px rgba(0,32,95,0.08), 0px 0px 0px 1px rgba(196,198,212,0.3)' }}
           >
-            {/* Column Headers */}
-            <div className="grid grid-cols-1 sm:grid-cols-3">
-              {/* FOCUS header */}
-              <div
-                className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
-                style={{ fontSize: '15px', background: '#7B2FBE', letterSpacing: '0.12em' }}
-              >
-                <Target size={16} className="opacity-80" />
-                FOCUS
-              </div>
-              {/* ACTION header */}
-              <div
-                className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
-                style={{ fontSize: '15px', background: '#00897B', letterSpacing: '0.12em' }}
-              >
-                <Zap size={16} className="opacity-80" />
-                ACTION
-              </div>
-              {/* SUPPORT header */}
-              <div
-                className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
-                style={{ fontSize: '15px', background: '#1565C0', letterSpacing: '0.12em' }}
-              >
-                <Layers size={16} className="opacity-80" />
-                SUPPORT
-              </div>
-            </div>
+            {/* Mobile: stacked columns | Desktop: 3-col grid */}
+            <div className="block sm:hidden">
 
-            {/* Column Bodies */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 min-h-[340px]">
-
-              {/* FOCUS body */}
-              <div
-                className="p-6 flex flex-col justify-center gap-5"
-                style={{ background: '#FFFFFF', borderRight: '1px solid rgba(196,198,212,0.3)' }}
-              >
-                {FOCUS_ITEMS?.map((item) => (
-                  <div key={item?.label} className="flex items-center gap-3">
-                    {item?.trend === 'up' ? (
-                      <ArrowUpRight size={28} style={{ color: '#00897B', flexShrink: 0 }} strokeWidth={2.5} />
-                    ) : (
-                      <TrendingDown size={28} style={{ color: '#C0006A', flexShrink: 0 }} strokeWidth={2.5} />
-                    )}
-                    <span
-                      className="font-display font-bold"
-                      style={{ fontSize: '1.35rem', color: '#111827' }}
-                    >
-                      {item?.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {/* ACTION body */}
-              <div
-                className="p-6 flex flex-col gap-5"
-                style={{ background: '#FFFFFF', borderRight: '1px solid rgba(196,198,212,0.3)' }}
-              >
-                {ACTION_GROUPS?.map((group) => (
-                  <div key={group?.team}>
-                    <p
-                      className="font-body font-bold mb-2"
-                      style={{ fontSize: '13px', color: '#111827' }}
-                    >
-                      {group?.team}
-                    </p>
-                    <ul className="space-y-1">
-                      {group?.items?.map((item) => (
-                        <li key={item} className="flex items-start gap-1.5">
-                          <ArrowUpRight size={13} style={{ color: '#00897B', flexShrink: 0, marginTop: '2px' }} strokeWidth={2.5} />
-                          <span className="font-body text-gray-600" style={{ fontSize: '12px' }}>
-                            {item}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-
-              {/* SUPPORT + QUESTION stacked */}
-              <div className="flex flex-col">
-                {/* SUPPORT body */}
+              {/* ── FOCUS column (mobile) ── */}
+              <div>
                 <div
-                  className="flex-1 p-6"
+                  className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
+                  style={{ fontSize: '15px', background: '#7B2FBE', letterSpacing: '0.12em' }}
+                >
+                  <Target size={16} className="opacity-80" />
+                  FOCUS
+                </div>
+                <div
+                  className="p-5 flex flex-col gap-5"
                   style={{ background: '#FFFFFF', borderBottom: '1px solid rgba(196,198,212,0.3)' }}
                 >
-                  <div className="space-y-3">
+                  {FOCUS_ITEMS?.map((item) => (
+                    <div key={item?.label} className="flex items-center gap-3 py-1">
+                      {item?.trend === 'up' ? (
+                        <ArrowUpRight size={28} style={{ color: '#00897B', flexShrink: 0 }} strokeWidth={2.5} />
+                      ) : (
+                        <TrendingDown size={28} style={{ color: '#C0006A', flexShrink: 0 }} strokeWidth={2.5} />
+                      )}
+                      <span
+                        className="font-display font-bold"
+                        style={{ fontSize: '1.25rem', color: '#111827' }}
+                      >
+                        {item?.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── ACTION column (mobile) ── */}
+              <div>
+                <div
+                  className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
+                  style={{ fontSize: '15px', background: '#00897B', letterSpacing: '0.12em' }}
+                >
+                  <Zap size={16} className="opacity-80" />
+                  ACTION
+                </div>
+                <div
+                  className="p-5 flex flex-col gap-5"
+                  style={{ background: '#FFFFFF', borderBottom: '1px solid rgba(196,198,212,0.3)' }}
+                >
+                  {ACTION_GROUPS?.map((group) => (
+                    <div key={group?.team}>
+                      <p
+                        className="font-body font-bold mb-2"
+                        style={{ fontSize: '14px', color: '#111827' }}
+                      >
+                        {group?.team}
+                      </p>
+                      <ul className="space-y-2">
+                        {group?.items?.map((item) => (
+                          <li key={item} className="flex items-start gap-2">
+                            <ArrowUpRight size={14} style={{ color: '#00897B', flexShrink: 0, marginTop: '2px' }} strokeWidth={2.5} />
+                            <span className="font-body text-gray-600" style={{ fontSize: '13px' }}>
+                              {item}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── SUPPORT column (mobile) ── */}
+              <div>
+                <div
+                  className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
+                  style={{ fontSize: '15px', background: '#1565C0', letterSpacing: '0.12em' }}
+                >
+                  <Layers size={16} className="opacity-80" />
+                  SUPPORT
+                </div>
+                <div
+                  className="p-5"
+                  style={{ background: '#FFFFFF', borderBottom: '1px solid rgba(196,198,212,0.3)' }}
+                >
+                  <div className="space-y-4">
                     <div>
-                      <p className="font-body font-bold mb-1" style={{ fontSize: '13px', color: '#111827' }}>
+                      <p className="font-body font-bold mb-1" style={{ fontSize: '14px', color: '#111827' }}>
                         Firm Support Teams
                       </p>
-                      <p className="font-body text-gray-600" style={{ fontSize: '12px', lineHeight: '1.5' }}>
+                      <p className="font-body text-gray-600" style={{ fontSize: '13px', lineHeight: '1.6' }}>
                         {SUPPORT_DATA?.firmTeams}
                       </p>
                     </div>
                     <div>
-                      <p className="font-body font-bold mb-1" style={{ fontSize: '13px', color: '#111827' }}>
+                      <p className="font-body font-bold mb-1" style={{ fontSize: '14px', color: '#111827' }}>
                         Tools
                       </p>
-                      <p className="font-body text-gray-600" style={{ fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
+                      <p className="font-body text-gray-600" style={{ fontSize: '13px', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
                         {SUPPORT_DATA?.tools}
                       </p>
                     </div>
@@ -398,7 +394,7 @@ export default function ScalingAIFrameworkPage() {
 
                 {/* QUESTION header */}
                 <div
-                  className="flex items-center justify-center gap-2 py-3 px-6 font-body font-extrabold text-white tracking-widest uppercase"
+                  className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
                   style={{ fontSize: '14px', background: '#C0006A', letterSpacing: '0.12em' }}
                 >
                   <HelpCircle size={15} className="opacity-80" />
@@ -410,16 +406,16 @@ export default function ScalingAIFrameworkPage() {
                   className="p-5"
                   style={{ background: '#FFFFFF' }}
                 >
-                  <ol className="space-y-2">
+                  <ol className="space-y-3">
                     {QUESTIONS?.map((q, i) => (
-                      <li key={i} className="flex items-start gap-2">
+                      <li key={i} className="flex items-start gap-2 py-1">
                         <span
                           className="font-body font-bold flex-shrink-0"
-                          style={{ fontSize: '12px', color: '#C0006A', minWidth: '22px' }}
+                          style={{ fontSize: '13px', color: '#C0006A', minWidth: '24px' }}
                         >
                           Q{i + 1}
                         </span>
-                        <span className="font-body font-semibold" style={{ fontSize: '12px', color: '#C0006A', lineHeight: '1.4' }}>
+                        <span className="font-body font-semibold" style={{ fontSize: '13px', color: '#C0006A', lineHeight: '1.5' }}>
                           {q}
                         </span>
                       </li>
@@ -429,6 +425,143 @@ export default function ScalingAIFrameworkPage() {
               </div>
 
             </div>
+
+            {/* Desktop: original 3-col grid layout */}
+            <div className="hidden sm:block">
+              {/* Column Headers */}
+              <div className="grid grid-cols-3">
+                <div
+                  className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
+                  style={{ fontSize: '15px', background: '#7B2FBE', letterSpacing: '0.12em' }}
+                >
+                  <Target size={16} className="opacity-80" />
+                  FOCUS
+                </div>
+                <div
+                  className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
+                  style={{ fontSize: '15px', background: '#00897B', letterSpacing: '0.12em' }}
+                >
+                  <Zap size={16} className="opacity-80" />
+                  ACTION
+                </div>
+                <div
+                  className="flex items-center justify-center gap-2 py-4 px-6 font-body font-extrabold text-white tracking-widest uppercase"
+                  style={{ fontSize: '15px', background: '#1565C0', letterSpacing: '0.12em' }}
+                >
+                  <Layers size={16} className="opacity-80" />
+                  SUPPORT
+                </div>
+              </div>
+
+              {/* Column Bodies */}
+              <div className="grid grid-cols-3 min-h-[340px]">
+                {/* FOCUS body */}
+                <div
+                  className="p-6 flex flex-col justify-center gap-5"
+                  style={{ background: '#FFFFFF', borderRight: '1px solid rgba(196,198,212,0.3)' }}
+                >
+                  {FOCUS_ITEMS?.map((item) => (
+                    <div key={item?.label} className="flex items-center gap-3">
+                      {item?.trend === 'up' ? (
+                        <ArrowUpRight size={28} style={{ color: '#00897B', flexShrink: 0 }} strokeWidth={2.5} />
+                      ) : (
+                        <TrendingDown size={28} style={{ color: '#C0006A', flexShrink: 0 }} strokeWidth={2.5} />
+                      )}
+                      <span
+                        className="font-display font-bold"
+                        style={{ fontSize: '1.35rem', color: '#111827' }}
+                      >
+                        {item?.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* ACTION body */}
+                <div
+                  className="p-6 flex flex-col gap-5"
+                  style={{ background: '#FFFFFF', borderRight: '1px solid rgba(196,198,212,0.3)' }}
+                >
+                  {ACTION_GROUPS?.map((group) => (
+                    <div key={group?.team}>
+                      <p
+                        className="font-body font-bold mb-2"
+                        style={{ fontSize: '13px', color: '#111827' }}
+                      >
+                        {group?.team}
+                      </p>
+                      <ul className="space-y-1">
+                        {group?.items?.map((item) => (
+                          <li key={item} className="flex items-start gap-1.5">
+                            <ArrowUpRight size={13} style={{ color: '#00897B', flexShrink: 0, marginTop: '2px' }} strokeWidth={2.5} />
+                            <span className="font-body text-gray-600" style={{ fontSize: '12px' }}>
+                              {item}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+
+                {/* SUPPORT + QUESTION stacked */}
+                <div className="flex flex-col">
+                  <div
+                    className="flex-1 p-6"
+                    style={{ background: '#FFFFFF', borderBottom: '1px solid rgba(196,198,212,0.3)' }}
+                  >
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-body font-bold mb-1" style={{ fontSize: '13px', color: '#111827' }}>
+                          Firm Support Teams
+                        </p>
+                        <p className="font-body text-gray-600" style={{ fontSize: '12px', lineHeight: '1.5' }}>
+                          {SUPPORT_DATA?.firmTeams}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-body font-bold mb-1" style={{ fontSize: '13px', color: '#111827' }}>
+                          Tools
+                        </p>
+                        <p className="font-body text-gray-600" style={{ fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
+                          {SUPPORT_DATA?.tools}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="flex items-center justify-center gap-2 py-3 px-6 font-body font-extrabold text-white tracking-widest uppercase"
+                    style={{ fontSize: '14px', background: '#C0006A', letterSpacing: '0.12em' }}
+                  >
+                    <HelpCircle size={15} className="opacity-80" />
+                    QUESTION
+                  </div>
+
+                  <div
+                    className="p-5"
+                    style={{ background: '#FFFFFF' }}
+                  >
+                    <ol className="space-y-2">
+                      {QUESTIONS?.map((q, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span
+                            className="font-body font-bold flex-shrink-0"
+                            style={{ fontSize: '12px', color: '#C0006A', minWidth: '22px' }}
+                          >
+                            Q{i + 1}
+                          </span>
+                          <span className="font-body font-semibold" style={{ fontSize: '12px', color: '#C0006A', lineHeight: '1.4' }}>
+                            {q}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </div>
