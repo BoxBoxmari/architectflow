@@ -297,10 +297,10 @@ export default function ValueSimulatorContent() {
 
   return (
     // Stone Base canvas
-    <div className="min-h-screen" style={{ background: '#FCF9F8' }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ background: '#FCF9F8' }}>
       {/* ── HERO METRIC ROW — Summary-First Principle ── */}
       <div
-        className="rounded-2xl p-8 mb-6"
+        className="rounded-2xl p-5 sm:p-8 mb-6"
         style={{ background: 'linear-gradient(135deg, #00205F 0%, #003580 100%)' }}
       >
         {/* Scenario selector inside hero */}
@@ -333,7 +333,7 @@ export default function ValueSimulatorContent() {
           <div className="flex items-baseline gap-3 flex-wrap">
             <span
               className="tabular-nums font-bold"
-              style={{ fontFamily: 'Manrope, sans-serif', fontSize: '56px', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1 }}
+              style={{ fontFamily: 'Manrope, sans-serif', fontSize: 'clamp(36px, 8vw, 56px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1 }}
             >
               {fmtExec(displayOutputs.annualizedReturn)}
             </span>

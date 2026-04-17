@@ -65,7 +65,7 @@ export default function AppLayout({ children, activeRoute }: AppLayoutProps) {
         <Topbar onMenuClick={() => setMobileSidebarOpen(true)} />
 
         {/* Surface Container Low (#F6F3F2) for the scroll area — structural lane */}
-        <main className="flex-1 overflow-y-auto scrollbar-thin bg-kpmg-background dark:bg-gray-950">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin bg-kpmg-background dark:bg-gray-950">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={pathname}
@@ -74,7 +74,7 @@ export default function AppLayout({ children, activeRoute }: AppLayoutProps) {
               animate="animate"
               exit="exit"
               transition={transition}
-              className="max-w-screen-2xl mx-auto px-6 lg:px-8 xl:px-10 py-8"
+              className="max-w-screen-2xl mx-auto px-4 lg:px-8 xl:px-10 py-8 overflow-x-hidden"
             >
               {children}
             </motion.div>
