@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "serve architectflow-html -p 4028",
-    "start": "serve architectflow-html -p 4028"
+    "dev": "serve . -p 4028",
+    "start": "serve . -p 4028",
+    "build": "echo 'No build required for static HTML'"
   },
   "dependencies": {
     "serve": "^14.2.4"
