@@ -1,0 +1,12 @@
+{
+  "name": "architectflow-static",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "serve architectflow-html -p 4028",
+    "start": "serve architectflow-html -p 4028"
+  },
+  "dependencies": {
+    "serve": "^14.2.4"
+  }
+}
