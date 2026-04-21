@@ -12,7 +12,7 @@
 
   const { DEFAULTS, calcScenarioVariants } = SimulatorCore;
   const { CONSTANTS } = SimulatorCore;
-  const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = CONSTANTS;
+  const { WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = CONSTANTS;
   const {
     SLIDER_DEFS, SCENARIOS, OUTPUT_CARDS, fmtExec,
     renderSliders, updateSliderTrack,
@@ -34,10 +34,22 @@
 
     // Hero
     document.getElementById('hero-annualized').textContent = fmtExec(displayOutputs.annualizedReturn);
-    document.getElementById('hero-monthly').textContent    = fmtExec(displayOutputs.monthlyCostSavings);
     document.getElementById('hero-users').textContent      = displayOutputs.activeUsers.toLocaleString();
     document.getElementById('hero-ftes').textContent       = displayOutputs.ftesFreed.toFixed(1);
     document.getElementById('hero-cases').textContent      = displayOutputs.activeUseCases.toString();
+
+    // Hero insight
+    const insightEl = document.getElementById('hero-insight');
+    if (insightEl) {
+      insightEl.textContent =
+        'At the current modelled state, AI could release ' +
+        displayOutputs.ftesFreed.toFixed(1) +
+        ' FTEs per month and create approximately ' +
+        fmtExec(displayOutputs.annualizedReturn) +
+        ' annual value across ' +
+        displayOutputs.activeUsers.toLocaleString() +
+        ' active users.';
+    }
 
     // Output cards
     OUTPUT_CARDS.forEach(c => {
@@ -92,6 +104,19 @@
     });
   }
 
+  function bindAssumptionsToggle() {
+    var toggle = document.getElementById('assumptions-toggle');
+    var body = document.getElementById('assumptions-body');
+    if (!toggle || !body) return;
+
+    toggle.addEventListener('click', function () {
+      var isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!isExpanded));
+      body.classList.toggle('hidden', isExpanded);
+      toggle.textContent = isExpanded ? 'Show inputs' : 'Hide inputs';
+    });
+  }
+
   function showReady(action) {
     const badge    = document.getElementById('ready-badge');
     const actionEl = document.getElementById('ready-action');
@@ -122,8 +147,10 @@
       const existing = JSON.parse(localStorage.getItem('savedScenarios') || '[]');
       existing.unshift(saved);
       localStorage.setItem('savedScenarios', JSON.stringify(existing.slice(0, 10)));
-      Toast.showToast('success', 'Scenario saved', { description: 'Stored locally — available in Scenario Comparison' });
-      showReady('Scenario saved');
+      Toast.showToast('success', 'Working version saved locally', {
+        description: 'Stored on this browser for working sessions'
+      });
+      showReady('Working version saved locally');
     } catch (err) {
       if (err && (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
         Toast.showToast('error', 'Storage full', { description: 'Clear saved scenarios to free space' });
@@ -140,7 +167,7 @@
     const f = variants.fullAdoption.outputs;
 
     const rows = [
-      ['KPMG AI Value Simulator — Scenario Export'],
+      ['KPMG AI Value Case — Scenario Export'],
       ['Generated', new Date().toLocaleString()],
       [],
       ['--- INPUTS ---'],
@@ -153,16 +180,16 @@
       ['Avg Time Saved / Task (min)', inputs.avgTimeSavedMinutes],
       [],
       ['--- KEY ASSUMPTIONS ---'],
-      ['Hourly Cost Rate (USD/hr)', HOURLY_COST],
+      ['Hourly Cost Rate (USD/hr)', inputs.hourlyRate],
       ['Working Days / Month', WORKING_DAYS_PER_MONTH],
       ['Working Hours / Day', WORKING_HOURS_PER_DAY],
       [],
       ['--- OUTPUTS (ALL SCENARIOS) ---'],
-      ['Metric', 'Current State', '2× Scale-Up', 'Full Adoption'],
+      ['Metric', 'Baseline', 'Scaled Adoption', 'Full Rollout'],
       ['Active Use Cases', o.activeUseCases, s.activeUseCases, f.activeUseCases],
       ['Active Users', o.activeUsers, s.activeUsers, f.activeUsers],
       ['AI-Assisted Tasks / Month', o.tasksPerMonth, s.tasksPerMonth, f.tasksPerMonth],
-      ['Hours Recovered / Month', Math.round(o.hoursPerMonth), Math.round(s.hoursPerMonth), Math.round(f.hoursPerMonth)],
+      ['Hours Released / Month', Math.round(o.hoursPerMonth), Math.round(s.hoursPerMonth), Math.round(f.hoursPerMonth)],
       ['Monthly Cost Savings (USD)', Math.round(o.monthlyCostSavings), Math.round(s.monthlyCostSavings), Math.round(f.monthlyCostSavings)],
       ['Annualised Return (USD)', Math.round(o.annualizedReturn), Math.round(s.annualizedReturn), Math.round(f.annualizedReturn)],
       ['FTEs Freed / Month', o.ftesFreed.toFixed(1), s.ftesFreed.toFixed(1), f.ftesFreed.toFixed(1)],
@@ -173,14 +200,18 @@
     ];
     const csv     = ExportUtils.buildCSV(rows);
     const dateStr = new Date().toISOString().slice(0, 10);
-    ExportUtils.downloadFile(csv, 'kpmg-ai-value-simulator-' + dateStr + '.csv', 'text/csv;charset=utf-8;');
-    Toast.showToast('success', 'CSV downloaded', { description: 'All three scenario variants included' });
-    showReady('CSV exported');
+    ExportUtils.downloadFile(csv, 'kpmg-ai-value-case-' + dateStr + '.csv', 'text/csv;charset=utf-8;');
+    Toast.showToast('success', 'Full model exported', {
+      description: 'CSV includes all model inputs, assumptions, and scenario outputs'
+    });
+    showReady('Full model exported (CSV)');
   }
 
   function handleExportPDF() {
     var btn = document.getElementById('btn-pdf');
-    if (btn) { btn.disabled = true; btn.textContent = 'Exporting…'; }
+    var btnLabel = document.getElementById('btn-pdf-label');
+    if (btn) btn.disabled = true;
+    if (btnLabel) btnLabel.textContent = 'Exporting…';
 
     try {
       var jsPDF   = window.jspdf.jsPDF;
@@ -217,7 +248,7 @@
         doc.setFont('helvetica', 'bold');
         doc.text('KPMG AI Intelligence Hub', margin, 8);
         doc.setFont('helvetica', 'normal');
-        doc.text('AI Value Simulator — Scenario Export', pageW - margin, 8, { align: 'right' });
+        doc.text('AI Value Case — Executive briefing summary', pageW - margin, 8, { align: 'right' });
         y = 20;
       }
 
@@ -235,20 +266,20 @@
       doc.setFillColor(TEAL[0], TEAL[1], TEAL[2]);
       doc.rect(0, 55, pageW, 3, 'F');
       doc.setFontSize(17); doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]); doc.setFont('helvetica', 'bold');
-      doc.text('AI Value Simulator', margin, 73);
+      doc.text('AI Value Case', margin, 73);
       doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-      doc.text('Scenario Export — ' + dateStr, margin, 83);
+      doc.text('Executive briefing summary — ' + dateStr, margin, 83);
       // Hero metric box
       doc.setFillColor(LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]);
       doc.roundedRect(margin, 96, contentW, 36, 3, 3, 'F');
       doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
-      doc.text('ESTIMATED ANNUALISED RETURN — CURRENT STATE', margin + 6, 106);
+      doc.text('INDICATIVE ANNUAL VALUE — BASELINE', margin + 6, 106);
       doc.setFontSize(22); doc.setTextColor(TEAL[0], TEAL[1], TEAL[2]);
       doc.text(fmtExec(o.annualizedReturn) + ' / year', margin + 6, 120);
       doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
       doc.text(o.activeUsers.toLocaleString() + ' active users  ·  ' + o.ftesFreed.toFixed(1) + ' FTEs freed  ·  ' + o.activeUseCases + ' use cases', margin + 6, 128);
       doc.setFontSize(7); doc.setFont('helvetica', 'italic'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-      doc.text('CONFIDENTIAL — For internal use only. Not for external distribution.', pageW / 2, pageH - 14, { align: 'center' });
+      doc.text('Illustrative management view — figures are modelled estimates based on selected inputs.', pageW / 2, pageH - 14, { align: 'center' });
 
       // ── Page 2: Inputs + Key Assumptions ──────────────────
       doc.addPage(); addPageHeader();
@@ -257,7 +288,7 @@
       doc.setFillColor(BLUE[0], BLUE[1], BLUE[2]);
       doc.rect(margin, y, 3, 8, 'F');
       doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
-      doc.text('Simulation Inputs', margin + 7, y + 6.5);
+      doc.text('Model inputs', margin + 7, y + 6.5);
       y += 14;
 
       doc.autoTable({
@@ -292,7 +323,7 @@
         startY: y,
         head: [['Assumption', 'Value']],
         body: [
-          ['Hourly cost rate',    '$' + HOURLY_COST + '/hr'],
+          ['Hourly cost rate',    '$' + inputs.hourlyRate + '/hr'],
           ['Working days / month', '' + WORKING_DAYS_PER_MONTH],
           ['Working hours / day',  '' + WORKING_HOURS_PER_DAY],
         ],
@@ -316,9 +347,9 @@
       // Scenario summary cards
       var cardW = (contentW - 6) / 3;
       var scenarios = [
-        { label: 'Current State', color: NAVY,  outputs: o },
-        { label: '2× Scale-Up',   color: TEAL,  outputs: s },
-        { label: 'Full Adoption', color: GREEN, outputs: f },
+        { label: 'Baseline',         color: NAVY,  outputs: o },
+        { label: 'Scaled Adoption',  color: TEAL,  outputs: s },
+        { label: 'Full Rollout',     color: GREEN, outputs: f },
       ];
       scenarios.forEach(function (sc, i) {
         var bx = margin + i * (cardW + 3);
@@ -337,12 +368,12 @@
 
       doc.autoTable({
         startY: y,
-        head: [['Metric', 'Current State', '2× Scale-Up', 'Full Adoption']],
+        head: [['Metric', 'Baseline', 'Scaled Adoption', 'Full Rollout']],
         body: [
           ['Active Use Cases',          '' + o.activeUseCases,                              '' + s.activeUseCases,                              '' + f.activeUseCases],
           ['Active Users',              o.activeUsers.toLocaleString(),                     s.activeUsers.toLocaleString(),                     f.activeUsers.toLocaleString()],
           ['AI Tasks / Month',          Math.round(o.tasksPerMonth).toLocaleString(),       Math.round(s.tasksPerMonth).toLocaleString(),       Math.round(f.tasksPerMonth).toLocaleString()],
-          ['Hours Recovered / Month',   Math.round(o.hoursPerMonth).toLocaleString(),       Math.round(s.hoursPerMonth).toLocaleString(),       Math.round(f.hoursPerMonth).toLocaleString()],
+          ['Hours Released / Month',    Math.round(o.hoursPerMonth).toLocaleString(),       Math.round(s.hoursPerMonth).toLocaleString(),       Math.round(f.hoursPerMonth).toLocaleString()],
           ['Monthly Cost Savings',      fmtExec(o.monthlyCostSavings),                     fmtExec(s.monthlyCostSavings),                     fmtExec(f.monthlyCostSavings)],
           ['Annualised Return',         fmtExec(o.annualizedReturn),                       fmtExec(s.annualizedReturn),                       fmtExec(f.annualizedReturn)],
           ['FTEs Freed / Month',        o.ftesFreed.toFixed(1),                            s.ftesFreed.toFixed(1),                            f.ftesFreed.toFixed(1)],
@@ -367,24 +398,25 @@
 
       // Footer note
       doc.setFontSize(7); doc.setFont('helvetica', 'italic'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-      doc.text('KPMG AI Architecture — Confidential. For internal use only. All figures are illustrative estimates based on modelled assumptions.', margin, y + 6);
+      doc.text('KPMG AI Architecture — Illustrative management view. All figures are modelled estimates based on selected inputs.', margin, y + 6);
 
       // Page numbers
       var totalPages = doc.internal.getNumberOfPages();
       for (var p = 1; p <= totalPages; p++) {
         doc.setPage(p);
         doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-        doc.text('Page ' + p + ' of ' + totalPages + '  |  KPMG AI Intelligence Hub  |  Value Simulator', pageW / 2, pageH - 7, { align: 'center' });
+        doc.text('Page ' + p + ' of ' + totalPages + '  |  KPMG AI Intelligence Hub  |  Value Case', pageW / 2, pageH - 7, { align: 'center' });
       }
 
-      doc.save('KPMG_AI_Value_Simulator_' + Date.now() + '.pdf');
-      Toast.showToast('success', 'PDF downloaded');
-      showReady('PDF exported');
+      doc.save('KPMG_AI_Value_Case_' + Date.now() + '.pdf');
+      Toast.showToast('success', 'Briefing PDF downloaded');
+      showReady('Briefing PDF exported');
     } catch (err) {
       console.error('PDF export error:', err);
       Toast.showToast('error', 'PDF export failed', { description: err.message });
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = 'PDF'; }
+      if (btn) btn.disabled = false;
+      if (btnLabel) btnLabel.textContent = 'Export briefing PDF';
     }
   }
 
@@ -399,6 +431,7 @@
 
     bindSliders();
     bindScenarioTabs();
+    bindAssumptionsToggle();
 
     document.getElementById('btn-save').addEventListener('click', handleSave);
     document.getElementById('btn-csv').addEventListener('click', handleExportCSV);

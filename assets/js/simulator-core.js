@@ -20,6 +20,7 @@ const SimulatorCore = (() => {
     adoptionRate: 50,
     tasksPerUserPerUseCasePerMonth: 6,
     avgTimeSavedMinutes: 15,
+    hourlyRate: 15,
   };
 
   const RANGES = {
@@ -29,6 +30,7 @@ const SimulatorCore = (() => {
     adoptionRate:                   { min: 5,  max: 100,  step: 1  },
     tasksPerUserPerUseCasePerMonth: { min: 1,  max: 100,  step: 1  },
     avgTimeSavedMinutes:            { min: 1,  max: 60,   step: 1  },
+    hourlyRate:                     { min: 5,  max: 150,  step: 1  },
   };
 
   /**
@@ -37,7 +39,8 @@ const SimulatorCore = (() => {
    * @returns {Object} outputs
    */
   function calcOutputs(inputs) {
-    const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = CONSTANTS;
+    const { WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = CONSTANTS;
+    const HOURLY_COST = inputs.hourlyRate ?? CONSTANTS.HOURLY_COST;
 
     const activeUseCases =
       inputs.activationRate >= 100
@@ -92,7 +95,7 @@ const SimulatorCore = (() => {
       inputs.tasksPerUserPerUseCasePerMonth *
       inputs.avgTimeSavedMinutes /
       60 *
-      CONSTANTS.HOURLY_COST *
+      (inputs.hourlyRate ?? CONSTANTS.HOURLY_COST) *
       12;
 
     // Full Adoption
@@ -102,7 +105,7 @@ const SimulatorCore = (() => {
       inputs.tasksPerUserPerUseCasePerMonth *
       inputs.avgTimeSavedMinutes /
       60 *
-      CONSTANTS.HOURLY_COST *
+      (inputs.hourlyRate ?? CONSTANTS.HOURLY_COST) *
       12;
 
     return {

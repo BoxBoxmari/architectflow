@@ -16,33 +16,124 @@ const SimulatorUI = (() => {
 
   const SLIDER_DEFS = {
     faster: [
-      { key: 'targetUseCaseCount',            label: 'Target Use Case Count',         hint: 'Total number of AI use cases targeted for activation',           format: v => '' + v,                color: '#00B8A9' },
-      { key: 'activationRate',                label: 'Use Case Activation Rate',      hint: 'Percentage of targeted use cases that will be activated',        format: v => v + '%',               color: '#00B8A9' },
-      { key: 'tasksPerUserPerUseCasePerMonth', label: 'Tasks / User / Use Case / Mo', hint: 'Average tasks each user performs per use case per month',        format: v => '' + v,                color: '#00B8A9' },
+      {
+        key: 'targetUseCaseCount',
+        label: 'Target Use Case Count',
+        hint: 'Number of AI use cases selected for scaled enablement.',
+        format: v => '' + v,
+        color: '#00B8A9'
+      },
+      {
+        key: 'activationRate',
+        label: 'Use Case Activation Rate',
+        hint: 'Share of prioritised use cases expected to reach active deployment.',
+        format: v => v + '%',
+        color: '#00B8A9'
+      },
+      {
+        key: 'tasksPerUserPerUseCasePerMonth',
+        label: 'Tasks per User / Use Case / Month',
+        hint: 'Average monthly task volume per active user for each active use case.',
+        format: v => '' + v,
+        color: '#00B8A9'
+      },
     ],
     deeper: [
-      { key: 'targetUserCount',               label: 'Target User Count',             hint: 'Total number of staff targeted to use AI tools',                 format: v => v.toLocaleString(),   color: '#F39C12' },
-      { key: 'adoptionRate',                  label: 'User Adoption Rate',            hint: 'Percentage of targeted users who actively use the tools',        format: v => v + '%',               color: '#F39C12' },
-      { key: 'avgTimeSavedMinutes',           label: 'Avg Time Saved / Task',         hint: 'Average minutes saved per AI-assisted task',                    format: v => v + 'm',               color: '#F39C12' },
+      {
+        key: 'targetUserCount',
+        label: 'Target User Count',
+        hint: 'Number of professionals targeted for AI-enabled workflows.',
+        format: v => v.toLocaleString(),
+        color: '#F39C12'
+      },
+      {
+        key: 'adoptionRate',
+        label: 'User Adoption Rate',
+        hint: 'Share of targeted users expected to use the workflow consistently.',
+        format: v => v + '%',
+        color: '#F39C12'
+      },
+      {
+        key: 'avgTimeSavedMinutes',
+        label: 'Average Time Saved per Task',
+        hint: 'Average minutes released per AI-assisted task.',
+        format: v => v + 'm',
+        color: '#F39C12'
+      },
+      {
+        key: 'hourlyRate',
+        label: 'Hourly Cost Rate',
+        hint: 'Fully-loaded average cost per working hour (USD). Used to convert time saved into indicative value.',
+        format: v => '$' + v + '/hr',
+        color: '#F39C12'
+      },
     ],
   };
 
   const SCENARIOS = [
-    { id: 'current',      label: 'Current State', color: '#006397' },
-    { id: 'scale2x',      label: '2× Scale-Up',   color: '#00B8A9' },
-    { id: 'fulladoption', label: 'Full Adoption',  color: '#0F6E56' },
+    { id: 'current',      label: 'Baseline',         color: 'var(--scenario-color-baseline)' },
+    { id: 'scale2x',      label: 'Scaled adoption',  color: 'var(--scenario-color-scaled)' },
+    { id: 'fulladoption', label: 'Full rollout',     color: 'var(--scenario-color-full)' },
   ];
 
   const OUTPUT_CARDS = [
-    { id: 'out-active-cases',  label: 'ACTIVE USE CASES',        get: (o, i) => ({ value: o.activeUseCases.toString(),                    suffix: 'of ' + i.targetUseCaseCount }),         color: '#00B8A9' },
-    { id: 'out-active-users',  label: 'ACTIVE USERS',            get: (o, i) => ({ value: o.activeUsers.toLocaleString(),                  suffix: 'of ' + i.targetUserCount.toLocaleString() }), color: '#F39C12' },
-    { id: 'out-hours',         label: 'HOURS RECOVERED / MO',    get: (o)    => ({ value: Math.round(o.hoursPerMonth).toLocaleString(),     suffix: 'hrs' }),                                color: '#00B8A9' },
-    { id: 'out-tasks',         label: 'AI TASKS / MONTH',        get: (o)    => ({ value: Math.round(o.tasksPerMonth).toLocaleString(),     suffix: 'tasks' }),                              color: '#F39C12' },
-    { id: 'out-ftes',          label: 'FTES FREED / MONTH',      get: (o)    => ({ value: o.ftesFreed.toFixed(1),                           suffix: 'FTEs' }),                               color: '#0F6E56' },
-    { id: 'out-value-user',    label: 'VALUE / USER / MONTH',    get: (o)    => ({ value: fmtExec(o.valuePerUserPerMonth),                  suffix: '' }),                                   color: '#0F6E56' },
-    { id: 'out-time-user',     label: 'TIME FREED / USER / MO',  get: (o)    => ({ value: Math.round(o.timePerUserPerMonth).toLocaleString(),suffix: 'min' }),                              color: '#45004F' },
-    { id: 'out-daily',         label: 'DAILY AI INTERACTIONS',   get: (o)    => ({ value: Math.round(o.dailyInteractions).toLocaleString(), suffix: '/day' }),                              color: '#00205F' },
-    { id: 'out-penetration',   label: 'PROGRAMME PENETRATION',   get: (o)    => ({ value: Math.round(o.penetration).toString(),             suffix: '%' }),                                  color: '#00205F' },
+    {
+      id: 'out-active-cases',
+      label: 'Activated use cases',
+      get: (o, i) => ({ value: o.activeUseCases.toString(), suffix: 'of ' + Math.max(o.activeUseCases, i.targetUseCaseCount) }),
+      color: 'var(--card-color-1)'
+    },
+    {
+      id: 'out-active-users',
+      label: 'Active users',
+      get: (o, i) => ({ value: o.activeUsers.toLocaleString(), suffix: 'of ' + Math.max(o.activeUsers, i.targetUserCount).toLocaleString() }),
+      color: 'var(--card-color-2)'
+    },
+    {
+      id: 'out-hours',
+      label: 'Hours released / month',
+      get: (o) => ({ value: Math.round(o.hoursPerMonth).toLocaleString(), suffix: 'hrs' }),
+      color: 'var(--card-color-3)'
+    },
+    {
+      id: 'out-tasks',
+      label: 'AI-assisted tasks / month',
+      get: (o) => ({ value: Math.round(o.tasksPerMonth).toLocaleString(), suffix: 'tasks' }),
+      color: 'var(--card-color-4)'
+    },
+    {
+      id: 'out-ftes',
+      label: 'Capacity released',
+      get: (o) => ({ value: o.ftesFreed.toFixed(1), suffix: 'FTE / month' }),
+      color: 'var(--card-color-5)'
+    },
+    {
+      id: 'out-value-user',
+      label: 'Indicative value / user / month',
+      get: (o) => ({ value: fmtExec(o.valuePerUserPerMonth), suffix: '' }),
+      color: 'var(--card-color-1)'
+    },
+    {
+      id: 'out-time-user',
+      label: 'Time released / user / month',
+      get: (o) => ({ value: Math.round(o.timePerUserPerMonth).toLocaleString(), suffix: 'min' }),
+      color: 'var(--card-color-2)'
+    },
+    {
+      id: 'out-daily',
+      label: 'Daily AI interactions',
+      get: (o) => ({ value: Math.round(o.dailyInteractions).toLocaleString(), suffix: '/day' }),
+      color: 'var(--card-color-3)'
+    },
+    {
+      id: 'out-penetration',
+      label: 'Programme penetration',
+      get: (o, i) => {
+        const pct = (o.activeUsers / Math.max(i.targetUserCount, 1)) * 100;
+        return { value: Math.round(Math.min(pct, 100)).toString(), suffix: '%' };
+      },
+      color: 'var(--card-color-4)'
+    },
   ];
 
   // ── Formatter (shared) ────────────────────────────────────
@@ -145,11 +236,10 @@ const SimulatorUI = (() => {
     if (!container) return;
     const o = variants.currentState.outputs;
     const items = [
-      { label: 'Hourly cost rate',    value: '$' + CONSTANTS.HOURLY_COST + '/hr' },
-      { label: 'Working days/month',  value: '' + CONSTANTS.WORKING_DAYS_PER_MONTH },
-      { label: 'Working hours/day',   value: '' + CONSTANTS.WORKING_HOURS_PER_DAY },
-      { label: 'Active use cases',    value: o.activeUseCases + ' of ' + inputs.targetUseCaseCount },
-      { label: 'Active users',        value: o.activeUsers.toLocaleString() + ' of ' + inputs.targetUserCount.toLocaleString() },
+      { label: 'Working days / month', value: '' + CONSTANTS.WORKING_DAYS_PER_MONTH },
+      { label: 'Working hours / day',  value: '' + CONSTANTS.WORKING_HOURS_PER_DAY },
+      { label: 'Activated use cases',  value: o.activeUseCases + ' of ' + Math.max(o.activeUseCases, inputs.targetUseCaseCount) },
+      { label: 'Active users',         value: o.activeUsers.toLocaleString() + ' of ' + inputs.targetUserCount.toLocaleString() },
     ];
     container.innerHTML = items.map(i => `
       <div class="ka-row">
@@ -161,9 +251,9 @@ const SimulatorUI = (() => {
 
   function renderChart(variants) {
     ChartBar.render('chart-container', [
-      { name: 'Current',       value: variants.currentState.annualizedReturn, color: '#006397' },
-      { name: '2× Scale',      value: variants.scale2x.annualizedReturn,      color: '#00B8A9' },
-      { name: 'Full Adoption', value: variants.fullAdoption.annualizedReturn,  color: '#0F6E56' },
+      { name: 'Baseline',        value: variants.currentState.annualizedReturn, color: '#006397' },
+      { name: 'Scaled adoption', value: variants.scale2x.annualizedReturn,      color: '#00B8A9' },
+      { name: 'Full rollout',    value: variants.fullAdoption.annualizedReturn,  color: '#0F6E56' },
     ]);
   }
 

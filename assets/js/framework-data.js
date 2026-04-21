@@ -7,43 +7,49 @@
 const FrameworkData = (() => {
   'use strict';
 
-  /** Focus area items */
   const FOCUS_ITEMS = [
-    { label: 'Use Case',      trend: 'up' },
-    { label: 'Adoption',      trend: 'up' },
-    { label: 'Value',         trend: 'up' },
-    { label: 'Platform Cost', trend: 'down' },
+    { label: 'Prioritised use cases', trend: 'up' },
+    { label: 'Sustained adoption', trend: 'up' },
+    { label: 'Realised business value', trend: 'up' },
+    { label: 'Controlled platform cost', trend: 'down' },
   ];
 
-  /** Action groups — team + bullet items */
   const ACTION_GROUPS = [
     {
-      team: 'AI Function Core Team',
-      items: ['Measure use case values', 'Use case portfolio'],
+      team: 'Central AI team',
+      items: [
+        'Define and track value by use case',
+        'Maintain the enterprise use-case portfolio',
+      ],
     },
     {
-      team: 'AI Service Line Team',
-      items: ['Implementation', 'Testing, Pilot, Apply, Scale'],
+      team: 'Service line leadership',
+      items: [
+        'Lead implementation by service line',
+        'Pilot, validate, standardise, then scale',
+      ],
     },
     {
-      team: 'Employees',
-      items: ['Skill training', 'Quality feedback', 'Adoption rate'],
+      team: 'Practitioner community',
+      items: [
+        'Build practitioner capability',
+        'Capture quality and adoption feedback',
+        'Track and improve adoption rates',
+      ],
     },
   ];
 
-  /** Support section */
   const SUPPORT = {
     teams: 'AI Innovation, KDC, L&D, QRM, NITSO',
-    tools: 'AI management template package Functional AI Platform, Copilot, alQChat, Workbench',
+    tools: 'AI management template package, Functional AI Platform, Copilot, aiQChat, Workbench',
   };
 
-  /** Key questions */
   const QUESTIONS = [
-    'Who are best for "AI-enabled workflow" program?',
-    'Your top 03 areas can free up human capacity?',
-    'How to speed up AI use case enablement?',
-    'How to avoid AI is just "optional"?',
-    'How use cases can be 100% adopted daily?',
+    'Which workflows should be prioritised first for scaled AI enablement?',
+    'Where can AI release the most professional capacity within the next 12 months?',
+    'What must be standardised to move from pilots to repeatable deployment?',
+    'How will leaders make AI part of the default way of working, not an optional add-on?',
+    'What evidence will confirm sustained adoption and realised value?',
   ];
 
   return { FOCUS_ITEMS, ACTION_GROUPS, SUPPORT, QUESTIONS };

@@ -46,6 +46,16 @@
   --sidebar-collapsed-width: 64px;
   --topbar-height: 56px;
   --border-subtle: 1px solid rgba(196, 198, 212, 0.3);
+  --scenario-color-baseline: #006397;
+  --scenario-color-scaled: #00B8A9;
+  --scenario-color-full: #0F6E56;
+
+  /* 5 Core KPMG Colors for Cards */
+  --card-color-1: #00B8A9; /* Teal */
+  --card-color-2: #F39C12; /* Amber */
+  --card-color-3: #0F6E56; /* Green */
+  --card-color-4: #006397; /* Blue */
+  --card-color-5: #45004F; /* Purple */
 }
 
 /* ── Dark Mode Tokens ────────────────────────────────────── */
@@ -59,4 +69,14 @@ html.dark {
   --kpmg-on-surface-variant: #a0a0a0;
   --kpmg-outline: #666;
   --kpmg-outline-variant: #444;
+  --scenario-color-baseline: #60a5fa; /* light blue for dark mode */
+  --scenario-color-scaled: #00B8A9; /* keep base or brighten */
+  --scenario-color-full: #10b981; /* bright green */
+  
+  /* 5 Core KPMG Colors for Cards (Dark Mode overrides) */
+  --card-color-1: #2dd4bf; 
+  --card-color-2: #fbbf24;
+  --card-color-3: #34d399;
+  --card-color-4: #60a5fa;
+  --card-color-5: #c084fc;
 }

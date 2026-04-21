@@ -37,7 +37,7 @@
         doc.setFont('helvetica', 'bold');
         doc.text('KPMG AI Intelligence Hub', margin, 8);
         doc.setFont('helvetica', 'normal');
-        doc.text('Scaling AI Implementation Framework', pageW - margin, 8, { align: 'right' });
+        doc.text('Scale Model — Management Blueprint', pageW - margin, 8, { align: 'right' });
         y = 20;
       }
 
@@ -64,11 +64,11 @@
       doc.setFontSize(18);
       doc.setTextColor(TEXT_PRIMARY[0], TEXT_PRIMARY[1], TEXT_PRIMARY[2]);
       doc.setFont('helvetica', 'bold');
-      doc.text('Scaling AI Implementation Framework', margin, 75);
+      doc.text('How KPMG scales AI from isolated pilots to embedded ways of working', margin, 75);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(TEXT_MUTED[0], TEXT_MUTED[1], TEXT_MUTED[2]);
-      doc.text('Strategic Framework for AI Adoption at Scale', margin, 85);
+      doc.text('Management blueprint for scaled AI adoption and realised value', margin, 85);
       doc.setFillColor(LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]);
       doc.roundedRect(margin, 100, contentW, 30, 3, 3, 'F');
       doc.setFontSize(8);
@@ -81,9 +81,9 @@
       doc.setFontSize(7);
       doc.setTextColor(TEXT_MUTED[0], TEXT_MUTED[1], TEXT_MUTED[2]);
       doc.setFont('helvetica', 'italic');
-      doc.text('CONFIDENTIAL — For internal boardroom use only. Not for external distribution.', pageW / 2, pageH - 14, { align: 'center' });
+      doc.text('Illustrative management view — intended for leadership discussion and operating alignment.', pageW / 2, pageH - 14, { align: 'center' });
 
-      // Page 2: Focus Areas
+      // Page 2: Outcomes to move
       doc.addPage();
       addPageHeader();
       doc.setFillColor(BLUE[0], BLUE[1], BLUE[2]);
@@ -91,7 +91,7 @@
       doc.setFontSize(13);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
-      doc.text('Focus Areas', margin + 7, y + 6.5);
+      doc.text('Outcomes to move', margin + 7, y + 6.5);
       y += 16;
 
       var focusItems   = FrameworkData.FOCUS_ITEMS;
@@ -112,18 +112,18 @@
         doc.setFontSize(7);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(TEXT_MUTED[0], TEXT_MUTED[1], TEXT_MUTED[2]);
-        doc.text(item.trend === 'up' ? '\u25b2 Increase' : '\u25bc Decrease', bx + boxW / 2, y + 17, { align: 'center' });
+        doc.text(item.trend === 'up' ? '\u25b2 Increase' : '\u25bc Control', bx + boxW / 2, y + 17, { align: 'center' });
       });
       y += 28;
 
-      // Action Groups
+      // Owners and actions
       checkPageBreak(20);
       doc.setFillColor(BLUE[0], BLUE[1], BLUE[2]);
       doc.rect(margin, y, 3, 8, 'F');
       doc.setFontSize(13);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
-      doc.text('Action Groups', margin + 7, y + 6.5);
+      doc.text('Owners and actions', margin + 7, y + 6.5);
       y += 14;
 
       doc.autoTable({
@@ -139,14 +139,14 @@
       });
       y = doc.lastAutoTable.finalY + 10;
 
-      // Support Section
+      // Enablers and governance
       checkPageBreak(30);
       doc.setFillColor(BLUE[0], BLUE[1], BLUE[2]);
       doc.rect(margin, y, 3, 8, 'F');
       doc.setFontSize(13);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
-      doc.text('Support Structure', margin + 7, y + 6.5);
+      doc.text('Enablers and governance', margin + 7, y + 6.5);
       y += 14;
 
       var support = FrameworkData.SUPPORT;
@@ -167,14 +167,14 @@
       doc.text(support.tools, margin + 20, y + 18);
       y += 36;
 
-      // Key Questions
+      // Board questions
       checkPageBreak(50);
       doc.setFillColor(BLUE[0], BLUE[1], BLUE[2]);
       doc.rect(margin, y, 3, 8, 'F');
       doc.setFontSize(13);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
-      doc.text('Key Questions', margin + 7, y + 6.5);
+      doc.text('Board questions', margin + 7, y + 6.5);
       y += 14;
 
       var questions = FrameworkData.QUESTIONS;
@@ -196,17 +196,17 @@
         doc.setFontSize(7);
         doc.setTextColor(TEXT_MUTED[0], TEXT_MUTED[1], TEXT_MUTED[2]);
         doc.setFont('helvetica', 'normal');
-        doc.text('Page ' + p + ' of ' + totalPages + '  |  KPMG AI Intelligence Hub  |  Scaling AI Framework', pageW / 2, pageH - 7, { align: 'center' });
+        doc.text('Page ' + p + ' of ' + totalPages + '  |  KPMG AI Intelligence Hub  |  Scale Model', pageW / 2, pageH - 7, { align: 'center' });
       }
 
-      doc.save('KPMG_Scaling_AI_Framework_' + Date.now() + '.pdf');
-      Toast.showToast('success', 'PDF downloaded');
+      doc.save('KPMG_Scale_Model_' + Date.now() + '.pdf');
+      Toast.showToast('success', 'Briefing PDF downloaded');
     } catch (err) {
       console.error('PDF export error:', err);
       Toast.showToast('error', 'PDF export failed', { description: err.message });
     } finally {
       if (btn) btn.disabled = false;
-      if (label) label.textContent = 'Export PDF';
+      if (label) label.textContent = 'Export briefing PDF';
     }
   }
 
