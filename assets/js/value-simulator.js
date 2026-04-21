@@ -1,184 +1,47 @@
 /**
  * Value Simulator — Page driver.
- * Initializes state, renders UI, binds events, manages scenarios/exports.
+ * State, event binding, and export logic only.
+ * Render functions and static definitions are in simulator-ui.js (SimulatorUI).
+ *
+ * Depends on: simulator-core.js, simulator-ui.js, chart-bar.js,
+ *             export-utils.js, theme.js, app-shell.js, toast.js
  */
 
 (function () {
   'use strict';
 
-  const { CONSTANTS, DEFAULTS, RANGES, calcOutputs, calcScenarioVariants } = SimulatorCore;
+  const { DEFAULTS, calcScenarioVariants } = SimulatorCore;
+  const { CONSTANTS } = SimulatorCore;
   const { HOURLY_COST, WORKING_DAYS_PER_MONTH, WORKING_HOURS_PER_DAY } = CONSTANTS;
+  const {
+    SLIDER_DEFS, SCENARIOS, OUTPUT_CARDS, fmtExec,
+    renderSliders, updateSliderTrack,
+    renderScenarioTabs, renderOutputGrid,
+    renderScenarioSummary, renderKeyAssumptions, renderChart,
+  } = SimulatorUI;
 
   // ── State ─────────────────────────────────────────────────
-  let inputs = { ...DEFAULTS };
+  let inputs         = { ...DEFAULTS };
   let activeScenario = 'current'; // 'current' | 'scale2x' | 'fulladoption'
-  let lastAction = '';
 
-  // ── Formatters ────────────────────────────────────────────
-  function fmtExec(value) {
-    if (value >= 1_000_000) return '$' + (value / 1_000_000).toFixed(1) + 'M';
-    if (value >= 1_000) return '$' + (value / 1_000).toFixed(1) + 'K';
-    return '$' + Math.round(value);
-  }
-
-  // ── Slider definitions ────────────────────────────────────
-  const SLIDER_DEFS = {
-    faster: [
-      { key: 'targetUseCaseCount', label: 'Target Use Case Count', hint: 'Total number of AI use cases targeted for activation', format: v => '' + v, color: '#00B8A9' },
-      { key: 'activationRate', label: 'Use Case Activation Rate', hint: 'Percentage of targeted use cases that will be activated', format: v => v + '%', color: '#00B8A9' },
-      { key: 'tasksPerUserPerUseCasePerMonth', label: 'Tasks / User / Use Case / Mo', hint: 'Average tasks each user performs per use case per month', format: v => '' + v, color: '#00B8A9' },
-    ],
-    deeper: [
-      { key: 'targetUserCount', label: 'Target User Count', hint: 'Total number of staff targeted to use AI tools', format: v => v.toLocaleString(), color: '#F39C12' },
-      { key: 'adoptionRate', label: 'User Adoption Rate', hint: 'Percentage of targeted users who actively use the tools', format: v => v + '%', color: '#F39C12' },
-      { key: 'avgTimeSavedMinutes', label: 'Avg Time Saved / Task', hint: 'Average minutes saved per AI-assisted task', format: v => v + 'm', color: '#F39C12' },
-    ],
-  };
-
-  const SCENARIOS = [
-    { id: 'current', label: 'Current State', color: '#006397' },
-    { id: 'scale2x', label: '2× Scale-Up', color: '#00B8A9' },
-    { id: 'fulladoption', label: 'Full Adoption', color: '#0F6E56' },
-  ];
-
-  const OUTPUT_CARDS = [
-    { id: 'out-active-cases', label: 'ACTIVE USE CASES', get: (o, i) => ({ value: o.activeUseCases.toString(), suffix: 'of ' + i.targetUseCaseCount }), color: '#00B8A9' },
-    { id: 'out-active-users', label: 'ACTIVE USERS', get: (o, i) => ({ value: o.activeUsers.toLocaleString(), suffix: 'of ' + i.targetUserCount.toLocaleString() }), color: '#F39C12' },
-    { id: 'out-hours', label: 'HOURS RECOVERED / MO', get: (o) => ({ value: Math.round(o.hoursPerMonth).toLocaleString(), suffix: 'hrs' }), color: '#00B8A9' },
-    { id: 'out-tasks', label: 'AI TASKS / MONTH', get: (o) => ({ value: Math.round(o.tasksPerMonth).toLocaleString(), suffix: 'tasks' }), color: '#F39C12' },
-    { id: 'out-ftes', label: 'FTES FREED / MONTH', get: (o) => ({ value: o.ftesFreed.toFixed(1), suffix: 'FTEs' }), color: '#0F6E56' },
-    { id: 'out-value-user', label: 'VALUE / USER / MONTH', get: (o) => ({ value: fmtExec(o.valuePerUserPerMonth), suffix: '' }), color: '#0F6E56' },
-    { id: 'out-time-user', label: 'TIME FREED / USER / MO', get: (o) => ({ value: Math.round(o.timePerUserPerMonth).toLocaleString(), suffix: 'min' }), color: '#45004F' },
-    { id: 'out-daily', label: 'DAILY AI INTERACTIONS', get: (o) => ({ value: Math.round(o.dailyInteractions).toLocaleString(), suffix: '/day' }), color: '#00205F' },
-    { id: 'out-penetration', label: 'PROGRAMME PENETRATION', get: (o) => ({ value: Math.round(o.penetration).toString(), suffix: '%' }), color: '#00205F' },
-  ];
-
-  // ── Rendering ─────────────────────────────────────────────
-  function renderSliders(containerId, defs) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.innerHTML = defs.map(d => {
-      const r = RANGES[d.key];
-      return `
-        <div class="slider-row" data-slider="${d.key}">
-          <div class="slider-header">
-            <div style="display:flex;align-items:center;gap:6px;min-width:0;">
-              <span class="slider-label">${d.label}</span>
-              <div class="slider-tooltip">
-                <svg class="slider-tooltip-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                <div class="slider-tooltip-text">${d.hint}</div>
-              </div>
-            </div>
-            <span class="slider-value" style="color:${d.color};" data-display="${d.key}">${d.format(inputs[d.key])}</span>
-          </div>
-          <div class="slider-track">
-            <input type="range" min="${r.min}" max="${r.max}" step="${r.step}" value="${inputs[d.key]}" data-input="${d.key}" aria-label="${d.label}">
-          </div>
-          <div class="slider-minmax">
-            <span>${d.format(r.min)}</span>
-            <span>${d.format(r.max)}</span>
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  function updateSliderTrack(inputEl, color) {
-    const min = parseFloat(inputEl.min);
-    const max = parseFloat(inputEl.max);
-    const val = parseFloat(inputEl.value);
-    const pct = ((val - min) / (max - min)) * 100;
-    inputEl.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #EBE7E7 ${pct}%, #EBE7E7 100%)`;
-    // Set thumb color via CSS custom property
-    inputEl.style.setProperty('--thumb-color', color);
-  }
-
-  function renderScenarioTabs() {
-    const container = document.getElementById('scenario-tabs');
-    if (!container) return;
-    container.innerHTML = SCENARIOS.map(s =>
-      `<button class="scenario-chip ${activeScenario === s.id ? '' : 'inactive'}" data-scenario="${s.id}" style="${
-        activeScenario === s.id ? 'background:' + s.color + ';color:#fff;' : ''
-      }">${s.label}</button>`
-    ).join('');
-  }
-
-  function renderOutputGrid() {
-    const container = document.getElementById('output-grid');
-    if (!container) return;
-    container.innerHTML = OUTPUT_CARDS.map(c => `
-      <div class="output-card" id="${c.id}">
-        <p class="output-card-label">${c.label}</p>
-        <div style="display:flex;align-items:baseline;gap:4px;flex-wrap:wrap;">
-          <span class="output-card-value tabular-nums" data-out-value="${c.id}" style="color:${c.color};"></span>
-          <span class="output-card-suffix" data-out-suffix="${c.id}"></span>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  function renderScenarioSummary() {
-    const container = document.getElementById('scenario-summary');
-    if (!container) return;
-    const variants = calcScenarioVariants(inputs);
-    const scenarioMap = {
-      current: variants.currentState.outputs,
-      scale2x: variants.scale2x.outputs,
-      fulladoption: variants.fullAdoption.outputs,
-    };
-
-    container.innerHTML = SCENARIOS.map(s => {
-      const o = scenarioMap[s.id];
-      const isActive = activeScenario === s.id;
-      return `
-        <button class="scenario-summary-btn ${isActive ? 'active-scenario' : ''}" data-scenario-summary="${s.id}"
-          style="${isActive ? 'outline-color:' + s.color + ';' : ''}">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-            <span class="scenario-label" style="color:${s.color};">${s.label}</span>
-            ${isActive ? '<span style="width:8px;height:8px;border-radius:50%;background:' + s.color + ';"></span>' : ''}
-          </div>
-          <p class="scenario-value">${fmtExec(o.annualizedReturn)}</p>
-          <p class="scenario-detail">${o.ftesFreed.toFixed(1)} FTEs · ${o.activeUsers.toLocaleString()} users</p>
-        </button>`;
-    }).join('');
-  }
-
-  function renderKeyAssumptions() {
-    const container = document.getElementById('key-assumptions');
-    if (!container) return;
-    const variants = calcScenarioVariants(inputs);
-    const o = variants.currentState.outputs;
-    const items = [
-      { label: 'Hourly cost rate', value: '$' + CONSTANTS.HOURLY_COST + '/hr' },
-      { label: 'Working days/month', value: '' + CONSTANTS.WORKING_DAYS_PER_MONTH },
-      { label: 'Working hours/day', value: '' + CONSTANTS.WORKING_HOURS_PER_DAY },
-      { label: 'Active use cases', value: o.activeUseCases + ' of ' + inputs.targetUseCaseCount },
-      { label: 'Active users', value: o.activeUsers.toLocaleString() + ' of ' + inputs.targetUserCount.toLocaleString() },
-    ];
-    container.innerHTML = items.map(i => `
-      <div class="ka-row">
-        <span class="ka-label">${i.label}</span>
-        <span class="ka-value tabular-nums">${i.value}</span>
-      </div>
-    `).join('');
-  }
-
+  // ── updateAll ─────────────────────────────────────────────
   function updateAll() {
     const variants = calcScenarioVariants(inputs);
     const displayOutputs =
-      activeScenario === 'current' ? variants.currentState.outputs :
-      activeScenario === 'scale2x' ? variants.scale2x.outputs :
+      activeScenario === 'current'      ? variants.currentState.outputs  :
+      activeScenario === 'scale2x'      ? variants.scale2x.outputs       :
       variants.fullAdoption.outputs;
 
     // Hero
     document.getElementById('hero-annualized').textContent = fmtExec(displayOutputs.annualizedReturn);
-    document.getElementById('hero-monthly').textContent = fmtExec(displayOutputs.monthlyCostSavings);
-    document.getElementById('hero-users').textContent = displayOutputs.activeUsers.toLocaleString();
-    document.getElementById('hero-ftes').textContent = displayOutputs.ftesFreed.toFixed(1);
-    document.getElementById('hero-cases').textContent = displayOutputs.activeUseCases.toString();
+    document.getElementById('hero-monthly').textContent    = fmtExec(displayOutputs.monthlyCostSavings);
+    document.getElementById('hero-users').textContent      = displayOutputs.activeUsers.toLocaleString();
+    document.getElementById('hero-ftes').textContent       = displayOutputs.ftesFreed.toFixed(1);
+    document.getElementById('hero-cases').textContent      = displayOutputs.activeUseCases.toString();
 
     // Output cards
     OUTPUT_CARDS.forEach(c => {
-      const data = c.get(displayOutputs, inputs);
+      const data  = c.get(displayOutputs, inputs);
       const valEl = document.querySelector(`[data-out-value="${c.id}"]`);
       const sufEl = document.querySelector(`[data-out-suffix="${c.id}"]`);
       if (valEl) valEl.textContent = data.value;
@@ -196,20 +59,13 @@
       }
     });
 
-    // Chart
-    ChartBar.render('chart-container', [
-      { name: 'Current', value: variants.currentState.annualizedReturn, color: '#006397' },
-      { name: '2× Scale', value: variants.scale2x.annualizedReturn, color: '#00B8A9' },
-      { name: 'Full Adoption', value: variants.fullAdoption.annualizedReturn, color: '#0F6E56' },
-    ]);
-
-    // Scenario tabs + summary
-    renderScenarioTabs();
-    renderScenarioSummary();
-    renderKeyAssumptions();
+    renderChart(variants);
+    renderScenarioTabs(activeScenario);
+    renderScenarioSummary(activeScenario, variants);
+    renderKeyAssumptions(inputs, variants);
   }
 
-  // ── Event Binding ─────────────────────────────────────────
+  // ── Event binding ──────────────────────────────────────────
   function bindSliders() {
     document.querySelectorAll('[data-input]').forEach(el => {
       const key = el.getAttribute('data-input');
@@ -237,29 +93,28 @@
   }
 
   function showReady(action) {
-    lastAction = action;
-    const badge = document.getElementById('ready-badge');
+    const badge    = document.getElementById('ready-badge');
     const actionEl = document.getElementById('ready-action');
-    const timeEl = document.getElementById('ready-time');
+    const timeEl   = document.getElementById('ready-time');
     if (!badge) return;
     const now = new Date();
     actionEl.textContent = action;
-    timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) +
+    timeEl.textContent   = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) +
       ' · ' + now.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    badge.style.display = '';
+    badge.classList.remove('hidden');
   }
 
   // ── Exports ───────────────────────────────────────────────
   function handleSave() {
     const variants = calcScenarioVariants(inputs);
     const saved = {
-      id: 'scenario-' + Date.now(),
-      name: 'Scenario ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      id:        'scenario-' + Date.now(),
+      name:      'Scenario ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
       timestamp: new Date().toISOString(),
-      inputs: inputs,
+      inputs,
       outputs: {
-        current: variants.currentState.outputs,
-        scale2x: variants.scale2x.outputs,
+        current:      variants.currentState.outputs,
+        scale2x:      variants.scale2x.outputs,
         fullAdoption: variants.fullAdoption.outputs,
       },
     };
@@ -270,7 +125,11 @@
       Toast.showToast('success', 'Scenario saved', { description: 'Stored locally — available in Scenario Comparison' });
       showReady('Scenario saved');
     } catch (err) {
-      Toast.showToast('error', 'Could not save scenario');
+      if (err && (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
+        Toast.showToast('error', 'Storage full', { description: 'Clear saved scenarios to free space' });
+      } else {
+        Toast.showToast('error', 'Could not save scenario');
+      }
     }
   }
 
@@ -312,7 +171,7 @@
       ['Daily AI Interactions', o.dailyInteractions, s.dailyInteractions, f.dailyInteractions],
       ['Programme Penetration (%)', Math.round(o.penetration), Math.round(s.penetration), Math.round(f.penetration)],
     ];
-    const csv = ExportUtils.buildCSV(rows);
+    const csv     = ExportUtils.buildCSV(rows);
     const dateStr = new Date().toISOString().slice(0, 10);
     ExportUtils.downloadFile(csv, 'kpmg-ai-value-simulator-' + dateStr + '.csv', 'text/csv;charset=utf-8;');
     Toast.showToast('success', 'CSV downloaded', { description: 'All three scenario variants included' });
@@ -320,75 +179,213 @@
   }
 
   function handleExportPDF() {
-    const variants = calcScenarioVariants(inputs);
-    const o = variants.currentState.outputs;
-    const s = variants.scale2x.outputs;
-    const f = variants.fullAdoption.outputs;
-    const dateStr = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+    var btn = document.getElementById('btn-pdf');
+    if (btn) { btn.disabled = true; btn.textContent = 'Exporting…'; }
 
-    const scenarioRows = [
-      ['Active Use Cases', o.activeUseCases, s.activeUseCases, f.activeUseCases],
-      ['Active Users', o.activeUsers, s.activeUsers, f.activeUsers],
-      ['Tasks / Month', o.tasksPerMonth.toLocaleString(), s.tasksPerMonth.toLocaleString(), f.tasksPerMonth.toLocaleString()],
-      ['Hours Recovered / Month', Math.round(o.hoursPerMonth).toLocaleString(), Math.round(s.hoursPerMonth).toLocaleString(), Math.round(f.hoursPerMonth).toLocaleString()],
-      ['Monthly Cost Savings', fmtExec(o.monthlyCostSavings), fmtExec(s.monthlyCostSavings), fmtExec(f.monthlyCostSavings)],
-      ['Annualised Return', fmtExec(o.annualizedReturn), fmtExec(s.annualizedReturn), fmtExec(f.annualizedReturn)],
-      ['FTEs Freed / Month', o.ftesFreed.toFixed(1), s.ftesFreed.toFixed(1), f.ftesFreed.toFixed(1)],
-      ['Programme Penetration', Math.round(o.penetration) + '%', Math.round(s.penetration) + '%', Math.round(f.penetration) + '%'],
-    ];
-    const tableRows = scenarioRows.map(function (r) {
-      return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td></tr>';
-    }).join('');
+    try {
+      var jsPDF   = window.jspdf.jsPDF;
+      var doc     = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      var pageW   = doc.internal.pageSize.getWidth();
+      var pageH   = doc.internal.pageSize.getHeight();
+      var margin  = 18;
+      var contentW = pageW - margin * 2;
+      var y = 0;
 
-    var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>' +
-      '<title>KPMG AI Value Simulator — ' + dateStr + '</title>' +
-      '<style>' +
-      'body{font-family:Arial,sans-serif;color:#1a1a2e;margin:40px;font-size:13px;}' +
-      'h1{color:#00205F;font-size:20px;margin-bottom:4px;}' +
-      '.subtitle{color:#666;font-size:12px;margin-bottom:24px;}' +
-      'h2{color:#006397;font-size:14px;margin:20px 0 8px;border-bottom:1px solid #e0e0e0;padding-bottom:4px;}' +
-      'table{width:100%;border-collapse:collapse;margin-bottom:16px;}' +
-      'th{background:#00205F;color:white;padding:8px 10px;text-align:left;font-size:12px;}' +
-      'td{padding:7px 10px;border-bottom:1px solid #f0f0f0;}' +
-      'tr:nth-child(even) td{background:#f8f8f8;}' +
-      '.footer{margin-top:32px;font-size:11px;color:#999;border-top:1px solid #e0e0e0;padding-top:12px;}' +
-      '@media print{body{margin:20px;}}' +
-      '</style></head><body>' +
-      '<h1>KPMG AI Value Simulator</h1>' +
-      '<div class="subtitle">Scenario Export — Generated ' + dateStr + '</div>' +
-      '<h2>Inputs</h2><table>' +
-      '<tr><th>Parameter</th><th>Value</th></tr>' +
-      '<tr><td>Target Use Case Count</td><td>' + inputs.targetUseCaseCount + '</td></tr>' +
-      '<tr><td>Use Case Activation Rate</td><td>' + inputs.activationRate + '%</td></tr>' +
-      '<tr><td>Target User Count</td><td>' + inputs.targetUserCount.toLocaleString() + '</td></tr>' +
-      '<tr><td>User Adoption Rate</td><td>' + inputs.adoptionRate + '%</td></tr>' +
-      '<tr><td>Tasks / User / Use Case / Month</td><td>' + inputs.tasksPerUserPerUseCasePerMonth + '</td></tr>' +
-      '<tr><td>Avg Time Saved / Task</td><td>' + inputs.avgTimeSavedMinutes + ' min</td></tr>' +
-      '</table>' +
-      '<h2>Key Assumptions</h2><table>' +
-      '<tr><th>Assumption</th><th>Value</th></tr>' +
-      '<tr><td>Hourly cost rate (USD)</td><td>$' + HOURLY_COST + '/hr</td></tr>' +
-      '<tr><td>Working days / month</td><td>' + WORKING_DAYS_PER_MONTH + '</td></tr>' +
-      '<tr><td>Working hours / day</td><td>' + WORKING_HOURS_PER_DAY + '</td></tr>' +
-      '</table>' +
-      '<h2>Scenario Outputs</h2><table>' +
-      '<tr><th>Metric</th><th>Current State</th><th>2× Scale-Up</th><th>Full Adoption</th></tr>' +
-      tableRows +
-      '</table>' +
-      '<div class="footer">KPMG AI Architecture — Confidential. For internal use only. All figures are illustrative estimates based on modelled assumptions.</div>' +
-      '<script>window.onload=function(){window.print();}<\/script>' +
-      '</body></html>';
+      var NAVY       = [0, 32, 95];
+      var BLUE       = [0, 99, 151];
+      var TEAL       = [0, 184, 169];
+      var AMBER      = [243, 156, 18];
+      var GREEN      = [15, 110, 86];
+      var LIGHT_BG   = [252, 249, 248];
+      var BORDER     = [235, 231, 231];
+      var TEXT       = [28, 27, 27];
+      var MUTED      = [116, 118, 131];
+      var WHITE      = [255, 255, 255];
 
-    var blob = new Blob([html], { type: 'text/html' });
-    var url = URL.createObjectURL(blob);
-    var win = window.open(url, '_blank');
-    if (!win) {
-      Toast.showToast('error', 'Pop-up blocked', { description: 'Please allow pop-ups to export PDF' });
-    } else {
-      Toast.showToast('success', 'PDF ready', { description: 'Print dialog opened — save as PDF' });
+      var variants = calcScenarioVariants(inputs);
+      var o = variants.currentState.outputs;
+      var s = variants.scale2x.outputs;
+      var f = variants.fullAdoption.outputs;
+      var dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      // ── Helper ─────────────────────────────────────────────
+      function addPageHeader() {
+        doc.setFillColor(NAVY[0], NAVY[1], NAVY[2]);
+        doc.rect(0, 0, pageW, 12, 'F');
+        doc.setFontSize(7);
+        doc.setTextColor(WHITE[0], WHITE[1], WHITE[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.text('KPMG AI Intelligence Hub', margin, 8);
+        doc.setFont('helvetica', 'normal');
+        doc.text('AI Value Simulator — Scenario Export', pageW - margin, 8, { align: 'right' });
+        y = 20;
+      }
+
+      function checkPageBreak(needed) {
+        if (y + needed > pageH - 16) { doc.addPage(); addPageHeader(); }
+      }
+
+      // ── Cover ──────────────────────────────────────────────
+      doc.setFillColor(NAVY[0], NAVY[1], NAVY[2]);
+      doc.rect(0, 0, pageW, 55, 'F');
+      doc.setFontSize(22); doc.setTextColor(WHITE[0], WHITE[1], WHITE[2]); doc.setFont('helvetica', 'bold');
+      doc.text('KPMG', margin, 22);
+      doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(180, 200, 240);
+      doc.text('AI Intelligence Hub', margin, 30);
+      doc.setFillColor(TEAL[0], TEAL[1], TEAL[2]);
+      doc.rect(0, 55, pageW, 3, 'F');
+      doc.setFontSize(17); doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]); doc.setFont('helvetica', 'bold');
+      doc.text('AI Value Simulator', margin, 73);
+      doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.text('Scenario Export — ' + dateStr, margin, 83);
+      // Hero metric box
+      doc.setFillColor(LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]);
+      doc.roundedRect(margin, 96, contentW, 36, 3, 3, 'F');
+      doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+      doc.text('ESTIMATED ANNUALISED RETURN — CURRENT STATE', margin + 6, 106);
+      doc.setFontSize(22); doc.setTextColor(TEAL[0], TEAL[1], TEAL[2]);
+      doc.text(fmtExec(o.annualizedReturn) + ' / year', margin + 6, 120);
+      doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.text(o.activeUsers.toLocaleString() + ' active users  ·  ' + o.ftesFreed.toFixed(1) + ' FTEs freed  ·  ' + o.activeUseCases + ' use cases', margin + 6, 128);
+      doc.setFontSize(7); doc.setFont('helvetica', 'italic'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.text('CONFIDENTIAL — For internal use only. Not for external distribution.', pageW / 2, pageH - 14, { align: 'center' });
+
+      // ── Page 2: Inputs + Key Assumptions ──────────────────
+      doc.addPage(); addPageHeader();
+
+      // Section: Inputs
+      doc.setFillColor(BLUE[0], BLUE[1], BLUE[2]);
+      doc.rect(margin, y, 3, 8, 'F');
+      doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+      doc.text('Simulation Inputs', margin + 7, y + 6.5);
+      y += 14;
+
+      doc.autoTable({
+        startY: y,
+        head: [['Parameter', 'Value']],
+        body: [
+          ['Target Use Case Count',           '' + inputs.targetUseCaseCount],
+          ['Use Case Activation Rate',         inputs.activationRate + '%'],
+          ['Tasks / User / Use Case / Month',  '' + inputs.tasksPerUserPerUseCasePerMonth],
+          ['Target User Count',                inputs.targetUserCount.toLocaleString()],
+          ['User Adoption Rate',               inputs.adoptionRate + '%'],
+          ['Avg Time Saved / Task',            inputs.avgTimeSavedMinutes + ' min'],
+        ],
+        margin: { left: margin, right: margin },
+        styles: { fontSize: 9, cellPadding: 4, textColor: TEXT, lineColor: BORDER, lineWidth: 0.2 },
+        headStyles: { fillColor: NAVY, textColor: WHITE, fontStyle: 'bold', fontSize: 9 },
+        alternateRowStyles: { fillColor: LIGHT_BG },
+        columnStyles: { 0: { cellWidth: contentW * 0.72 }, 1: { cellWidth: contentW * 0.28, fontStyle: 'bold', textColor: TEAL } },
+        didDrawPage: function () { addPageHeader(); },
+      });
+      y = doc.lastAutoTable.finalY + 10;
+
+      // Section: Key Assumptions
+      checkPageBreak(40);
+      doc.setFillColor(BLUE[0], BLUE[1], BLUE[2]);
+      doc.rect(margin, y, 3, 8, 'F');
+      doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+      doc.text('Key Assumptions', margin + 7, y + 6.5);
+      y += 14;
+
+      doc.autoTable({
+        startY: y,
+        head: [['Assumption', 'Value']],
+        body: [
+          ['Hourly cost rate',    '$' + HOURLY_COST + '/hr'],
+          ['Working days / month', '' + WORKING_DAYS_PER_MONTH],
+          ['Working hours / day',  '' + WORKING_HOURS_PER_DAY],
+        ],
+        margin: { left: margin, right: margin },
+        styles: { fontSize: 9, cellPadding: 4, textColor: TEXT, lineColor: BORDER, lineWidth: 0.2 },
+        headStyles: { fillColor: NAVY, textColor: WHITE, fontStyle: 'bold', fontSize: 9 },
+        alternateRowStyles: { fillColor: LIGHT_BG },
+        columnStyles: { 0: { cellWidth: contentW * 0.72 }, 1: { cellWidth: contentW * 0.28, fontStyle: 'bold' } },
+        didDrawPage: function () { addPageHeader(); },
+      });
+      y = doc.lastAutoTable.finalY + 10;
+
+      // ── Page 3+: Scenario Outputs ──────────────────────────
+      checkPageBreak(50);
+      doc.setFillColor(BLUE[0], BLUE[1], BLUE[2]);
+      doc.rect(margin, y, 3, 8, 'F');
+      doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+      doc.text('Scenario Outputs', margin + 7, y + 6.5);
+      y += 14;
+
+      // Scenario summary cards
+      var cardW = (contentW - 6) / 3;
+      var scenarios = [
+        { label: 'Current State', color: NAVY,  outputs: o },
+        { label: '2× Scale-Up',   color: TEAL,  outputs: s },
+        { label: 'Full Adoption', color: GREEN, outputs: f },
+      ];
+      scenarios.forEach(function (sc, i) {
+        var bx = margin + i * (cardW + 3);
+        doc.setFillColor(LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]);
+        doc.roundedRect(bx, y, cardW, 28, 2, 2, 'F');
+        doc.setFillColor(sc.color[0], sc.color[1], sc.color[2]);
+        doc.rect(bx, y, cardW, 2.5, 'F');
+        doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(sc.color[0], sc.color[1], sc.color[2]);
+        doc.text(sc.label.toUpperCase(), bx + cardW / 2, y + 9, { align: 'center' });
+        doc.setFontSize(13); doc.setTextColor(sc.color[0], sc.color[1], sc.color[2]);
+        doc.text(fmtExec(sc.outputs.annualizedReturn), bx + cardW / 2, y + 19, { align: 'center' });
+        doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+        doc.text(sc.outputs.ftesFreed.toFixed(1) + ' FTEs · ' + sc.outputs.activeUsers.toLocaleString() + ' users', bx + cardW / 2, y + 25, { align: 'center' });
+      });
+      y += 36;
+
+      doc.autoTable({
+        startY: y,
+        head: [['Metric', 'Current State', '2× Scale-Up', 'Full Adoption']],
+        body: [
+          ['Active Use Cases',          '' + o.activeUseCases,                              '' + s.activeUseCases,                              '' + f.activeUseCases],
+          ['Active Users',              o.activeUsers.toLocaleString(),                     s.activeUsers.toLocaleString(),                     f.activeUsers.toLocaleString()],
+          ['AI Tasks / Month',          Math.round(o.tasksPerMonth).toLocaleString(),       Math.round(s.tasksPerMonth).toLocaleString(),       Math.round(f.tasksPerMonth).toLocaleString()],
+          ['Hours Recovered / Month',   Math.round(o.hoursPerMonth).toLocaleString(),       Math.round(s.hoursPerMonth).toLocaleString(),       Math.round(f.hoursPerMonth).toLocaleString()],
+          ['Monthly Cost Savings',      fmtExec(o.monthlyCostSavings),                     fmtExec(s.monthlyCostSavings),                     fmtExec(f.monthlyCostSavings)],
+          ['Annualised Return',         fmtExec(o.annualizedReturn),                       fmtExec(s.annualizedReturn),                       fmtExec(f.annualizedReturn)],
+          ['FTEs Freed / Month',        o.ftesFreed.toFixed(1),                            s.ftesFreed.toFixed(1),                            f.ftesFreed.toFixed(1)],
+          ['Time Freed / User / Mo',    Math.round(o.timePerUserPerMonth) + ' min',        Math.round(s.timePerUserPerMonth) + ' min',        Math.round(f.timePerUserPerMonth) + ' min'],
+          ['Value / User / Month',      fmtExec(o.valuePerUserPerMonth),                   fmtExec(s.valuePerUserPerMonth),                   fmtExec(f.valuePerUserPerMonth)],
+          ['Daily Interactions',        Math.round(o.dailyInteractions).toLocaleString(),   Math.round(s.dailyInteractions).toLocaleString(),   Math.round(f.dailyInteractions).toLocaleString()],
+          ['Programme Penetration',     Math.round(o.penetration) + '%',                   Math.round(s.penetration) + '%',                   Math.round(f.penetration) + '%'],
+        ],
+        margin: { left: margin, right: margin },
+        styles: { fontSize: 8, cellPadding: 3.5, textColor: TEXT, lineColor: BORDER, lineWidth: 0.2 },
+        headStyles: { fillColor: NAVY, textColor: WHITE, fontStyle: 'bold', fontSize: 8 },
+        alternateRowStyles: { fillColor: LIGHT_BG },
+        columnStyles: {
+          0: { cellWidth: contentW * 0.37 },
+          1: { cellWidth: contentW * 0.21, halign: 'right', textColor: NAVY,  fontStyle: 'bold' },
+          2: { cellWidth: contentW * 0.21, halign: 'right', textColor: TEAL,  fontStyle: 'bold' },
+          3: { cellWidth: contentW * 0.21, halign: 'right', textColor: GREEN, fontStyle: 'bold' },
+        },
+        didDrawPage: function () { addPageHeader(); },
+      });
+      y = doc.lastAutoTable.finalY + 6;
+
+      // Footer note
+      doc.setFontSize(7); doc.setFont('helvetica', 'italic'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.text('KPMG AI Architecture — Confidential. For internal use only. All figures are illustrative estimates based on modelled assumptions.', margin, y + 6);
+
+      // Page numbers
+      var totalPages = doc.internal.getNumberOfPages();
+      for (var p = 1; p <= totalPages; p++) {
+        doc.setPage(p);
+        doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+        doc.text('Page ' + p + ' of ' + totalPages + '  |  KPMG AI Intelligence Hub  |  Value Simulator', pageW / 2, pageH - 7, { align: 'center' });
+      }
+
+      doc.save('KPMG_AI_Value_Simulator_' + Date.now() + '.pdf');
+      Toast.showToast('success', 'PDF downloaded');
       showReady('PDF exported');
+    } catch (err) {
+      console.error('PDF export error:', err);
+      Toast.showToast('error', 'PDF export failed', { description: err.message });
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'PDF'; }
     }
-    setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
   }
 
   // ── Init ──────────────────────────────────────────────────
@@ -396,8 +393,8 @@
     ThemeManager.initTheme();
     AppShell.init();
 
-    renderSliders('sliders-faster', SLIDER_DEFS.faster);
-    renderSliders('sliders-deeper', SLIDER_DEFS.deeper);
+    renderSliders('sliders-faster', SLIDER_DEFS.faster, inputs);
+    renderSliders('sliders-deeper', SLIDER_DEFS.deeper, inputs);
     renderOutputGrid();
 
     bindSliders();

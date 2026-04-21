@@ -29,7 +29,11 @@ const ThemeManager = (() => {
   function setThemeMode(mode) {
     if (!['light', 'dark', 'system'].includes(mode)) return;
     _mode = mode;
-    localStorage.setItem(STORAGE_KEY, mode);
+    try {
+      localStorage.setItem(STORAGE_KEY, mode);
+    } catch (_) {
+      // Private browsing or storage quota — silently ignore
+    }
     applyTheme();
     updateToggleUI();
   }
@@ -55,9 +59,13 @@ const ThemeManager = (() => {
 
   function initTheme() {
     // Load saved preference
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && ['light', 'dark', 'system'].includes(saved)) {
-      _mode = saved;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved && ['light', 'dark', 'system'].includes(saved)) {
+        _mode = saved;
+      }
+    } catch (_) {
+      // localStorage unavailable — use default
     }
 
     // Detect system preference

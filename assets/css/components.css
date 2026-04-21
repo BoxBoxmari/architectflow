@@ -1,0 +1,638 @@
+/* ═══════════════════════════════════════════════════════════
+   components.css — Reusable UI components: buttons, cards,
+   hero banner, sliders, output grid, chart, scenario summary,
+   key assumptions, actions, toast notifications
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--kpmg-primary);
+  color: #fff;
+  transition: all 0.15s;
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--kpmg-surface-container-high);
+  color: var(--kpmg-primary);
+  transition: all 0.15s;
+}
+
+.btn-secondary:hover {
+  background: var(--kpmg-surface-container);
+}
+
+.btn-navy-gradient {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #fff;
+  background: var(--navy-gradient);
+  box-shadow: 0 2px 8px rgba(0, 32, 95, 0.25);
+  transition: opacity 0.15s;
+}
+
+.btn-navy-gradient:hover {
+  opacity: 0.9;
+}
+.btn-navy-gradient:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+  background: var(--kpmg-surface-container-lowest);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+html.dark .card {
+  background: #111827;
+}
+
+/* ── Hero Banner (Simulator) ─────────────────────────────── */
+.hero-banner {
+  border-radius: 16px;
+  padding: 20px 24px;
+  background: var(--navy-gradient-subtle);
+  margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+  .hero-banner {
+    padding: 32px;
+  }
+}
+
+/* Scenario selector chips */
+.scenario-chip {
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.scenario-chip.inactive {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Hero metric */
+.hero-metric-label {
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.hero-metric-value {
+  font-family: var(--font-body);
+  font-size: clamp(36px, 8vw, 56px);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-metric-unit {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.hero-sub-metric-label {
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+}
+
+.hero-sub-metric-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+/* ── Simulator Grid ──────────────────────────────────────── */
+.sim-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 1024px) {
+  .sim-grid {
+    grid-template-columns: 4fr 5fr 3fr;
+  }
+}
+
+@media (min-width: 1280px) {
+  .sim-grid {
+    grid-template-columns: 3fr 6fr 3fr;
+  }
+}
+
+/* Output metrics grid */
+.output-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.output-card {
+  background: var(--kpmg-surface-container-lowest);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+html.dark .output-card {
+  background: #111827;
+}
+
+.output-card-label {
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  color: #9e9e9e;
+}
+
+.output-card-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.output-card-suffix {
+  font-weight: 700;
+  font-size: 11px;
+  color: #9e9e9e;
+  letter-spacing: 0.02em;
+}
+
+.output-card-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* ── Slider / Range ──────────────────────────────────────── */
+.slider-row {
+  margin-bottom: 24px;
+}
+
+.slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.slider-label-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.slider-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kpmg-primary);
+}
+
+html.dark .slider-label {
+  color: #93c5fd;
+}
+
+.slider-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.slider-tooltip {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.slider-tooltip-icon {
+  color: #9e9e9e;
+  cursor: help;
+}
+
+.slider-tooltip-text {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  margin-bottom: 4px;
+  width: 208px;
+  padding: 8px 12px;
+  background: var(--kpmg-primary);
+  color: #fff;
+  font-size: 12px;
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 10;
+}
+
+.slider-tooltip:hover .slider-tooltip-text {
+  opacity: 1;
+}
+
+.slider-track {
+  position: relative;
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+}
+
+.slider-track input[type='range'] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.slider-track input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  border: 3px solid #fff;
+  transition: box-shadow 0.15s;
+}
+
+.slider-track input[type='range']::-webkit-slider-thumb:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+}
+
+.slider-track input[type='range']::-moz-range-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  border: 3px solid #fff;
+}
+
+.slider-minmax {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #9e9e9e;
+}
+
+/* ── Assumptions Panel ───────────────────────────────────── */
+.assumptions-panel {
+  background: var(--kpmg-surface-container-lowest);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+html.dark .assumptions-panel {
+  background: #111827;
+}
+
+.axis-label {
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.axis-divider {
+  padding-top: 20px;
+  border-top: 1px solid var(--kpmg-surface-container-high);
+}
+
+/* ── Scenario Summary ────────────────────────────────────── */
+.scenario-summary-btn {
+  width: 100%;
+  text-align: left;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.15s;
+  background: var(--kpmg-background);
+  margin-bottom: 12px;
+}
+
+.scenario-summary-btn.active-scenario {
+  background: rgba(0, 0, 0, 0.03);
+  outline: 2px solid currentColor;
+}
+
+html.dark .scenario-summary-btn {
+  background: #0a0a0a;
+}
+
+.scenario-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.scenario-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.scenario-active-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.scenario-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--kpmg-primary);
+  letter-spacing: -0.02em;
+}
+
+.scenario-detail {
+  font-size: 11px;
+  color: #9e9e9e;
+  margin-top: 2px;
+}
+
+/* ── Key Assumptions Box ─────────────────────────────────── */
+.ka-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ka-label {
+  font-size: 12px;
+  color: #9e9e9e;
+}
+.ka-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--kpmg-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+html.dark .ka-value {
+  color: #93c5fd;
+}
+
+/* ── Actions area ────────────────────────────────────────── */
+.actions-divider {
+  padding-top: 16px;
+  border-top: 1px solid var(--kpmg-surface-container-high);
+}
+
+.actions-row {
+  display: flex;
+  gap: 8px;
+}
+
+.ready-badge {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(15, 110, 86, 0.06);
+  border: 1px solid rgba(15, 110, 86, 0.15);
+}
+
+.ready-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--kpmg-accent-positive);
+  flex-shrink: 0;
+}
+
+/* Visibility utility — prefer this over inline display:none */
+.hidden {
+  display: none !important;
+}
+
+/* ── Chart card ──────────────────────────────────────────── */
+.chart-card {
+  background: var(--kpmg-surface-container-lowest);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+html.dark .chart-card {
+  background: #111827;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.chart-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--kpmg-primary);
+}
+
+html.dark .chart-title {
+  color: #93c5fd;
+}
+
+.chart-subtitle {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  color: #9E9E9E;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 24px;
+  height: 100%;
+  padding: 0 8px;
+}
+
+.chart-bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  height: 100%;
+}
+
+.chart-bar-label-top {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--kpmg-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+html.dark .chart-bar-label-top { color: #93c5fd; }
+
+.chart-bar-track {
+  flex: 1;
+  width: 100%;
+  max-width: 56px;
+  display: flex;
+  align-items: flex-end;
+  background: var(--kpmg-surface-container);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+html.dark .chart-bar-track { background: #1f2937; }
+
+.chart-bar-fill {
+  width: 100%;
+  transition: height 0.4s ease;
+}
+
+.chart-bar-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9E9E9E;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Toast Notifications ─────────────────────────────────── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  max-width: 360px;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--kpmg-surface-container-lowest);
+  box-shadow: var(--shadow-overlay);
+  border: 1px solid var(--kpmg-outline-variant);
+  transform: translateX(100%);
+  opacity: 0;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+html.dark .toast {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.toast-visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+.toast-exit {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.toast-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.toast-success .toast-icon {
+  background: var(--kpmg-accent-positive);
+}
+.toast-error .toast-icon {
+  background: var(--kpmg-accent-negative);
+}
+.toast-info .toast-icon {
+  background: var(--kpmg-secondary);
+}
+
+.toast-message {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--kpmg-on-surface);
+}
+.toast-description {
+  font-size: 12px;
+  color: var(--kpmg-outline);
+  margin-top: 2px;
+}

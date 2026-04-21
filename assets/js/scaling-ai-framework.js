@@ -94,12 +94,9 @@
       doc.text('Focus Areas', margin + 7, y + 6.5);
       y += 16;
 
-      var focusItems = [
-        { label: 'Use Case', trend: 'up' },
-        { label: 'Adoption', trend: 'up' },
-        { label: 'Value', trend: 'up' },
-        { label: 'Platform Cost', trend: 'down' },
-      ];
+      var focusItems   = FrameworkData.FOCUS_ITEMS;
+      var actionGroups = FrameworkData.ACTION_GROUPS;
+
       var boxW = (contentW - 9) / 4;
       focusItems.forEach(function (item, i) {
         var bx = margin + i * (boxW + 3);
@@ -115,7 +112,7 @@
         doc.setFontSize(7);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(TEXT_MUTED[0], TEXT_MUTED[1], TEXT_MUTED[2]);
-        doc.text(item.trend === 'up' ? '▲ Increase' : '▼ Decrease', bx + boxW / 2, y + 17, { align: 'center' });
+        doc.text(item.trend === 'up' ? '\u25b2 Increase' : '\u25bc Decrease', bx + boxW / 2, y + 17, { align: 'center' });
       });
       y += 28;
 
@@ -128,12 +125,6 @@
       doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
       doc.text('Action Groups', margin + 7, y + 6.5);
       y += 14;
-
-      var actionGroups = [
-        { team: 'AI Function Core Team', items: ['Measure use case values', 'Use case portfolio'] },
-        { team: 'AI Service Line Team', items: ['Implementation', 'Testing, Pilot, Apply, Scale'] },
-        { team: 'Employees', items: ['Skill training', 'Quality feedback', 'Adoption rate'] },
-      ];
 
       doc.autoTable({
         startY: y,
@@ -158,6 +149,7 @@
       doc.text('Support Structure', margin + 7, y + 6.5);
       y += 14;
 
+      var support = FrameworkData.SUPPORT;
       doc.setFillColor(LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]);
       doc.roundedRect(margin, y, contentW, 28, 2, 2, 'F');
       doc.setFontSize(8);
@@ -166,13 +158,13 @@
       doc.text('Firm Teams:', margin + 6, y + 9);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(TEXT_PRIMARY[0], TEXT_PRIMARY[1], TEXT_PRIMARY[2]);
-      doc.text('AI Innovation, KDC, L&D, QRM, NITSO', margin + 30, y + 9);
+      doc.text(support.teams, margin + 30, y + 9);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
       doc.text('Tools:', margin + 6, y + 18);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(TEXT_PRIMARY[0], TEXT_PRIMARY[1], TEXT_PRIMARY[2]);
-      doc.text('AI management template package, Functional AI Platform, Copilot, alQChat, Workbench', margin + 20, y + 18);
+      doc.text(support.tools, margin + 20, y + 18);
       y += 36;
 
       // Key Questions
@@ -185,13 +177,7 @@
       doc.text('Key Questions', margin + 7, y + 6.5);
       y += 14;
 
-      var questions = [
-        'Who are best for "AI-enabled workflow" program?',
-        'Your top 03 areas can free up human capacity?',
-        'How to speed up AI use case enablement?',
-        'How to avoid AI is just "optional"?',
-        'How use cases can be 100% adopted daily?',
-      ];
+      var questions = FrameworkData.QUESTIONS;
       questions.forEach(function (q, i) {
         checkPageBreak(12);
         doc.setFillColor(235, 240, 255);

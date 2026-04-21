@@ -1,0 +1,264 @@
+/* ═══════════════════════════════════════════════════════════
+   pages/scaling-ai-framework.css — Framework page-specific styles
+   Extracted from inline styles during AF-03 cleanup.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Sidebar Logo Row (shared with value-simulator) ──────── */
+.sidebar-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* ── Framework Hero ──────────────────────────────────────── */
+.framework-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (min-width: 640px) {
+  .framework-hero {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.framework-hero-actions {
+  flex-shrink: 0;
+}
+
+.framework-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2rem;
+  color: var(--kpmg-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+html.dark .framework-title {
+  color: #93c5fd;
+}
+
+/* ── Framework Table ─────────────────────────────────────── */
+.framework-table {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0px 1px 4px rgba(0, 32, 95, 0.08),
+    0px 0px 0px 1px rgba(196, 198, 212, 0.3);
+}
+
+/* Column headers — color variants */
+.fw-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 24px;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 15px;
+}
+
+.fw-col-header--focus    { background: #7b2fbe; }
+.fw-col-header--action   { background: #00897b; }
+.fw-col-header--support  { background: #1565c0; }
+.fw-col-header--question { background: #c0006a; font-size: 14px; }
+
+.fw-col-header-icon {
+  opacity: 0.8;
+}
+
+.fw-col-body {
+  background: var(--kpmg-surface-container-lowest);
+  padding: 24px;
+}
+
+html.dark .fw-col-body {
+  background: #111827;
+}
+
+/* Column body layout variants */
+.fw-col-body--flex {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fw-col-body--center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+.fw-col-body--support-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.fw-col-body--support-grow {
+  flex: 1;
+}
+
+/* ── Focus items ─────────────────────────────────────────── */
+.fw-focus-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.fw-focus-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #111827;
+}
+
+html.dark .fw-focus-label {
+  color: #e5e5e5;
+}
+
+.fw-focus-label--mobile  { font-size: 1.25rem; }
+.fw-focus-label--desktop { font-size: 1.35rem; }
+
+/* ── Action items ────────────────────────────────────────── */
+.fw-action-team {
+  font-weight: 700;
+  font-size: 13px;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.fw-action-team--lg { font-size: 14px; }
+
+html.dark .fw-action-team {
+  color: #e5e5e5;
+}
+
+.fw-action-list {
+  list-style: none;
+  padding: 0;
+}
+
+.fw-action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.fw-action-item--lg { font-size: 13px; }
+
+html.dark .fw-action-item {
+  color: #9ca3af;
+}
+
+/* ── Support section ─────────────────────────────────────── */
+.fw-support-label {
+  font-weight: 700;
+  font-size: 13px;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.fw-support-label--lg { font-size: 14px; }
+
+html.dark .fw-support-label {
+  color: #e5e5e5;
+}
+
+.fw-support-text {
+  font-size: 12px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.fw-support-text--lg { font-size: 13px; }
+
+.fw-support-text--preline {
+  white-space: pre-line;
+}
+
+html.dark .fw-support-text {
+  color: #9ca3af;
+}
+
+.fw-support-block {
+  margin-bottom: 16px;
+}
+
+.fw-support-block--sm {
+  margin-bottom: 12px;
+}
+
+/* ── Questions ───────────────────────────────────────────── */
+.fw-question-list {
+  list-style: none;
+  padding: 0;
+}
+
+.fw-question-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.fw-question-item--lg { font-size: 13px; }
+
+.fw-question-num {
+  font-weight: 700;
+  font-size: 12px;
+  color: #c0006a;
+  min-width: 22px;
+  flex-shrink: 0;
+}
+
+.fw-question-text {
+  font-weight: 600;
+  font-size: 12px;
+  color: #c0006a;
+  line-height: 1.4;
+}
+
+/* ── Grid and layout helpers ─────────────────────────────── */
+.fw-desktop {
+  display: none;
+}
+.fw-mobile {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  .fw-desktop {
+    display: block;
+  }
+  .fw-mobile {
+    display: none;
+  }
+}
+
+.fw-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.fw-min-h {
+  min-height: 340px;
+}
+
+.fw-border-r {
+  border-right: 1px solid rgba(196, 198, 212, 0.3);
+}
+.fw-border-b {
+  border-bottom: 1px solid rgba(196, 198, 212, 0.3);
+}
