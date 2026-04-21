@@ -20,17 +20,22 @@ const ExportUtils = (() => {
   }
 
   /** Build a CSV string from rows (array of arrays) */
-  function buildCSV(rows) {
-    return rows
+  function buildCSV(rows, separator = ';') {
+    const BOM = '\uFEFF';
+    const escapeRegex = new RegExp(`[${separator}"\n]`);
+    
+    const csvContent = rows
       .map(row =>
         row
           .map(cell => {
             const s = String(cell);
-            return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+            return escapeRegex.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
           })
-          .join(',')
+          .join(separator)
       )
       .join('\n');
+      
+    return BOM + csvContent;
   }
 
   return { downloadFile, buildCSV };
