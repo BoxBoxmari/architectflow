@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>AI Value Discovery — KPMG Vietnam &amp; Cambodia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --kb:#00338D;--kd:#001B4A;
+  --teal:#00B8A9;--green:#0F6E56;--amber:#F39C12;
+  --sf:#F7F8FC;--card:#FFFFFF;
+  --t1:#0A1628;--t2:#5A6B85;--t3:#8E9BB4;
+  --bd:#E2E8F0;
+  --fd:'Barlow Condensed',sans-serif;
+  --fb:'DM Sans',sans-serif;
+}
+html,body{min-height:100%}
+body{font-family:var(--fb);background:var(--sf);color:var(--t1);-webkit-tap-highlight-color:transparent}
+.wrap{max-width:640px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+
+header{background:var(--kb);padding:20px 24px;text-align:center}
+header h1{font-family:var(--fd);color:#fff;font-size:22px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+header p{color:rgba(255,255,255,.55);font-size:13px;margin-top:4px}
+
+.content{flex:1;padding:24px 24px 120px}
+
+.step{display:none;animation:fadeUp .4s ease}
+.step.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+.q-label{font-size:13px;color:var(--teal);font-family:var(--fd);font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.q-title{font-family:var(--fd);font-size:28px;font-weight:700;color:var(--kd);line-height:1.2;margin-bottom:6px}
+.q-sub{font-size:15px;color:var(--t2);line-height:1.6;margin-bottom:20px}
+
+.pain-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.pain-card{
+  background:var(--card);border:2px solid var(--bd);border-radius:14px;
+  padding:18px 16px;cursor:pointer;transition:all .2s;
+  display:flex;flex-direction:column;gap:6px;
+  -webkit-tap-highlight-color:transparent;
+}
+.pain-card:hover{border-color:#B5D4F4}
+.pain-card.selected{border-color:var(--kb);background:#F0F4FB}
+.pain-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff}
+.pain-name{font-family:var(--fd);font-size:17px;font-weight:600;color:var(--kd);line-height:1.2}
+.pain-desc{font-size:12px;color:var(--t3);line-height:1.4}
+
+.wf-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.wf-card{
+  background:var(--card);border:2px solid var(--bd);border-radius:14px;
+  padding:16px 18px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:14px;
+}
+.wf-card:hover{border-color:var(--teal)}
+.wf-card.selected{border-color:var(--teal);background:#F0FDFB}
+.wf-check{
+  width:28px;height:28px;border-radius:50%;border:2px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .2s;
+}
+.wf-card.selected .wf-check{background:var(--teal);border-color:var(--teal)}
+.wf-card.selected .wf-check::after{content:'';display:block;width:10px;height:6px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(-45deg);margin-top:-2px}
+.wf-info{flex:1}
+.wf-name{font-family:var(--fd);font-size:17px;font-weight:600;color:var(--kd)}
+.wf-meta{font-size:12px;color:var(--t3);margin-top:2px}
+
+.insight-bar{
+  background:var(--kd);border-radius:14px;padding:16px 20px;
+  margin-bottom:20px;
+}
+.insight-text{font-size:14px;color:rgba(255,255,255,.7);line-height:1.5}
+.insight-text strong{color:#fff;font-weight:600}
+.insight-num{font-family:var(--fd);font-size:36px;font-weight:700;color:var(--teal);margin-top:4px}
+
+.slider-group{margin-bottom:22px}
+.slider-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.slider-label{font-size:15px;color:var(--t2);font-weight:500}
+.slider-val{font-family:var(--fd);font-size:30px;font-weight:700;color:var(--kb)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:5px;background:var(--bd);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:40px;height:40px;border-radius:50%;background:var(--kb);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,51,141,.3);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:40px;height:40px;border-radius:50%;background:var(--kb);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,51,141,.3);cursor:pointer}
+
+.live-result{
+  background:var(--card);border-radius:16px;border:1px solid var(--bd);
+  padding:24px 20px;text-align:center;margin-bottom:16px;
+}
+.live-label{font-size:14px;color:var(--t2);font-weight:500;margin-bottom:4px}
+.live-num{font-family:var(--fd);font-size:52px;font-weight:700;line-height:1.1;margin:6px 0}
+.live-ctx{font-size:12px;color:var(--t3)}
+.live-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.live-card{background:var(--card);border-radius:14px;border:1px solid var(--bd);padding:16px 14px;text-align:center}
+.live-card-label{font-size:12px;color:var(--t3);margin-bottom:2px}
+.live-card-num{font-family:var(--fd);font-size:30px;font-weight:700;color:var(--kd);line-height:1.1}
+
+.portfolio{margin-bottom:20px}
+.port-item{
+  background:var(--card);border-radius:14px;border:1px solid var(--bd);
+  padding:14px 18px;margin-bottom:8px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.port-name{font-family:var(--fd);font-size:16px;font-weight:600;color:var(--kd)}
+.port-meta{font-size:12px;color:var(--t3)}
+.port-val{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--green);text-align:right}
+.port-val-sub{font-size:11px;color:var(--t3);text-align:right}
+
+.port-total{
+  background:var(--kd);border-radius:14px;padding:20px;
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:20px;
+}
+.port-total-label{font-size:14px;color:rgba(255,255,255,.6)}
+.port-total-num{font-family:var(--fd);font-size:38px;font-weight:700;color:var(--teal)}
+.port-total-sub{font-size:12px;color:rgba(255,255,255,.4);text-align:right}
+
+.social-proof{
+  background:#F0FDFB;border-radius:12px;border:1px solid #D1F0E8;
+  padding:14px 18px;margin-bottom:20px;
+  font-size:13px;color:var(--green);line-height:1.5;
+}
+
+.bottom-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);border-top:1px solid var(--bd);
+  padding:14px 24px;
+  display:flex;justify-content:space-between;align-items:center;
+  z-index:50;
+}
+.bottom-bar .wrap-inner{max-width:640px;margin:0 auto;width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.btn{
+  font-family:var(--fd);font-size:16px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.8px;
+  padding:14px 28px;border-radius:12px;border:none;
+  cursor:pointer;min-height:50px;touch-action:manipulation;transition:all .15s;
+}
+.btn:active{transform:scale(.96)}
+.btn-back{background:transparent;color:var(--t2);border:1.5px solid var(--bd)}
+.btn-back:disabled{opacity:.2;cursor:default}
+.btn-next{background:var(--kb);color:#fff;flex:1;max-width:240px}
+.btn-next:disabled{opacity:.3;cursor:default}
+.btn-next.btn-teal{background:var(--teal)}
+.btn-next.btn-green{background:var(--green)}
+
+.func-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.func-card{
+  background:var(--card);border:2px solid var(--bd);border-radius:14px;
+  padding:18px 16px;cursor:pointer;transition:all .2s;text-align:center;
+}
+.func-card:hover{border-color:var(--kb)}
+.func-card.selected{border-color:var(--kb);background:#F0F4FB}
+.func-name{font-family:var(--fd);font-size:18px;font-weight:600;color:var(--kd)}
+.func-count{font-size:13px;color:var(--t3);margin-top:2px}
+
+.blueprint-header{text-align:center;margin-bottom:24px}
+.blueprint-header .q-title{font-size:32px}
+
+.bp-actions{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.bp-btn{
+  flex:1;min-width:140px;
+  background:var(--card);border:1.5px solid var(--bd);border-radius:12px;
+  padding:14px;text-align:center;cursor:pointer;transition:all .2s;
+}
+.bp-btn:hover{border-color:var(--kb)}
+.bp-btn-label{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--kd)}
+.bp-btn-sub{font-size:11px;color:var(--t3);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>AI value discovery</h1>
+  <p>KPMG Vietnam &amp; Cambodia</p>
+</header>
+
+<div class="content">
+
+<!-- STEP 0: Choose function -->
+<div class="step active" id="s0">
+  <div class="q-label">Let's start</div>
+  <div class="q-title">Which function do you lead?</div>
+  <div class="q-sub">We'll tailor everything to your team's context.</div>
+
+  <div class="func-grid" id="funcGrid">
+    <div class="func-card" data-fn="Audit" data-hc="520" onclick="pickFunc(this)">
+      <div class="func-name">Audit</div><div class="func-count">~520 people</div>
+    </div>
+    <div class="func-card" data-fn="Tax &amp; Legal" data-hc="450" onclick="pickFunc(this)">
+      <div class="func-name">Tax &amp; Legal</div><div class="func-count">~450 people</div>
+    </div>
+    <div class="func-card" data-fn="Deal" data-hc="180" onclick="pickFunc(this)">
+      <div class="func-name">Deal</div><div class="func-count">~180 people</div>
+    </div>
+    <div class="func-card" data-fn="Consulting" data-hc="350" onclick="pickFunc(this)">
+      <div class="func-name">Consulting</div><div class="func-count">~350 people</div>
+    </div>
+    <div class="func-card" data-fn="Shared Services" data-hc="300" onclick="pickFunc(this)">
+      <div class="func-name">Shared Services</div><div class="func-count">~300 people</div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 1: Pain points -->
+<div class="step" id="s1">
+  <div class="q-label">Step 1</div>
+  <div class="q-title">What slows your team down the most?</div>
+  <div class="q-sub">Pick 2–3 pain areas. We'll map them to AI opportunities.</div>
+
+  <div class="pain-grid" id="painGrid">
+    <div class="pain-card" data-pain="research" onclick="togglePain(this)">
+      <div class="pain-icon" style="background:var(--kb)">R</div>
+      <div class="pain-name">Manual research</div>
+      <div class="pain-desc">Searching regulations, precedents, comparables across multiple sources</div>
+    </div>
+    <div class="pain-card" data-pain="drafting" onclick="togglePain(this)">
+      <div class="pain-icon" style="background:var(--teal)">D</div>
+      <div class="pain-name">Repetitive drafting</div>
+      <div class="pain-desc">Writing reports, memos, proposals, emails from scratch each time</div>
+    </div>
+    <div class="pain-card" data-pain="review" onclick="togglePain(this)">
+      <div class="pain-icon" style="background:var(--amber)">Q</div>
+      <div class="pain-name">Quality review burden</div>
+      <div class="pain-desc">High rework rate, manual checking, multi-stage review loops</div>
+    </div>
+    <div class="pain-card" data-pain="turnaround" onclick="togglePain(this)">
+      <div class="pain-icon" style="background:#E74C3C">T</div>
+      <div class="pain-name">Slow turnaround</div>
+      <div class="pain-desc">Clients waiting too long, deadline pressure, sequential bottlenecks</div>
+    </div>
+    <div class="pain-card" data-pain="knowledge" onclick="togglePain(this)">
+      <div class="pain-icon" style="background:#8E44AD">K</div>
+      <div class="pain-name">Knowledge trapped in people</div>
+      <div class="pain-desc">Expertise locked in senior heads, hard to train juniors, tribal knowledge</div>
+    </div>
+    <div class="pain-card" data-pain="data" onclick="togglePain(this)">
+      <div class="pain-icon" style="background:#2C3E50">C</div>
+      <div class="pain-name">Data &amp; compliance processing</div>
+      <div class="pain-desc">Classification, extraction, validation of structured data at volume</div>
+    </div>
+  </div>
+
+  <div class="social-proof" id="proofBar" style="display:none"></div>
+</div>
+
+<!-- STEP 2: Workflow selection -->
+<div class="step" id="s2">
+  <div class="q-label">Step 2</div>
+  <div class="q-title">Which workflows should AI tackle first?</div>
+  <div class="q-sub" id="wfSub">Based on your pain areas, here are the highest-impact candidates. Pick 1–3.</div>
+
+  <div class="wf-list" id="wfList"></div>
+
+  <div class="insight-bar" id="wfInsight" style="display:none">
+    <div class="insight-text">Selected workflows affect an estimated</div>
+    <div class="insight-num" id="wfInsightNum">--</div>
+    <div class="insight-text"><strong>hours per month</strong> across your team</div>
+  </div>
+</div>
+
+<!-- STEP 3: Size it (per selected workflow) -->
+<div class="step" id="s3">
+  <div class="q-label" id="s3Label">Step 3</div>
+  <div class="q-title" id="s3Title">Let's size it</div>
+  <div class="q-sub" id="s3Sub">Adjust the estimates to match your reality.</div>
+
+  <div class="slider-group">
+    <div class="slider-header">
+      <span class="slider-label">People who do this task</span>
+      <span class="slider-val" id="s3People">20</span>
+    </div>
+    <input type="range" min="1" max="500" value="20" step="1" id="rPeople">
+  </div>
+
+  <div class="slider-group">
+    <div class="slider-header">
+      <span class="slider-label">Times per person per month</span>
+      <span class="slider-val" id="s3Freq">8</span>
+    </div>
+    <input type="range" min="1" max="200" value="8" step="1" id="rFreq">
+  </div>
+
+  <div class="slider-group">
+    <div class="slider-header">
+      <span class="slider-label">Current time per task</span>
+      <span class="slider-val" id="s3Time">30 min</span>
+    </div>
+    <input type="range" min="5" max="240" value="30" step="5" id="rTime">
+  </div>
+
+  <div class="slider-group">
+    <div class="slider-header">
+      <span class="slider-label">AI could save approximately</span>
+      <span class="slider-val" style="color:var(--teal)" id="s3Save">40%</span>
+    </div>
+    <input type="range" min="10" max="80" value="40" step="5" id="rSave">
+  </div>
+
+  <div class="live-result">
+    <div class="live-label">This single workflow recovers</div>
+    <div class="live-num" style="color:var(--teal)" id="liveHrs">--</div>
+    <div class="live-ctx">hours per month</div>
+  </div>
+
+  <div class="live-row">
+    <div class="live-card">
+      <div class="live-card-label">Monthly savings</div>
+      <div class="live-card-num" style="color:var(--green)" id="liveCost">--</div>
+    </div>
+    <div class="live-card">
+      <div class="live-card-label">Annual value</div>
+      <div class="live-card-num" style="color:var(--kb)" id="liveYear">--</div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 4: Portfolio + add more -->
+<div class="step" id="s4">
+  <div class="q-label">Your AI portfolio</div>
+  <div class="q-title" id="s4Title">Here's what you've built</div>
+  <div class="q-sub" id="s4Sub"></div>
+
+  <div class="portfolio" id="portList"></div>
+
+  <div class="port-total">
+    <div>
+      <div class="port-total-label">Total annual value</div>
+    </div>
+    <div style="text-align:right">
+      <div class="port-total-num" id="portTotal">--</div>
+      <div class="port-total-sub" id="portTotalHrs">--</div>
+    </div>
+  </div>
+
+  <div class="social-proof" id="portProof"></div>
+</div>
+
+<!-- STEP 5: Blueprint -->
+<div class="step" id="s5">
+  <div class="blueprint-header">
+    <div class="q-label">Your AI blueprint</div>
+    <div class="q-title" id="bpTitle">--</div>
+    <div class="q-sub" id="bpSub">--</div>
+  </div>
+
+  <div class="port-total" style="margin-bottom:16px">
+    <div>
+      <div class="port-total-label">Projected annual value</div>
+    </div>
+    <div style="text-align:right">
+      <div class="port-total-num" id="bpTotal">--</div>
+      <div class="port-total-sub" id="bpTotalHrs">--</div>
+    </div>
+  </div>
+
+  <div class="portfolio" id="bpList"></div>
+
+  <div class="live-row" style="margin-top:16px">
+    <div class="live-card">
+      <div class="live-card-label">Use cases identified</div>
+      <div class="live-card-num" style="color:var(--teal)" id="bpCases">--</div>
+    </div>
+    <div class="live-card">
+      <div class="live-card-label">FTEs recovered / month</div>
+      <div class="live-card-num" style="color:var(--kb)" id="bpFTE">--</div>
+    </div>
+  </div>
+
+  <div class="bp-actions" style="margin-top:20px">
+    <div class="bp-btn" onclick="restart()">
+      <div class="bp-btn-label">Add more use cases</div>
+      <div class="bp-btn-sub">Continue building your portfolio</div>
+    </div>
+    <div class="bp-btn" onclick="downloadBP()">
+      <div class="bp-btn-label">Download blueprint</div>
+      <div class="bp-btn-sub">Save as text summary</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:20px 0;font-size:12px;color:var(--t3)">
+    KPMG Vietnam &amp; Cambodia · AI Transformation Program · FY27
+  </div>
+</div>
+
+</div>
+
+<div class="bottom-bar">
+  <div class="wrap-inner">
+    <button class="btn btn-back" id="btnBack" disabled onclick="goBack()">Back</button>
+    <button class="btn btn-next" id="btnNext" disabled onclick="goNext()">Next</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+var R=15,D=21,H=8;
+var cur=0,maxStep=5;
+var state={fn:'',hc:0,pains:[],workflows:[],selectedWFs:[],sizing:[],portfolio:[],wfIdx:0};
+
+var wfDB={
+  research:[
+    {name:'Tax regulation lookup',time:45,freq:10,people:15,save:40},
+    {name:'Comparable company search',time:60,freq:6,people:10,save:45},
+    {name:'Legal precedent research',time:90,freq:4,people:8,save:35},
+    {name:'Market & industry analysis',time:120,freq:3,people:12,save:30},
+  ],
+  drafting:[
+    {name:'Report & memo drafting',time:60,freq:8,people:20,save:40},
+    {name:'Email & client correspondence',time:15,freq:20,people:25,save:50},
+    {name:'Proposal & pitch writing',time:180,freq:2,people:10,save:35},
+    {name:'Workpaper preparation',time:45,freq:10,people:15,save:40},
+  ],
+  review:[
+    {name:'Contract clause review',time:90,freq:4,people:8,save:40},
+    {name:'Engagement quality review',time:60,freq:6,people:12,save:30},
+    {name:'Data validation & reconciliation',time:30,freq:15,people:10,save:50},
+    {name:'Compliance checklist verification',time:45,freq:8,people:6,save:45},
+  ],
+  turnaround:[
+    {name:'Client query response',time:30,freq:12,people:20,save:50},
+    {name:'Deliverable assembly',time:120,freq:4,people:10,save:35},
+    {name:'Approval workflow routing',time:20,freq:15,people:8,save:60},
+  ],
+  knowledge:[
+    {name:'Policy & procedure Q&A',time:15,freq:20,people:30,save:60},
+    {name:'Technical advisory lookup',time:45,freq:8,people:12,save:40},
+    {name:'Training content generation',time:90,freq:3,people:5,save:35},
+    {name:'Onboarding knowledge transfer',time:60,freq:2,people:8,save:40},
+  ],
+  data:[
+    {name:'HS code / tax classification',time:30,freq:15,people:10,save:50},
+    {name:'Document data extraction',time:20,freq:25,people:8,save:55},
+    {name:'Financial data processing',time:45,freq:10,people:6,save:40},
+    {name:'Regulatory filing preparation',time:60,freq:4,people:10,save:35},
+  ]
+};
+
+function $(id){return document.getElementById(id)}
+function fmt(n){return n>=1e6?'$'+(Math.round(n/1e5)/10).toFixed(1)+'M':n>=1e3?'$'+(Math.round(n/100)/10).toFixed(1)+'K':'$'+Math.round(n)}
+function fN(n){return Math.round(n).toLocaleString()}
+
+function show(s){
+  for(var i=0;i<=maxStep;i++) $('s'+i).classList.remove('active');
+  $('s'+s).classList.add('active');
+  cur=s;
+  $('btnBack').disabled=cur===0;
+  updateNextBtn();
+  window.scrollTo(0,0);
+}
+
+function updateNextBtn(){
+  var btn=$('btnNext');
+  btn.className='btn btn-next';
+  btn.disabled=true;
+  if(cur===0){btn.disabled=!state.fn;btn.textContent='NEXT'}
+  else if(cur===1){btn.disabled=state.pains.length<1;btn.textContent='SHOW WORKFLOWS'}
+  else if(cur===2){btn.disabled=state.selectedWFs.length<1;btn.textContent='SIZE IT';btn.className='btn btn-next btn-teal'}
+  else if(cur===3){btn.disabled=false;btn.textContent='ADD TO PORTFOLIO';btn.className='btn btn-next btn-green'}
+  else if(cur===4){btn.disabled=false;btn.textContent='VIEW BLUEPRINT';btn.className='btn btn-next'}
+  else{btn.style.display='none';return}
+  btn.style.display='';
+}
+
+function pickFunc(el){
+  document.querySelectorAll('.func-card').forEach(function(c){c.classList.remove('selected')});
+  el.classList.add('selected');
+  state.fn=el.dataset.fn;
+  state.hc=parseInt(el.dataset.hc);
+  updateNextBtn();
+}
+
+function togglePain(el){
+  el.classList.toggle('selected');
+  state.pains=[];
+  document.querySelectorAll('.pain-card.selected').forEach(function(c){state.pains.push(c.dataset.pain)});
+  var pb=$('proofBar');
+  if(state.pains.length>=2){
+    pb.style.display='';
+    pb.textContent='Teams addressing '+state.pains.length+' pain areas typically uncover $200K–$500K in annual recoverable value.';
+  }else{pb.style.display='none'}
+  updateNextBtn();
+}
+
+function buildWorkflows(){
+  var wfs=[];
+  var seen={};
+  state.pains.forEach(function(p){
+    if(wfDB[p]){
+      wfDB[p].forEach(function(w){
+        if(!seen[w.name]){seen[w.name]=1;wfs.push(Object.assign({pain:p},w))}
+      });
+    }
+  });
+  state.workflows=wfs;
+  state.selectedWFs=[];
+  var list=$('wfList');
+  list.innerHTML='';
+  wfs.forEach(function(w,i){
+    var div=document.createElement('div');
+    div.className='wf-card';
+    div.dataset.idx=i;
+    div.onclick=function(){toggleWF(this)};
+    div.innerHTML='<div class="wf-check"></div><div class="wf-info"><div class="wf-name">'+w.name+'</div><div class="wf-meta">~'+w.time+' min/task · ~'+w.freq+'x/person/month · est. '+w.save+'% AI savings</div></div>';
+    list.appendChild(div);
+  });
+}
+
+function toggleWF(el){
+  el.classList.toggle('selected');
+  state.selectedWFs=[];
+  document.querySelectorAll('.wf-card.selected').forEach(function(c){state.selectedWFs.push(parseInt(c.dataset.idx))});
+  var ins=$('wfInsight');
+  if(state.selectedWFs.length>0){
+    ins.style.display='';
+    var totalHrs=0;
+    state.selectedWFs.forEach(function(i){
+      var w=state.workflows[i];
+      totalHrs+=w.people*w.freq*w.time*w.save/100/60;
+    });
+    $('wfInsightNum').textContent=fN(totalHrs)+' hrs';
+  }else{ins.style.display='none'}
+  updateNextBtn();
+}
+
+function startSizing(){
+  state.wfIdx=0;
+  state.sizing=[];
+  loadSizingStep();
+}
+
+function loadSizingStep(){
+  var idx=state.selectedWFs[state.wfIdx];
+  var w=state.workflows[idx];
+  $('s3Label').textContent='Step 3 — Use case '+(state.wfIdx+1)+' of '+state.selectedWFs.length;
+  $('s3Title').textContent=w.name;
+  $('s3Sub').textContent='Adjust these estimates to match your team\'s reality.';
+  $('rPeople').value=w.people;$('s3People').textContent=w.people;
+  $('rFreq').value=w.freq;$('s3Freq').textContent=w.freq;
+  $('rTime').value=w.time;$('s3Time').textContent=w.time+' min';
+  $('rSave').value=w.save;$('s3Save').textContent=w.save+'%';
+  calcLive();
+  $('btnNext').textContent=state.wfIdx<state.selectedWFs.length-1?'NEXT USE CASE':'ADD TO PORTFOLIO';
+}
+
+function calcLive(){
+  var p=+$('rPeople').value,f=+$('rFreq').value,t=+$('rTime').value,s=+$('rSave').value;
+  $('s3People').textContent=p;
+  $('s3Freq').textContent=f;
+  $('s3Time').textContent=t+' min';
+  $('s3Save').textContent=s+'%';
+  var savedMin=p*f*t*s/100;
+  var hrs=savedMin/60;
+  var cost=hrs*R;
+  $('liveHrs').textContent=fN(hrs);
+  $('liveCost').textContent=fmt(cost);
+  $('liveYear').textContent=fmt(cost*12);
+}
+
+function saveSizing(){
+  var idx=state.selectedWFs[state.wfIdx];
+  var w=state.workflows[idx];
+  state.sizing.push({
+    name:w.name,
+    people:+$('rPeople').value,
+    freq:+$('rFreq').value,
+    time:+$('rTime').value,
+    save:+$('rSave').value
+  });
+}
+
+function buildPortfolio(){
+  state.sizing.forEach(function(s){
+    state.portfolio.push(Object.assign({},s));
+  });
+  renderPortfolio();
+}
+
+function renderPortfolio(){
+  var list=$('portList');
+  list.innerHTML='';
+  var totalHrs=0,totalCost=0;
+  state.portfolio.forEach(function(p,i){
+    var hrs=p.people*p.freq*p.time*p.save/100/60;
+    var cost=hrs*R;
+    totalHrs+=hrs;totalCost+=cost;
+    var div=document.createElement('div');
+    div.className='port-item';
+    div.innerHTML='<div><div class="port-name">'+(i+1)+'. '+p.name+'</div><div class="port-meta">'+p.people+' people · '+p.freq+'x/mo · '+p.time+' min · '+p.save+'% saved</div></div><div><div class="port-val">'+fmt(cost*12)+'</div><div class="port-val-sub">'+fN(hrs)+' hrs/mo</div></div>';
+    list.appendChild(div);
+  });
+  $('portTotal').textContent=fmt(totalCost*12);
+  $('portTotalHrs').textContent=fN(totalHrs)+' hours recovered per month';
+  $('s4Title').textContent=state.portfolio.length+' use case'+(state.portfolio.length>1?'s':'')+' identified';
+  $('s4Sub').textContent='Your '+state.fn+' team\'s AI value portfolio.';
+  var fte=totalHrs/(D*H);
+  $('portProof').textContent='That\'s equivalent to '+fte.toFixed(1)+' full-time employees freed every month — without adding headcount.';
+}
+
+function renderBlueprint(){
+  var list=$('bpList');
+  list.innerHTML=$('portList').innerHTML;
+  var totalHrs=0,totalCost=0;
+  state.portfolio.forEach(function(p){
+    var hrs=p.people*p.freq*p.time*p.save/100/60;
+    totalHrs+=hrs;totalCost+=hrs*R;
+  });
+  $('bpTitle').textContent=state.fn+' AI blueprint';
+  $('bpSub').textContent=state.portfolio.length+' use cases · '+fN(state.hc)+' team members · FY27';
+  $('bpTotal').textContent=fmt(totalCost*12);
+  $('bpTotalHrs').textContent=fN(totalHrs)+' hours/month recovered';
+  $('bpCases').textContent=state.portfolio.length;
+  $('bpFTE').textContent=(totalHrs/(D*H)).toFixed(1);
+}
+
+function goNext(){
+  if(cur===0){show(1)}
+  else if(cur===1){buildWorkflows();show(2)}
+  else if(cur===2){startSizing();show(3)}
+  else if(cur===3){
+    saveSizing();
+    if(state.wfIdx<state.selectedWFs.length-1){
+      state.wfIdx++;
+      loadSizingStep();
+      show(3);
+    }else{
+      buildPortfolio();
+      show(4);
+    }
+  }
+  else if(cur===4){renderBlueprint();show(5)}
+}
+
+function goBack(){
+  if(cur===3&&state.wfIdx>0){state.wfIdx--;state.sizing.pop();loadSizingStep();return}
+  if(cur>0)show(cur-1);
+}
+
+function restart(){
+  state.pains=[];state.selectedWFs=[];state.sizing=[];state.wfIdx=0;
+  document.querySelectorAll('.pain-card').forEach(function(c){c.classList.remove('selected')});
+  show(1);
+}
+
+function downloadBP(){
+  var txt='AI BLUEPRINT — '+state.fn+'\nKPMG Vietnam & Cambodia · FY27\n';
+  txt+='='+ '='.repeat(40)+'\n\n';
+  var totalH=0,totalC=0;
+  state.portfolio.forEach(function(p,i){
+    var h=p.people*p.freq*p.time*p.save/100/60;
+    var c=h*R;totalH+=h;totalC+=c;
+    txt+=(i+1)+'. '+p.name+'\n';
+    txt+='   People: '+p.people+' | Freq: '+p.freq+'x/mo | Time: '+p.time+' min | AI savings: '+p.save+'%\n';
+    txt+='   Monthly hours saved: '+Math.round(h)+' | Annual value: '+fmt(c*12)+'\n\n';
+  });
+  txt+='TOTAL ANNUAL VALUE: '+fmt(totalC*12)+'\n';
+  txt+='TOTAL MONTHLY HOURS: '+Math.round(totalH)+'\n';
+  txt+='FTEs FREED: '+(totalH/(D*H)).toFixed(1)+'\n';
+  var blob=new Blob([txt],{type:'text/plain'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='AI_Blueprint_'+state.fn.replace(/[^a-zA-Z]/g,'_')+'.txt';
+  a.click();
+}
+
+['rPeople','rFreq','rTime','rSave'].forEach(function(id){$(id).addEventListener('input',calcLive)});
+show(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+/* ═══════════════════════════════════════════════════════════
+   discover.css — Page-specific styles for /discover/
+   All classes prefixed discover-*
+   Synchronised with legacy Value Case / Scale Model design system.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Step Flow Container ──────────────────────────────────── */
+.discover-flow {
+  min-height: 300px;
+}
+
+.discover-step {
+  display: none;
+  animation: discover-fadeUp 0.35s ease;
+}
+
+.discover-step.active {
+  display: block;
+}
+
+@keyframes discover-fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Step Label / Title / Sub ─────────────────────────────── */
+.discover-step-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kpmg-accent-faster);
+  margin-bottom: 6px;
+}
+
+.discover-step-title {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3.5vw, 28px);
+  font-weight: 800;
+  color: var(--kpmg-on-surface);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.discover-step-sub {
+  font-size: 14px;
+  color: var(--kpmg-on-surface-variant);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* ── Function Grid (Step 0) — matches legacy .card ───────── */
+.discover-func-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.discover-func-card {
+  background: var(--kpmg-surface-container-lowest);
+  border: 2px solid var(--kpmg-outline-variant);
+  border-radius: 16px;
+  padding: 20px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+}
+
+.discover-func-card:hover {
+  border-color: var(--kpmg-primary-container);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.discover-func-card.selected {
+  border-color: var(--kpmg-primary-container);
+  background: rgba(0, 51, 141, 0.06);
+}
+
+html.dark .discover-func-card {
+  background: #111827;
+  border-color: #374151;
+}
+
+html.dark .discover-func-card:hover {
+  border-color: #60a5fa;
+}
+
+html.dark .discover-func-card.selected {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: #60a5fa;
+}
+
+.discover-func-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface);
+}
+
+.discover-func-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface-variant);
+  margin-top: 2px;
+}
+
+/* ── Pain Grid (Step 1) ──────────────────────────────────── */
+.discover-pain-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.discover-pain-card {
+  background: var(--kpmg-surface-container-lowest);
+  border: 2px solid var(--kpmg-outline-variant);
+  border-radius: 16px;
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-card);
+}
+
+.discover-pain-card:hover {
+  border-color: rgba(0, 184, 169, 0.5);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.discover-pain-card.selected {
+  border-color: var(--kpmg-primary-container);
+  background: rgba(0, 51, 141, 0.06);
+}
+
+html.dark .discover-pain-card {
+  background: #111827;
+  border-color: #374151;
+}
+
+html.dark .discover-pain-card:hover {
+  border-color: #60a5fa;
+}
+
+html.dark .discover-pain-card.selected {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: #60a5fa;
+}
+
+.discover-pain-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.discover-pain-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface);
+  line-height: 1.2;
+}
+
+.discover-pain-desc {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface-variant);
+  line-height: 1.4;
+}
+
+/* ── Workflow List (Step 2) ──────────────────────────────── */
+.discover-wf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.discover-wf-card {
+  background: var(--kpmg-surface-container-lowest);
+  border: 2px solid var(--kpmg-outline-variant);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.discover-wf-card:hover {
+  border-color: var(--kpmg-accent-faster);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.discover-wf-card.selected {
+  border-color: var(--kpmg-accent-faster);
+  background: rgba(0, 184, 169, 0.06);
+}
+
+html.dark .discover-wf-card {
+  background: #111827;
+  border-color: #374151;
+}
+
+html.dark .discover-wf-card:hover {
+  border-color: #2dd4bf;
+}
+
+html.dark .discover-wf-card.selected {
+  background: rgba(0, 184, 169, 0.15);
+  border-color: #2dd4bf;
+}
+
+.discover-wf-check {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--kpmg-outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.discover-wf-card.selected .discover-wf-check {
+  background: var(--kpmg-accent-faster);
+  border-color: var(--kpmg-accent-faster);
+}
+
+.discover-wf-card.selected .discover-wf-check::after {
+  content: '';
+  display: block;
+  width: 9px;
+  height: 5px;
+  border-left: 2.5px solid #fff;
+  border-bottom: 2.5px solid #fff;
+  transform: rotate(-45deg);
+  margin-top: -2px;
+}
+
+.discover-wf-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.discover-wf-name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface);
+}
+
+.discover-wf-meta {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface-variant);
+  margin-top: 2px;
+}
+
+/* ── Insight Bar ──────────────────────────────────────────── */
+.discover-insight-bar {
+  background: var(--navy-gradient);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.discover-insight-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+.discover-insight-text strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.discover-insight-num {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--kpmg-accent-faster);
+  margin-top: 4px;
+}
+
+/* ── Social Proof Bar ─────────────────────────────────────── */
+.discover-social-proof {
+  background: rgba(15, 110, 86, 0.06);
+  border-radius: 16px;
+  border: 1px solid rgba(15, 110, 86, 0.15);
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: var(--kpmg-accent-positive);
+  line-height: 1.5;
+}
+
+html.dark .discover-social-proof {
+  background: rgba(15, 110, 86, 0.12);
+  border-color: rgba(15, 110, 86, 0.3);
+}
+
+/* ── Slider Group (Step 3) — matches legacy slider ───────── */
+.discover-slider-group {
+  margin-bottom: 24px;
+}
+
+.discover-slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.discover-slider-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kpmg-primary);
+}
+
+html.dark .discover-slider-label {
+  color: #93c5fd;
+}
+
+.discover-slider-val {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--kpmg-primary-container);
+  letter-spacing: -0.01em;
+}
+
+html.dark .discover-slider-val {
+  color: #60a5fa;
+}
+
+.discover-slider-val--accent {
+  color: var(--kpmg-accent-faster);
+}
+
+html.dark .discover-slider-val--accent {
+  color: #2dd4bf;
+}
+
+input[type="range"].discover-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--kpmg-outline-variant);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"].discover-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--kpmg-accent-faster);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.1s;
+}
+
+input[type="range"].discover-range::-webkit-slider-thumb:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+  transform: scale(1.12);
+}
+
+input[type="range"].discover-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--kpmg-accent-faster);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+}
+
+/* ── Live Result Cards (Step 3) — matches legacy .output-card */
+.discover-live-result {
+  background: var(--kpmg-surface-container-lowest);
+  border-radius: 16px;
+  border: 2px solid var(--kpmg-outline-variant);
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+html.dark .discover-live-result {
+  background: #111827;
+  border-color: #374151;
+}
+
+.discover-live-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--kpmg-on-surface);
+  margin-bottom: 4px;
+}
+
+.discover-live-num {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 800;
+  color: var(--kpmg-accent-faster);
+  line-height: 1.1;
+  margin: 6px 0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.discover-live-ctx {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--kpmg-on-surface);
+}
+
+.discover-live-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.discover-live-card {
+  background: var(--kpmg-surface-container-lowest);
+  border-radius: 16px;
+  border: 2px solid var(--kpmg-outline-variant);
+  padding: 16px 12px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+}
+
+html.dark .discover-live-card {
+  background: #111827;
+  border-color: #374151;
+}
+
+.discover-live-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--kpmg-on-surface);
+  margin-bottom: 2px;
+}
+
+.discover-live-card-num {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ── Portfolio (Step 4) ───────────────────────────────────── */
+.discover-portfolio {
+  margin-bottom: 20px;
+}
+
+.discover-port-item {
+  background: var(--kpmg-surface-container-lowest);
+  border-radius: 16px;
+  border: 2px solid var(--kpmg-outline-variant);
+  padding: 16px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-card);
+}
+
+html.dark .discover-port-item {
+  background: #111827;
+  border-color: #374151;
+}
+
+.discover-port-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface);
+}
+
+.discover-port-meta {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface-variant);
+  margin-top: 2px;
+}
+
+.discover-port-val {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--kpmg-accent-positive);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.discover-port-val-sub {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface-variant);
+  text-align: right;
+}
+
+.discover-port-total {
+  background: var(--navy-gradient);
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.discover-port-total-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.discover-port-total-num {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--kpmg-accent-faster);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.discover-port-total-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: right;
+}
+
+/* ── Blueprint (Step 5) ───────────────────────────────────── */
+.discover-blueprint-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.discover-bp-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.discover-bp-btn {
+  flex: 1;
+  min-width: 140px;
+  background: var(--kpmg-surface-container-lowest);
+  border: 2px solid var(--kpmg-outline-variant);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-card);
+}
+
+.discover-bp-btn:hover {
+  border-color: var(--kpmg-primary-container);
+  box-shadow: var(--shadow-card-hover);
+}
+
+html.dark .discover-bp-btn {
+  background: #111827;
+  border-color: #374151;
+}
+
+html.dark .discover-bp-btn:hover {
+  border-color: #60a5fa;
+}
+
+.discover-bp-btn-label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface);
+}
+
+.discover-bp-btn-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface-variant);
+  margin-top: 2px;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .discover-func-grid,
+  .discover-pain-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .discover-live-row {
+    grid-template-columns: 1fr;
+  }
+
+  .discover-step-title {
+    font-size: 20px;
+  }
+
+  .discover-live-num {
+    font-size: 36px;
+  }
+
+  .discover-bp-actions {
+    flex-direction: column;
+  }
+}

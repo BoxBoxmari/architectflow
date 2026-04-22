@@ -1,0 +1,347 @@
+/* ═══════════════════════════════════════════════════════════
+   hub.css — Shared UI patterns for new modules
+   (Discover + Current Process only — not loaded on legacy pages)
+   Synchronised with legacy Value Case / Scale Model design system.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Module Hero Banner (matches legacy .hero-banner) ────── */
+.module-hero {
+  border-radius: 16px;
+  padding: 32px;
+  background: var(--navy-gradient-subtle);
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.module-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .module-hero {
+    padding: 20px 24px;
+  }
+}
+
+.module-hero-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kpmg-accent-faster);
+  margin-bottom: 12px;
+}
+
+.module-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.module-hero-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+/* ── Module Header (in-content variant) ──────────────────── */
+.module-header {
+  margin-bottom: 32px;
+}
+
+.module-kicker {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kpmg-accent-faster);
+  margin-bottom: 8px;
+}
+
+.module-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--kpmg-on-surface);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.module-subtitle {
+  font-size: 15px;
+  color: var(--kpmg-on-surface-variant);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+/* ── Module Toolbar ───────────────────────────────────────── */
+.module-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--kpmg-surface-container);
+  border: 2px solid var(--kpmg-outline-variant);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-card);
+}
+
+html.dark .module-toolbar {
+  background: #111827;
+  border-color: #374151;
+}
+
+.module-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--kpmg-outline-variant);
+  background: var(--kpmg-surface-container-lowest);
+  color: var(--kpmg-on-surface-variant);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.module-toolbar-btn:hover {
+  background: var(--kpmg-surface-container-high);
+  color: var(--kpmg-on-surface);
+}
+
+html.dark .module-toolbar-btn {
+  background: #1f2937;
+  border-color: #374151;
+  color: #9ca3af;
+}
+
+html.dark .module-toolbar-btn:hover {
+  background: #374151;
+  color: #d1d5db;
+}
+
+.module-toolbar-btn--primary {
+  background: var(--kpmg-primary-container);
+  color: #fff;
+  border-color: var(--kpmg-primary-container);
+}
+
+.module-toolbar-btn--primary:hover {
+  background: var(--kpmg-primary);
+}
+
+html.dark .module-toolbar-btn--primary {
+  background: var(--kpmg-primary-container);
+  border-color: var(--kpmg-primary-container);
+  color: #fff;
+}
+
+/* ── Module Card (matches legacy .card / .output-card) ───── */
+.module-card {
+  background: var(--kpmg-surface-container-lowest);
+  border: 2px solid var(--kpmg-outline-variant);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.module-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+html.dark .module-card {
+  background: #111827;
+  border-color: #374151;
+}
+
+/* ── Module Section ───────────────────────────────────────── */
+.module-section {
+  margin-bottom: 24px;
+}
+
+.module-section-title {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+/* ── Module Sticky Actions ────────────────────────────────── */
+.module-sticky-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--kpmg-surface-container-lowest);
+  border-top: 2px solid var(--kpmg-outline-variant);
+  padding: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+  margin-top: 32px;
+}
+
+html.dark .module-sticky-actions {
+  background: #111827;
+  border-color: #374151;
+}
+
+/* ── Module Badge ─────────────────────────────────────────── */
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--kpmg-surface-container);
+  color: var(--kpmg-on-surface-variant);
+  border: 1px solid var(--kpmg-outline-variant);
+}
+
+.module-badge--accent {
+  background: rgba(0, 184, 169, 0.1);
+  color: var(--kpmg-accent-faster);
+  border-color: rgba(0, 184, 169, 0.3);
+}
+
+/* ── Module Empty State ───────────────────────────────────── */
+.module-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--kpmg-on-surface-variant);
+}
+
+.module-empty-state h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface);
+  margin-bottom: 8px;
+}
+
+.module-empty-state p {
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+/* ── Shared Button Styles (matches legacy .btn-primary) ── */
+.module-btn {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.module-btn:active {
+  transform: scale(0.97);
+}
+
+.module-btn--primary {
+  background: var(--navy-gradient);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 32, 95, 0.25);
+}
+
+.module-btn--primary:hover {
+  opacity: 0.92;
+}
+
+.module-btn--primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.module-btn--secondary {
+  background: var(--kpmg-surface-container-high);
+  color: var(--kpmg-primary);
+  border: none;
+}
+
+.module-btn--secondary:hover {
+  background: var(--kpmg-surface-container);
+}
+
+.module-btn--secondary:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+html.dark .module-btn--secondary {
+  background: var(--kpmg-surface-container-high);
+  color: var(--kpmg-on-surface);
+  border: 1px solid var(--kpmg-outline-variant);
+}
+
+html.dark .module-btn--secondary:hover {
+  background: var(--kpmg-surface-container);
+  color: #fff;
+}
+
+.module-btn--accent {
+  background: var(--kpmg-accent-faster);
+  color: #fff;
+}
+
+.module-btn--accent:hover {
+  background: #009e93;
+}
+
+.module-btn--success {
+  background: var(--kpmg-accent-positive);
+  color: #fff;
+}
+
+.module-btn--success:hover {
+  background: #0a5c48;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .module-title {
+    font-size: 22px;
+  }
+
+  .module-subtitle {
+    font-size: 14px;
+  }
+
+  .module-sticky-actions {
+    padding: 12px 0;
+  }
+}

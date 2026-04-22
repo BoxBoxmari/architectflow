@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TraCuuHS — Blueprint Phân Loại Mã HS</title>
+<style>
+:root{
+  --bg:#F7F6F3;--surface:#fff;--surface2:#F1EFE8;--border:rgba(0,0,0,.09);
+  --border-strong:rgba(0,0,0,.16);--text:#0E0E0E;--muted:#6B6B6B;--hint:#9A9A90;
+  --accent:#2563EB;--accent-lt:#EFF6FF;--accent-mid:#BFDBFE;
+  --rad:8px;--rad-sm:5px;--rad-pill:20px;
+  --panel-w:420px;
+  --topbar-h:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+input,textarea,select{font-family:inherit;border:0.5px solid var(--border-strong);border-radius:var(--rad-sm);background:var(--surface);color:var(--text);padding:6px 9px;font-size:12px;outline:none;width:100%;transition:border-color .15s,box-shadow .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-lt)}
+textarea{resize:vertical;min-height:56px}
+select{cursor:pointer}
+
+/* ── TOP BAR ── */
+#topbar{height:var(--topbar-h);background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 16px;flex-shrink:0;z-index:100}
+#bp-name{font-size:14px;font-weight:600;border:none;background:transparent;padding:4px 8px;border-radius:var(--rad-sm);min-width:200px;flex:1;color:var(--text)}
+#bp-name:hover{background:var(--surface2)}
+#bp-name:focus{background:var(--surface2);outline:2px solid var(--accent-mid);outline-offset:-2px}
+.tb-sep{width:1px;height:22px;background:var(--border-strong)}
+.tb-btn{display:flex;align-items:center;gap:5px;font-size:12px;padding:5px 11px;border-radius:var(--rad-sm);border:0.5px solid var(--border-strong);color:var(--muted);background:var(--surface);transition:all .15s;white-space:nowrap}
+.tb-btn:hover{background:var(--surface2);color:var(--text)}
+.tb-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tb-btn.primary:hover{background:#1D4ED8}
+.zoom-ctrl{display:flex;align-items:center;gap:4px}
+.zoom-ctrl span{font-size:11px;color:var(--muted);min-width:36px;text-align:center}
+#saved-badge{font-size:10px;color:var(--hint);opacity:0;transition:opacity .3s}
+#saved-badge.show{opacity:1}
+
+/* ── MAIN LAYOUT ── */
+#main{display:flex;flex:1;overflow:hidden}
+
+/* ── LEFT PANEL ── */
+#left{width:var(--panel-w);flex-shrink:0;background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+#left-tabs{display:flex;border-bottom:0.5px solid var(--border);padding:0 12px;gap:2px;flex-shrink:0;background:var(--surface)}
+.ltab{font-size:11px;font-weight:500;padding:10px 12px;color:var(--hint);border-bottom:2px solid transparent;transition:all .15s;border-radius:var(--rad-sm) var(--rad-sm) 0 0}
+.ltab:hover{color:var(--muted);background:var(--surface2)}
+.ltab.active{color:var(--accent);border-bottom-color:var(--accent)}
+#left-body{flex:1;overflow-y:auto;padding:14px 14px 40px}
+#left-body::-webkit-scrollbar{width:4px}
+#left-body::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
+
+/* ── FORM SECTIONS ── */
+.form-section{margin-bottom:14px;border:0.5px solid var(--border);border-radius:var(--rad);overflow:hidden}
+.fs-head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;background:var(--surface2);transition:background .15s}
+.fs-head:hover{background:#E8E6DF}
+.fs-icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.fs-title{font-size:12px;font-weight:600;flex:1}
+.fs-count{font-size:10px;color:var(--hint);background:var(--surface);padding:1px 7px;border-radius:var(--rad-pill)}
+.fs-chevron{font-size:10px;color:var(--hint);transition:transform .25s}
+.fs-body{overflow:hidden;transition:max-height .3s cubic-bezier(.4,0,.2,1);max-height:0}
+.fs-body.open{max-height:9999px}
+.fs-inner{padding:12px}
+.fs-head.collapsed .fs-chevron{transform:rotate(-90deg)}
+
+.field-group{margin-bottom:10px}
+.field-label{font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.badge-req{font-size:8px;background:#FEE2E2;color:#B91C1C;padding:1px 4px;border-radius:3px;font-weight:700}
+.badge-opt{font-size:8px;background:#F0FDF4;color:#166534;padding:1px 4px;border-radius:3px;font-weight:700}
+
+/* ── STEP / STAKEHOLDER ITEMS ── */
+.item-row{display:flex;align-items:flex-start;gap:6px;padding:8px 10px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rad-sm);margin-bottom:6px;cursor:default;transition:box-shadow .15s,background .15s;position:relative}
+.item-row:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.item-row.dragging{opacity:.5;box-shadow:0 8px 24px rgba(0,0,0,.12);background:var(--surface2)}
+.item-row.drag-over{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-lt)}
+.drag-handle{cursor:grab;color:var(--hint);font-size:13px;padding:2px 0;flex-shrink:0;line-height:1.2;user-select:none}
+.drag-handle:active{cursor:grabbing}
+.item-content{flex:1;min-width:0}
+.item-expand-btn{font-size:10px;color:var(--hint);padding:2px 5px;border-radius:3px;transition:all .15s;flex-shrink:0;margin-top:2px}
+.item-expand-btn:hover{background:var(--surface2);color:var(--text)}
+.item-del{color:var(--hint);font-size:12px;padding:2px 5px;border-radius:3px;transition:all .15s;flex-shrink:0;margin-top:2px}
+.item-del:hover{background:#FEE2E2;color:#B91C1C}
+.item-detail{overflow:hidden;transition:max-height .25s cubic-bezier(.4,0,.2,1);max-height:0}
+.item-detail.open{max-height:600px}
+.item-detail-inner{padding-top:8px;display:flex;flex-direction:column;gap:8px}
+.item-name-row{display:flex;align-items:center;gap:6px}
+.item-name{font-size:12px;font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-sub{font-size:10px;color:var(--hint)}
+
+.add-btn{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--accent);padding:6px 10px;border:0.5px dashed var(--accent-mid);border-radius:var(--rad-sm);width:100%;justify-content:center;transition:all .15s;margin-top:4px}
+.add-btn:hover{background:var(--accent-lt);border-color:var(--accent)}
+
+/* ── COLOR PICKER ── */
+.color-picker{display:flex;gap:5px;flex-wrap:wrap}
+.color-swatch{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.color-swatch:hover{transform:scale(1.2)}
+.color-swatch.selected{border-color:var(--text);transform:scale(1.15)}
+
+/* ── STEP SELECTOR PILLS ── */
+.step-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.step-pill{font-size:11px;padding:4px 10px;border-radius:var(--rad-pill);border:0.5px solid var(--border-strong);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.step-pill:hover{background:var(--surface2)}
+.step-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ── SUBTABS ── */
+.subtabs{display:flex;gap:2px;margin-bottom:10px;background:var(--surface2);border-radius:var(--rad-sm);padding:3px}
+.subtab{font-size:11px;padding:5px 10px;border-radius:5px;color:var(--muted);cursor:pointer;transition:all .15s;flex:1;text-align:center}
+.subtab:hover{color:var(--text)}
+.subtab.active{background:var(--surface);color:var(--text);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* ── PAIN TYPE TAGS ── */
+.pain-types{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.ptag-btn{font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;cursor:pointer;border:0.5px solid transparent;transition:all .15s;user-select:none}
+.ptag-btn.active{opacity:1}
+.ptag-btn:not(.active){opacity:.4}
+.ptag-BOTTLENECK{background:#FFDDD9;color:#9B1C1C;border-color:#FCA5A5}
+.ptag-SLOW-DECISION{background:#FFF3CD;color:#7C5C00;border-color:#FCD34D}
+.ptag-OVERLOAD{background:#E8D5FE;color:#5B21B6;border-color:#C4B5FD}
+.ptag-REPETITIVE{background:#D1FAE5;color:#065F46;border-color:#6EE7B7}
+.ptag-DELAY{background:#FFE4E6;color:#9F1239;border-color:#FCA5A5}
+.ptag-OPPORTUNITY-LOSS{background:#FEF9C3;color:#713F12;border-color:#FDE047}
+/* System role — dashed border to distinguish from human */
+.uml-action.sys-action{border-style:dashed;opacity:.85}
+.uml-no-decision{font-size:8.5px;color:#64748B;font-style:italic;border:1px dashed #1E3A5F;border-radius:3px;padding:3px 6px;display:inline-block;position:relative;z-index:1;margin-top:2px}
+
+/* ── SEV BUTTONS ── */
+.sev-group{display:flex;gap:4px}
+.sev-btn{font-size:10px;font-weight:700;padding:3px 10px;border-radius:3px;cursor:pointer;border:0.5px solid transparent;transition:all .15s;opacity:.35}
+.sev-btn.active{opacity:1}
+.sev-HIGH{background:#FEE2E2;color:#B91C1C;border-color:#FCA5A5}
+.sev-MED{background:#FEF3C7;color:#92400E;border-color:#FCD34D}
+.sev-LOW{background:#DCFCE7;color:#166534;border-color:#86EFAC}
+
+/* ── RIGHT PANEL (PREVIEW) ── */
+#right{flex:1;overflow:hidden;background:var(--bg);display:flex;flex-direction:column;position:relative}
+#preview-outer{flex:1;overflow:auto;position:relative;cursor:grab}
+#preview-outer:active{cursor:grabbing}
+#preview-outer::-webkit-scrollbar{width:6px;height:6px}
+#preview-outer::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+#preview-wrap{transform-origin:top left;transition:transform .2s cubic-bezier(.4,0,.2,1);padding:20px;display:inline-block;min-width:100%}
+
+/* ── BLUEPRINT TABLE ── */
+.bp-table{border-collapse:collapse;border:1px solid var(--border);border-radius:10px;overflow:hidden;table-layout:fixed;background:var(--surface)}
+.bp-table th,.bp-table td{border:0.5px solid var(--border);vertical-align:top;padding:0}
+.bp-table .label-col{width:112px}
+.bp-table .step-col{min-width:200px;width:200px}
+
+/* step header */
+.sh-cell{background:#0E1117;padding:10px 11px}
+.sh-cell.label-hd{background:#1A1A18}
+.sh-num{font-size:8px;color:#9A9A90;letter-spacing:.1em;display:block;margin-bottom:2px;font-family:monospace}
+.sh-name{font-size:12px;font-weight:600;color:#F0EFE8;line-height:1.25}
+.sh-dur{font-size:9px;color:#6B6B72;margin-top:2px}
+
+/* row label */
+.row-label{padding:10px 8px 10px 12px;background:var(--surface);position:relative}
+.row-label::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0}
+.rl-name{font-size:10px;font-weight:700;letter-spacing:.04em}
+.rl-sub{font-size:8.5px;color:var(--hint);margin-top:2px;line-height:1.35}
+
+/* UML rows */
+.uml-label{background:#0F172A;border-right:1px solid #1E293B !important}
+.uml-label .rl-name{color:#CBD5E1}
+.uml-label .rl-sub{color:#475569}
+.role-pill-preview{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:var(--rad-pill);border:1px solid;font-size:10px;font-weight:600;white-space:nowrap;margin-bottom:3px}
+.uml-cell{background:#0B1120;padding:10px;border-right:1px solid #1E293B !important;border-bottom:1px solid #1E293B !important;position:relative}
+.uml-cell::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;border-left:1px dashed #1E293B;pointer-events:none}
+.uml-action{border-radius:4px;padding:4px 7px;font-size:9.5px;line-height:1.4;border:1px solid;position:relative;z-index:1}
+.uml-arrow{display:flex;align-items:center;gap:3px;margin:4px 0;position:relative;z-index:1}
+.uml-arrow-line{flex:1;height:1px;position:relative}
+.uml-arrow-line::after{content:'▶';font-size:7px;position:absolute;right:-1px;top:50%;transform:translateY(-50%);line-height:1}
+.uml-arrow-label{font-size:8px;font-weight:600;padding:1px 5px;border-radius:3px;white-space:nowrap}
+.bottleneck-warn{font-size:8.5px;font-weight:600;color:#F87171;display:block;margin-bottom:2px;position:relative;z-index:1}
+.uml-empty{font-size:9px;color:#334155;font-style:italic;position:relative;z-index:1}
+
+/* duration row */
+.dur-label{background:#0F172A}
+.dur-label .rl-name{color:#94A3B8}
+.dur-cell{background:#0B1120;padding:10px;border-right:1px solid #1E293B !important;border-bottom:1px solid #1E293B !important}
+.dur-big{font-size:18px;font-weight:700;color:#F8FAFC;line-height:1;margin-bottom:4px}
+.dur-big.warn{color:#F87171}
+.dur-sub{font-size:8.5px;color:#64748B;font-style:italic;margin-top:4px}
+.dur-breakdown{background:#1E293B;border-radius:3px;padding:4px 6px;font-size:9px;color:#CBD5E1}
+.dur-row{display:flex;justify-content:space-between;margin-bottom:1px}
+.dur-row:last-child{margin-bottom:0}
+
+/* process row */
+.proc-label::before{background:#374151}
+.proc-label .rl-name{color:#374151}
+.proc-cell{padding:9px;background:var(--surface)}
+.artifact-card{background:var(--surface);border:0.5px solid var(--border);border-radius:4px;padding:5px 8px;margin-bottom:4px;font-size:10px;line-height:1.45}
+.artifact-card:last-child{margin-bottom:0}
+
+/* touchpoint row */
+.tp-label::before{background:#0369A1}
+.tp-label .rl-name{color:#0369A1}
+.tp-cell{padding:9px;background:#F0F9FF}
+.tp-card{background:var(--surface);border:0.5px solid #BAE6FD;border-radius:4px;padding:6px 8px;margin-bottom:4px}
+.tp-card:last-child{margin-bottom:0}
+.tp-chips{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:3px}
+.tp-chip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;border:0.5px solid}
+.chip-client{background:#DBEAFE;color:#1D4ED8;border-color:#93C5FD}
+.chip-internal{background:#F3F4F6;color:#374151;border-color:#D1D5DB}
+.chip-twoway{background:#CCFBF1;color:#134E4A;border-color:#5EEAD4}
+.tp-desc{font-size:9.5px;color:#374151;line-height:1.45}
+.tp-type-tag{font-size:8.5px;color:#6B7280;font-style:italic;margin-top:2px}
+
+/* pain row */
+.pain-label::before{background:#B91C1C}
+.pain-label .rl-name{color:#B91C1C}
+.pain-cell{padding:9px;background:#FFF5F5}
+.pain-card{background:var(--surface);border:0.5px solid #FECACA;border-radius:4px;padding:6px 8px;margin-bottom:4px}
+.pain-card:last-child{margin-bottom:0}
+.pain-title{font-size:10.5px;font-weight:600;color:#991B1B;line-height:1.3;margin-bottom:3px}
+.pain-tags-row{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px}
+.pain-tag{font-size:8px;font-weight:700;padding:1px 5px;border-radius:2px}
+.sev-badge-HIGH{background:#FEE2E2;color:#B91C1C}
+.sev-badge-MED{background:#FEF3C7;color:#92400E}
+.sev-badge-LOW{background:#DCFCE7;color:#166534}
+.pain-desc{font-size:9.5px;color:#374151;line-height:1.45;margin-bottom:3px}
+.pain-impact{font-size:9px;color:#6B7280;border-top:0.5px solid #FECACA;padding-top:3px;line-height:1.4}
+.pain-impact b{color:#374151}
+
+/* backend row */
+.be-label::before{background:#78350F}
+.be-label .rl-name{color:#78350F}
+.be-cell{padding:9px;background:#FFFBEB}
+.be-card{background:var(--surface);border:0.5px solid #FDE68A;border-radius:4px;padding:6px 8px;margin-bottom:4px}
+.be-card:last-child{margin-bottom:0}
+.be-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;border:0.5px solid;margin-bottom:3px;display:inline-block}
+.be-Risk{background:#FEE2E2;color:#991B1B;border-color:#FCA5A5}
+.be-IT{background:#DBEAFE;color:#1E40AF;border-color:#93C5FD}
+.be-Admin{background:#F3F4F6;color:#374151;border-color:#D1D5DB}
+.be-Finance{background:#ECFDF5;color:#065F46;border-color:#6EE7B7}
+.be-HR{background:#FDF4FF;color:#6B21A8;border-color:#E9D5FF}
+.be-Legal{background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE}
+.be-KM{background:#FFF7ED;color:#7C2D12;border-color:#FDBA74}
+.be-CRM{background:#F0FDFA;color:#134E4A;border-color:#99F6E4}
+.be-RM{background:#F8FAFC;color:#334155;border-color:#CBD5E1}
+.be-desc{font-size:9.5px;color:#374151;line-height:1.45;margin-bottom:2px}
+.be-dep{font-size:9px;color:#92400E;font-style:italic;border-top:0.5px solid #FDE68A;padding-top:3px;margin-top:3px}
+
+/* empty cell */
+.empty-cell{color:#C0BEB8;font-size:10px;font-style:italic;padding:8px;border:0.5px dashed #D8D8D4;border-radius:4px;text-align:center}
+
+/* dividers */
+.dv-vis-row td{background:#F3F0FF;color:#5B21B6;font-size:8px;font-weight:700;padding:5px 10px;border-top:1.5px dashed #7C3AED !important}
+.dv-int-row td{background:#ECFDF9;color:#065F46;font-size:8px;font-weight:700;padding:5px 10px;border-top:1.5px dashed #0D9488 !important}
+
+/* empty state */
+#empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--hint);padding:40px}
+#empty-state h3{font-size:16px;font-weight:500;color:var(--muted)}
+#empty-state p{font-size:12px;text-align:center;line-height:1.6;max-width:280px}
+
+/* animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.item-row{animation:fadeIn .2s ease}
+
+/* scrollbar */
+#left-body::-webkit-scrollbar{width:4px}
+#left-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+    <div style="width:22px;height:22px;background:#0E1117;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">B</div>
+    <span style="font-size:13px;font-weight:600;color:var(--muted)">TraCuuHS — Blueprint</span>
+  </div>
+  <div class="tb-sep"></div>
+  <input id="bp-name" placeholder="Blueprint chưa đặt tên" value="Appendix I — Transfer Pricing Compliance">
+  <div class="tb-sep"></div>
+  <div class="zoom-ctrl">
+    <button class="tb-btn" id="zoom-out" title="Thu nhỏ">−</button>
+    <span id="zoom-label">100%</span>
+    <button class="tb-btn" id="zoom-in" title="Phóng to">+</button>
+    <button class="tb-btn" id="zoom-fit" title="Vừa màn hình" style="font-size:11px">⊡ Vừa màn</button>
+  </div>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="export-btn">↓ Xuất HTML</button>
+  <span id="saved-badge">✓ Đã lưu</span>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- LEFT PANEL -->
+  <div id="left">
+    <div id="left-tabs">
+      <button class="ltab active" data-tab="info">Thông tin</button>
+      <button class="ltab" data-tab="steps">Bước</button>
+      <button class="ltab" data-tab="stakeholders">Stakeholders</button>
+      <button class="ltab" data-tab="content">Nội dung</button>
+    </div>
+    <div id="left-body">
+      <!-- INFO TAB -->
+      <div id="tab-info" class="tab-pane">
+        <div class="field-group" style="margin-top:4px">
+          <div class="field-label">Tên quy trình <span class="badge-req">BẮT BUỘC</span></div>
+          <input id="info-name" placeholder="VD: TraCuuHS — Phân loại mã HS">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Mô tả <span class="badge-opt">TÙY CHỌN</span></div>
+          <textarea id="info-desc" rows="3" placeholder="Mô tả ngắn về quy trình và phạm vi..."></textarea>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Tổ chức <span class="badge-opt">TÙY CHỌN</span></div>
+          <input id="info-org" placeholder="VD: KPMG Vietnam – Hải quan / TP">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Người phụ trách <span class="badge-opt">TÙY CHỌN</span></div>
+          <input id="info-owner" placeholder="VD: Senior Manager Hải quan / TP">
+        </div>
+        <div class="field-group" style="margin-top:16px">
+          <div class="field-label" style="margin-bottom:8px">Hiển thị lớp</div>
+          <div id="layer-toggles" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+      </div>
+
+      <!-- STEPS TAB -->
+      <div id="tab-steps" class="tab-pane" style="display:none">
+        <div id="steps-list"></div>
+        <button class="add-btn" id="add-step">＋ Thêm bước</button>
+      </div>
+
+      <!-- STAKEHOLDERS TAB -->
+      <div id="tab-stakeholders" class="tab-pane" style="display:none">
+        <div id="stakeholders-list"></div>
+        <button class="add-btn" id="add-stakeholder">＋ Thêm stakeholder</button>
+      </div>
+
+      <!-- CONTENT TAB -->
+      <div id="tab-content" class="tab-pane" style="display:none">
+        <div class="step-pills" id="content-step-pills"></div>
+        <div class="subtabs" id="content-subtabs">
+          <div class="subtab active" data-st="actions">Hành động</div>
+          <div class="subtab" data-st="touchpoints">Touchpoints</div>
+          <div class="subtab" data-st="pain">Vấn đề</div>
+          <div class="subtab" data-st="backend">Backend</div>
+        </div>
+        <div id="content-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right">
+    <div id="preview-outer">
+      <div id="preview-wrap">
+        <div id="preview"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────────────────
+const COLORS = {
+  Blue:   {dark:'#2563EB',light:'#EFF6FF',border:'#BFDBFE',text:'#1E40AF'},
+  Teal:   {dark:'#0D9488',light:'#CCFBF1',border:'#5EEAD4',text:'#0F766E'},
+  Amber:  {dark:'#D97706',light:'#FFFBEB',border:'#FDE68A',text:'#92400E'},
+  Purple: {dark:'#7C3AED',light:'#F3F0FF',border:'#DDD6FE',text:'#5B21B6'},
+  Green:  {dark:'#16A34A',light:'#F0FDF4',border:'#BBF7D0',text:'#15803D'},
+  Coral:  {dark:'#DC4A2A',light:'#FFF1EE',border:'#FED7AA',text:'#9A3412'},
+  Pink:   {dark:'#DB2777',light:'#FDF2F8',border:'#FBCFE8',text:'#9D174D'},
+  Gray:   {dark:'#6B7280',light:'#F9FAFB',border:'#E5E7EB',text:'#374151'},
+};
+
+const PAIN_TYPES = ['BOTTLENECK','SLOW DECISION','OVERLOAD','REPETITIVE','DELAY','QUALITY','OPPORTUNITY LOSS'];
+const BE_CATS = ['Risk / CEAC','IT / Infra','Admin','Finance','HR','Legal','KM','CRM','RM Tool'];
+
+let uid = ()=>'id'+Math.random().toString(36).slice(2,8);
+
+const defaultState = ()=>({
+  info:{name:'',desc:'',org:'',owner:''},
+  layers:{uml:true,duration:true,process:true,touchpoint:true,pain:true,backend:true},
+  steps:[],
+  stakeholders:[],
+  actions:{},      // {stepId:{stakeholderId:{action,isBottleneck,arrowLabel}}}
+  touchpoints:{},  // {stepId:[{id,app,chip,type,dir,desc}]}
+  pain:{},         // {stepId:[{id,title,types[],sev,desc,impact}]}
+  backend:{},      // {stepId:[{id,name,cat,desc,dep}]}
+});
+
+let state = defaultState();
+let activeTab = 'info';
+let contentStep = null;
+let contentSubtab = 'actions';
+let zoom = 1;
+let draggingItem = null;
+let dragList = null;
+let dragStartY = 0;
+let saveTimer = null;
+
+// ─────────────────────────────────────────────────────────
+//  PERSISTENCE
+// ─────────────────────────────────────────────────────────
+function save(){
+  try{localStorage.setItem('blueprint_v1',JSON.stringify(state));}catch(e){}
+  const b=document.getElementById('saved-badge');
+  b.classList.add('show');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>b.classList.remove('show'),1800);
+}
+function load(){
+  // TraCuuHS blueprint: always load fresh — do not restore previous session
+  initSample();
+}
+
+// ─────────────────────────────────────────────────────────
+//  DỮ LIỆU HIỆN TRẠNG NỘI BỘ KPMG (TRƯỚC KHI CÓ GIẢI PHÁP)
+// ─────────────────────────────────────────────────────────
+function initSample(){
+  state=defaultState();
+  state.info={
+    name:'Quy trình Tra cứu & Phân loại Mã HS – Hiện trạng nội bộ',
+    desc:'Quy trình tra cứu, phân tích và kết luận mã HS cho hàng hóa của khách hàng. Toàn bộ thực hiện thủ công bởi con người, không có công cụ tìm kiếm tập trung.',
+    org:'KPMG Vietnam – Hải quan / TP',
+    owner:'Senior Manager Hải quan / TP (TBC)'
+  };
+
+  // Bước
+  const sids=['s1','s2','s3','s4','s5','s6'];
+  const snames=[
+    'Tiếp nhận mô tả hàng hóa',
+    'Tra cứu HS sơ bộ',
+    'Phân tích chuyên sâu & Ra phán quyết',
+    'Đối chiếu án lệ & Quyết định phân loại',
+    'Kết luận mã HS',
+    'Rà soát sau thông quan (tùy chọn)',
+  ];
+  const sdur=[
+    ['0,5 ngày','0,5 ngày','1 ngày','Độ rõ ràng của mô tả hàng hóa'],
+    ['1–2 ngày','1 ngày','5+ ngày','Độ phức tạp của chương HS'],
+    ['2–3 ngày','1 ngày','~1 tuần','Độ phức tạp / mơ hồ của case'],
+    ['1 ngày','0,5 ngày','2 ngày','Sẵn có của án lệ / quyết định'],
+    ['0,5–1 ngày','0,5 ngày','2 ngày','Lịch sign-off của Senior/Partner'],
+    ['Tùy phát sinh','Tùy phát sinh','Tùy phát sinh','Phát sinh từ sự kiện thực tế của khách hàng'],
+  ];
+  const sart=[
+    ['📄 Mô tả hàng hóa từ khách hàng (email / file)'],
+    ['📚 Danh sách chương HS sơ bộ','📋 Ghi chú giải thích đã đọc','📝 Danh sách mã HS ứng viên ban đầu'],
+    ['🔍 Các phương án HS đã được xem xét','📝 Ghi chú & luận điểm phân loại'],
+    ['⚖️ Quyết định phân loại của Hải quan','📋 Công văn / văn bản chính thức','📨 Án lệ phân loại hàng hóa tương tự'],
+    ['✅ Mã HS cuối cùng đã được xác nhận','📎 Tài liệu tham chiếu hỗ trợ'],
+    ['📄 Tờ khai hải quan của khách hàng','📊 So sánh mã HS & ghi chú rủi ro'],
+  ];
+  sids.forEach((id,i)=>{
+    state.steps.push({id,name:snames[i],durTyp:sdur[i][0],durBest:sdur[i][1],durWorst:sdur[i][2],durDriver:sdur[i][3],artifacts:sart[i].join('\n')});
+    state.touchpoints[id]=[];state.pain[id]=[];state.backend[id]=[];state.actions[id]={};
+  });
+
+  // Stakeholders – chỉ người thật, không có hệ thống
+  state.stakeholders=[
+    {id:'rCS',name:'Nhân viên Hải quan / TP',label:'CS',resp:'Tra cứu, phân tích mã HS',color:'Green'},
+    {id:'rSM',name:'Senior / Manager',label:'SM',resp:'Rà soát logic & phán quyết mã HS',color:'Teal'},
+    {id:'rEP',name:'Partner',label:'EP',resp:'Trách nhiệm kỹ thuật cuối cùng',color:'Purple'},
+  ];
+
+  // Hành động từng bước – hiện trạng thủ công
+  const act={
+    s1:{
+      rCS:{action:'Nhận mô tả hàng hóa từ email khách hàng\nĐọc, phân tích thông tin sản phẩm\nXác nhận lại với khách nếu mô tả chưa rõ',arrow:'chuyển lên SM',isBot:false},
+      rSM:{action:'Giao ca cho CS phụ trách\nĐặt mức độ phức tạp (đơn giản / phức tạp / nhạy cảm)',arrow:'giao cho CS',isBot:false},
+    },
+    s2:{
+      rCS:{action:'Đọc thủ công sách HS và ghi chú giải thích (bản in hoặc PDF)\nSearch Google để tìm chương HS liên quan\nLọc và lập danh sách mã HS ứng viên ban đầu',arrow:'nộp danh sách sơ bộ',isBot:true,botNote:'không có điểm xuất phát rõ ràng'},
+      rSM:{action:'Theo dõi tiến độ\nGiải đáp nhanh nếu CS bí',arrow:'',isBot:false},
+    },
+    s3:{
+      rCS:{action:'Đọc lại các chú thích pháp lý & tiêu chí phân loại\nÁp dụng Quy tắc GRI để phân tích\nDự thảo luận điểm phân loại',arrow:'nộp để rà soát',isBot:false},
+      rSM:{action:'Rà soát logic phân loại của CS\nKiểm tra lại căn cứ pháp lý\nQuyết định dải mã HS chấp nhận được\nFlag case rủi ro cao',arrow:'phê duyệt / leo thang',isBot:true,botNote:'phán quyết phụ thuộc cá nhân'},
+      rEP:{action:'Rà soát case phức tạp / nhạy cảm\nPhê duyệt kỹ thuật cuối cùng nếu cần',arrow:'sign-off',isBot:false},
+    },
+    s4:{
+      rCS:{action:'Tìm kiếm thủ công qua file Word / PDF lưu trữ cũ\nGọi điện / email hỏi đồng nghiệp có kinh nghiệm\nTìm quyết định phân loại của Tổng cục Hải quan trên web',arrow:'đối chiếu án lệ',isBot:true,botNote:'không có kho án lệ tập trung'},
+      rSM:{action:'Đánh giá khả năng áp dụng án lệ\nGhi chú nếu có mâu thuẫn với case hiện tại',arrow:'xác nhận án lệ',isBot:false},
+    },
+    s5:{
+      rCS:{action:'Tổng hợp kết luận mã HS cuối cùng\nTập hợp tài liệu tham chiếu hỗ trợ',arrow:'nộp kết luận',isBot:false},
+      rSM:{action:'Rà soát lần cuối kết luận HS\nPhê duyệt đầu ra tư vấn',arrow:'phê duyệt',isBot:false},
+      rEP:{action:'Chịu trách nhiệm kỹ thuật cuối cùng\nSign-off cho case phức tạp / nhạy cảm',arrow:'ký duyệt',isBot:false},
+    },
+    s6:{
+      rCS:{action:'Nhận tờ khai hải quan từ khách hàng\nSo sánh thủ công mã HS đã khai vs mã đã tư vấn\nDự thảo ghi chú rủi ro nếu có sai lệch',arrow:'flag rủi ro',isBot:false},
+      rSM:{action:'Đánh giá mức độ rủi ro\nQuyết định hành động tư vấn cần thiết',arrow:'leo thang nếu cần',isBot:false},
+    },
+  };
+  Object.keys(act).forEach(sid=>{Object.assign(state.actions[sid],act[sid]);});
+
+  // Touchpoints – công cụ thực tế đang dùng
+  state.touchpoints.s1=[
+    {id:uid(),app:'Email',chip:'✉ Email',type:'Async',dir:'Đến client',desc:'Khách hàng gửi mô tả hàng hóa qua email. Không có biểu mẫu chuẩn — mỗi khách gửi định dạng khác nhau.'},
+    {id:uid(),app:'MS Teams',chip:'💬 Teams',type:'Sync',dir:'Nội bộ',desc:'Giao ca, phân công case giữa SM và CS qua chat nội bộ.'},
+  ];
+  state.touchpoints.s2=[
+    {id:uid(),app:'Sách HS bản in / PDF',chip:'📖 Sách HS',type:'Async',dir:'Nội bộ',desc:'Đọc thủ công sách HS bản in hoặc PDF. Không có khả năng tìm kiếm full-text. Mỗi người giữ bản riêng.'},
+    {id:uid(),app:'Google Search',chip:'🔍 Google',type:'Async',dir:'Nội bộ',desc:'Tìm kiếm chương / nhóm HS trên Google. Không có nguồn tham chiếu chuẩn — kết quả phụ thuộc kỹ năng tìm kiếm cá nhân.'},
+    {id:uid(),app:'Ghi chú tay / Word',chip:'📝 Word/Notepad',type:'Async',dir:'Nội bộ',desc:'Ghi chép danh sách HS ứng viên thủ công vào Word hoặc giấy. Không có template thống nhất.'},
+  ];
+  state.touchpoints.s3=[
+    {id:uid(),app:'MS Teams',chip:'💬 Teams',type:'Sync',dir:'Nội bộ',desc:'Thảo luận case phức tạp giữa CS và SM/EP. Không có nơi lưu kết quả thảo luận.'},
+    {id:uid(),app:'Web Tổng cục Hải quan',chip:'🌐 TCHQ',type:'Async',dir:'Nội bộ',desc:'Tra cứu thủ công văn bản pháp lý, chú thích pháp lý trên website Tổng cục Hải quan.'},
+    {id:uid(),app:'File Word / Email',chip:'📄 Word',type:'Async',dir:'Nội bộ',desc:'Luận điểm phân loại được viết trực tiếp vào Word hoặc email. Không có template chuẩn hóa.'},
+  ];
+  state.touchpoints.s4=[
+    {id:uid(),app:'File lưu trữ nội bộ (SharePoint / máy cá nhân)',chip:'📁 File cũ',type:'Async',dir:'Nội bộ',desc:'Tìm án lệ trong thư mục SharePoint hoặc máy cá nhân. Không có chỉ mục, không có tag — tìm bằng tên file hoặc hỏi người biết.'},
+    {id:uid(),app:'Điện thoại / Email nội bộ',chip:'📞 Hỏi đồng nghiệp',type:'Sync',dir:'Nội bộ',desc:'Hỏi trực tiếp đồng nghiệp hoặc SM có kinh nghiệm về case tương tự đã gặp. Phụ thuộc vào trí nhớ cá nhân.'},
+    {id:uid(),app:'Web TCHQ / Cổng pháp luật',chip:'🌐 Pháp luật',type:'Async',dir:'Nội bộ',desc:'Tìm quyết định phân loại chính thức trên website TCHQ hoặc cổng văn bản pháp luật. Không có API, phải tìm thủ công.'},
+  ];
+  state.touchpoints.s5=[
+    {id:uid(),app:'Email',chip:'✉ Email',type:'Async',dir:'Đến client',desc:'Gửi kết luận mã HS và tài liệu hỗ trợ cho khách hàng qua email.'},
+    {id:uid(),app:'File Word / PDF',chip:'📄 Word/PDF',type:'Async',dir:'Đến client',desc:'Đầu ra tư vấn được tổng hợp thủ công trong file Word. Không có template chuẩn hóa.'},
+  ];
+  state.touchpoints.s6=[
+    {id:uid(),app:'Email',chip:'✉ Email',type:'Async',dir:'Đến client',desc:'Khách hàng gửi tờ khai hải quan. KPMG nhận qua email, so sánh thủ công.'},
+    {id:uid(),app:'So sánh thủ công (Word/Excel)',chip:'📊 Excel',type:'Async',dir:'Nội bộ',desc:'CS so sánh mã HS đã khai với mã đã tư vấn bằng tay trong Excel. Không có quy trình rà soát chủ động.'},
+  ];
+
+  // Điểm đau – hiện trạng thủ công
+  state.pain.s2=[
+    {id:uid(),
+     title:'Không có điểm xuất phát — không biết bắt đầu từ đâu',
+     types:['BOTTLENECK','SLOW DECISION'],sev:'HIGH',
+     desc:'Nhân viên thường không biết nên tra từ chương nào khi gặp mô tả hàng hóa mới. Phải đọc thủ công tài liệu HS dày hàng trăm trang mà không có công cụ tìm kiếm nào hỗ trợ.',
+     impact:'Mất 1–2 ngày chỉ để tìm đúng chương / nhóm trước khi bắt đầu phân tích thực sự.'},
+    {id:uid(),
+     title:'Tra cứu thủ công quá tải — Word, PDF, sách HS không tập trung',
+     types:['OVERLOAD','REPETITIVE'],sev:'HIGH',
+     desc:'Nghiên cứu phân loại đòi hỏi tra nhiều file Word, PDF rải rác và sách HS bản in. Không thể tìm kiếm toàn văn. Không có kho tập trung. Senior bị cuốn vào tra cứu thay vì tập trung phán quyết.',
+     impact:'Thời gian của Senior và Manager bị tiêu tốn vào việc tra cứu thủ công thay vì phán quyết chuyên môn.'},
+  ];
+  state.pain.s3=[
+    {id:uid(),
+     title:'Kết quả phân loại phụ thuộc cá nhân — cùng hàng hóa, kết quả khác nhau',
+     types:['QUALITY'],sev:'MED',
+     desc:'Kết quả phân loại phụ thuộc vào người phụ trách case. Không có nguồn tham chiếu chung hay lịch sử án lệ nội bộ. CS khác nhau có thể đưa ra mã HS khác nhau cho cùng một sản phẩm.',
+     impact:'Chất lượng tư vấn không đồng đều giữa các case. Rủi ro uy tín cho KPMG nếu khách hàng phát hiện mâu thuẫn.'},
+  ];
+  state.pain.s4=[
+    {id:uid(),
+     title:'Không có kho án lệ tập trung — phải hỏi người hoặc tìm file cũ',
+     types:['SLOW DECISION','REPETITIVE'],sev:'HIGH',
+     desc:'Quyết định phân loại của Hải quan, công văn hướng dẫn và các case trước đây được lưu rải rác trong SharePoint, máy cá nhân và email cũ. Không có chỉ mục, không có tag. Tìm kiếm bằng cách hỏi đồng nghiệp hoặc nhớ tên file.',
+     impact:'Mất 0,5–1 ngày chỉ để tìm tài liệu tham chiếu. Kiến thức nội bộ phụ thuộc vào trí nhớ cá nhân, dễ thất thoát khi nhân sự thay đổi.'},
+  ];
+  state.pain.s6=[
+    {id:uid(),
+     title:'Không có rà soát sau thông quan — bỏ lỡ rủi ro và cơ hội tư vấn',
+     types:['DELAY','OPPORTUNITY LOSS'],sev:'MED',
+     desc:'Sau khi khách hàng nộp tờ khai hải quan, mã HS gần như không được rà soát lại trừ khi có vấn đề phát sinh. Không có quy trình kiểm tra chủ động hay theo dõi hệ thống.',
+     impact:'Bỏ lỡ cơ hội tư vấn phòng ngừa rủi ro. Phát hiện sai phân loại quá muộn khi đã bị thanh tra hoặc xử phạt.'},
+  ];
+
+  // Backend – hệ thống hiện tại đang dùng thủ công
+  state.backend.s1=[
+    {id:uid(),name:'Email (Outlook)',cat:'IT / Infra',
+     desc:'Tiếp nhận mô tả hàng hóa qua email. Không có biểu mẫu chuẩn. Thông tin từ khách hàng mỗi lần một kiểu.',
+     dep:''},
+    {id:uid(),name:'Phân công qua Teams / miệng',cat:'Admin',
+     desc:'SM phân công case cho CS qua chat Teams hoặc trao đổi trực tiếp. Không có hệ thống quản lý case hay tracking tiến độ.',
+     dep:''},
+  ];
+  state.backend.s2=[
+    {id:uid(),name:'Sách HS bản in & PDF không tập trung',cat:'KM',
+     desc:'Tài liệu HS Giải thích (Explanatory Notes), cây phân cấp HS, chú thích pháp lý được lưu dưới dạng PDF hoặc bản in rải rác ở mỗi người. Không có full-text search.',
+     dep:'Mỗi nhân viên tự duy trì bản sao riêng — phiên bản không đồng nhất, dễ lỗi thời.'},
+    {id:uid(),name:'Google Search',cat:'IT / Infra',
+     desc:'Công cụ tìm kiếm chính khi tra cứu chương HS. Kết quả không được kiểm chứng, phụ thuộc kỹ năng tìm kiếm cá nhân.',
+     dep:''},
+  ];
+  state.backend.s3=[
+    {id:uid(),name:'Không có checklist / template phân loại chuẩn',cat:'Admin',
+     desc:'Luận điểm phân loại được viết tự do trong Word hoặc email. Không có checklist GRI, không có template đánh giá tiêu chí. Mỗi CS viết theo cách riêng.',
+     dep:'Dẫn đến chất lượng không đồng đều và khó review.'},
+    {id:uid(),name:'Quy định Hải quan (web TCHQ)',cat:'Legal',
+     desc:'Văn bản pháp lý, chú thích pháp lý và thông tư được tra thủ công trên website Tổng cục Hải quan hoặc cổng văn bản pháp luật. Không có cơ sở dữ liệu tích hợp.',
+     dep:''},
+  ];
+  state.backend.s4=[
+    {id:uid(),name:'Kho file nội bộ (SharePoint / máy cá nhân)',cat:'KM',
+     desc:'Quyết định phân loại, công văn Hải quan và case cũ được lưu rải rác trong SharePoint hoặc máy cá nhân. Không có metadata, không có tag, không có tìm kiếm.',
+     dep:'Kiến thức nội bộ phụ thuộc hoàn toàn vào trí nhớ và kinh nghiệm cá nhân. Rủi ro thất thoát kiến thức khi nhân sự nghỉ việc.'},
+  ];
+  state.backend.s5=[
+    {id:uid(),name:'Quản lý chất lượng thủ công (SM/EP)',cat:'Risk / CEAC',
+     desc:'SM và EP là cơ chế kiểm soát chất lượng duy nhất. Không có checklist review chuẩn. Không có SLA nội bộ cho thời gian review.',
+     dep:'SM/EP overload khi nhiều case đồng thời — review bị trễ, ảnh hưởng timeline toàn bộ engagement.'},
+  ];
+  state.backend.s6=[
+    {id:uid(),name:'So sánh thủ công (Excel)',cat:'Admin',
+     desc:'CS so sánh mã HS đã khai vs đã tư vấn bằng tay trong Excel. Không có hệ thống theo dõi tự động hay quy trình rà soát sau thông quan.',
+     dep:'Hoàn toàn phụ thuộc vào sáng kiến cá nhân — hầu hết case không được rà soát sau thông quan.'},
+  ];
+}
+
+// ─────────────────────────────────────────────────────────
+//  RENDER PREVIEW
+// ─────────────────────────────────────────────────────────
+function renderPreview(){
+  const el=document.getElementById('preview');
+  const steps=state.steps;
+  const stkhs=state.stakeholders;
+  if(!steps.length||!stkhs.length){
+    el.innerHTML=`<div id="empty-state"><h3>Bắt đầu bằng cách thêm bước và stakeholder</h3><p>Dùng tab <b>Bước</b> và <b>Stakeholders</b> bên trái, sau đó điền <b>Nội dung</b> cho từng bước.</p></div>`;return;
+  }
+  const nc=steps.length;
+  let t=`<table class="bp-table" cellspacing="0">`;
+  t+=`<colgroup><col class="label-col">${steps.map(()=>`<col class="step-col">`).join('')}</colgroup>`;
+
+  // Step headers
+  t+=`<thead><tr><th class="sh-cell label-hd"></th>${steps.map((s,i)=>`<th class="sh-cell"><span class="sh-num">BƯỚC ${String(i+1).padStart(2,'0')}</span><div class="sh-name">${esc(s.name)||'Bước chưa đặt tên'}</div>${s.durTyp?`<div class="sh-dur">${esc(s.durTyp)}</div>`:''}</th>`).join('')}</tr></thead>`;
+  t+=`<tbody>`;
+
+  // UML Stakeholder Rows
+  if(state.layers.uml){
+    stkhs.forEach(sh=>{
+      const C=COLORS[sh.color]||COLORS.Blue;
+      t+=`<tr>`;
+      t+=`<td class="row-label uml-label"><div class="role-pill-preview" style="background:${C.dark}22;border-color:${C.dark};color:${C.dark}">${esc(sh.label||'?')}</div><div class="rl-name" style="color:${C.dark}">${esc(sh.name)}</div><div class="rl-sub">${esc(sh.resp)}</div></td>`;
+      steps.forEach(s=>{
+        const a=(state.actions[s.id]||{})[sh.id];
+        t+=`<td class="uml-cell">`;
+        if(a&&a.action){
+          if(a.isBot) t+=`<span class="bottleneck-warn">⚠ BOTTLENECK${a.botNote?' — '+esc(a.botNote):''}</span>`;
+          const isSys=sh.label==='SYS';
+          t+=`<div class="uml-action${isSys?' sys-action':''}" style="border-color:${C.dark}55;color:${C.light==='#F9FAFB'?C.text:'#CBD5E1'};background:${C.dark}18">${esc(a.action).replace(/\n/g,'<br>')}</div>`;
+          if(isSys) t+=`<div class="uml-no-decision">⊘ Không ra quyết định cuối</div>`;
+          if(a.arrow) t+=`<div class="uml-arrow"><div class="uml-arrow-line" style="background:${C.dark};color:${C.dark}"></div><div class="uml-arrow-label" style="background:${C.dark}33;color:${C.dark}">${esc(a.arrow)}</div></div>`;
+        } else {
+          t+=`<div class="uml-empty">—</div>`;
+        }
+        t+=`</td>`;
+      });
+      t+=`</tr>`;
+    });
+  }
+
+  // Duration Row
+  if(state.layers.duration){
+    t+=`<tr>`;
+    t+=`<td class="row-label dur-label"><div class="rl-name" style="color:#94A3B8">THỜI GIAN</div><div class="rl-sub">Trung bình/bước</div></td>`;
+    steps.forEach(s=>{
+      const isWarn=s.durWorst&&(s.durWorst.includes('7+')||s.durWorst.includes('>7')||parseInt(s.durWorst)>=7);
+      t+=`<td class="dur-cell"><div class="dur-big${isWarn?' warn':''}">${esc(s.durTyp)||'—'}</div>`;
+      if(s.durBest||s.durTyp||s.durWorst) t+=`<div class="dur-breakdown"><div class="dur-row"><span>Tốt nhất</span><span style="color:#4ADE80;font-weight:600">${esc(s.durBest)||'—'}</span></div><div class="dur-row"><span>Điển hình</span><span style="color:#FCD34D;font-weight:600">${esc(s.durTyp)||'—'}</span></div><div class="dur-row"><span>Xấu nhất</span><span style="color:#F87171;font-weight:600">${esc(s.durWorst)||'—'}</span></div></div>`;
+      if(s.durDriver) t+=`<div class="dur-sub">⚡ ${esc(s.durDriver)}</div>`;
+      t+=`</td>`;
+    });
+    t+=`</tr>`;
+  }
+
+  // Visibility divider
+  if(state.layers.touchpoint||state.layers.pain||state.layers.backend){
+    t+=`<tr class="dv-vis-row"><td colspan="${nc+1}">▲ ONSTAGE — CLIENT THẤY ĐƯỢC &nbsp;·&nbsp; RANH GIỚI HIỂN THỊ &nbsp;·&nbsp; BACKSTAGE ▼</td></tr>`;
+  }
+
+  // Process Row
+  if(state.layers.process){
+    t+=`<tr><td class="row-label proc-label"><div class="rl-name">QUY TRÌNH</div><div class="rl-sub">Tài liệu &amp; cột mốc</div></td>`;
+    steps.forEach(s=>{
+      const arts=(s.artifacts||'').split('\n').filter(a=>a.trim());
+      t+=`<td class="proc-cell">`;
+      if(arts.length) arts.forEach(a=>t+=`<div class="artifact-card">${esc(a)}</div>`);
+      else t+=`<div class="empty-cell">—</div>`;
+      t+=`</td>`;
+    });
+    t+=`</tr>`;
+  }
+
+  // Touchpoint Row
+  if(state.layers.touchpoint){
+    t+=`<tr><td class="row-label tp-label"><div class="rl-name">TOUCHPOINT</div><div class="rl-sub">Ứng dụng · kênh · loại</div></td>`;
+    steps.forEach(s=>{
+      const tps=(state.touchpoints[s.id]||[]);
+      t+=`<td class="tp-cell">`;
+      if(tps.length){
+        tps.forEach(tp=>{
+          const cc=tp.dir==='Internal only'?'chip-internal':tp.dir==='Two-way'?'chip-twoway':'chip-client';
+          t+=`<div class="tp-card"><div class="tp-chips"><span class="tp-chip ${cc}">${esc(tp.chip||tp.app)}</span></div><div class="tp-desc">${esc(tp.desc)}</div><div class="tp-type-tag">→ ${esc(tp.type)} · ${esc(tp.dir)}</div></div>`;
+        });
+      } else t+=`<div class="empty-cell">—</div>`;
+      t+=`</td>`;
+    });
+    t+=`</tr>`;
+  }
+
+  // Pain Row
+  if(state.layers.pain){
+    t+=`<tr><td class="row-label pain-label"><div class="rl-name">ĐIỂM ĐAU</div><div class="rl-sub">Tắc nghẽn · chậm trễ · rủi ro</div></td>`;
+    steps.forEach(s=>{
+      const pains=(state.pain[s.id]||[]);
+      t+=`<td class="pain-cell">`;
+      if(pains.length){
+        pains.forEach(p=>{
+          t+=`<div class="pain-card"><div class="pain-title">${esc(p.title)}</div>`;
+          t+=`<div class="pain-tags-row">`;
+          p.types.forEach(tp=>t+=`<span class="pain-tag ptag-${tp.replace(/ /g,'-')}">${tp}</span>`);
+          t+=`<span class="pain-tag sev-badge-${p.sev}">${p.sev}</span></div>`;
+          if(p.desc) t+=`<div class="pain-desc">${esc(p.desc).replace(/\n/g,'<br>')}</div>`;
+          if(p.impact) t+=`<div class="pain-impact"><b>Tác động:</b> ${esc(p.impact)}</div>`;
+          t+=`</div>`;
+        });
+      } else t+=`<div class="empty-cell">—</div>`;
+      t+=`</td>`;
+    });
+    t+=`</tr>`;
+  }
+
+  // Internal divider
+  if(state.layers.backend){
+    t+=`<tr class="dv-int-row"><td colspan="${nc+1}">▲ NỘI BỘ &nbsp;·&nbsp; RANH GIỚI TƯƠNG TÁC NỘI BỘ &nbsp;·&nbsp; QUY TRÌNH HỖ TRỢ ▼</td></tr>`;
+  }
+
+  // Backend Row
+  if(state.layers.backend){
+    t+=`<tr><td class="row-label be-label"><div class="rl-name">BACK END</div><div class="rl-sub">Hệ thống · nhóm hỗ trợ</div></td>`;
+    steps.forEach(s=>{
+      const bes=(state.backend[s.id]||[]);
+      t+=`<td class="be-cell">`;
+      if(bes.length){
+        bes.forEach(b=>{
+          const cls='be-'+(b.cat||'Admin').replace(/[^a-zA-Z]/g,'').slice(0,6);
+          t+=`<div class="be-card"><div class="be-badge ${cls}">${esc(b.cat)}</div><div class="be-desc">${esc(b.desc).replace(/\n/g,'<br>')}</div>`;
+          if(b.dep) t+=`<div class="be-dep">${esc(b.dep)}</div>`;
+          t+=`</div>`;
+        });
+      } else t+=`<div class="empty-cell">—</div>`;
+      t+=`</td>`;
+    });
+    t+=`</tr>`;
+  }
+
+  t+=`</tbody></table>`;
+  el.innerHTML=t;
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ─────────────────────────────────────────────────────────
+//  RENDER LEFT PANEL
+// ─────────────────────────────────────────────────────────
+function renderInfo(){
+  document.getElementById('info-name').value=state.info.name||'';
+  document.getElementById('info-desc').value=state.info.desc||'';
+  document.getElementById('info-org').value=state.info.org||'';
+  document.getElementById('info-owner').value=state.info.owner||'';
+  renderLayerToggles();
+}
+
+function renderLayerToggles(){
+  const LAYERS=[
+    {k:'uml',label:'Sơ đồ UML Stakeholder'},
+    {k:'duration',label:'Hàng thời gian'},
+    {k:'process',label:'Quy trình / Tài liệu'},
+    {k:'touchpoint',label:'Touchpoint'},
+    {k:'pain',label:'Điểm đau'},
+    {k:'backend',label:'Hệ thống hỗ trợ'},
+  ];
+  const el=document.getElementById('layer-toggles');
+  el.innerHTML=LAYERS.map(l=>`
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 8px;border-radius:5px;transition:background .12s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+      <input type="checkbox" ${state.layers[l.k]?'checked':''} data-layer="${l.k}" style="width:auto;accent-color:var(--accent);width:14px;height:14px">
+      <span style="font-size:11px;color:var(--muted)">${l.label}</span>
+    </label>`).join('');
+  el.querySelectorAll('input[data-layer]').forEach(cb=>{
+    cb.addEventListener('change',e=>{
+      state.layers[e.target.dataset.layer]=e.target.checked;
+      renderPreview();save();
+    });
+  });
+}
+
+function renderSteps(){
+  const el=document.getElementById('steps-list');
+  el.innerHTML='';
+  state.steps.forEach((s,i)=>{
+    const div=makeItemRow(s.id,'step',i);
+    const nameIn=document.createElement('input');
+    nameIn.className='';nameIn.style.cssText='border:none;background:transparent;padding:0;font-size:12px;font-weight:500;width:100%;outline:none;color:var(--text)';
+    nameIn.placeholder='Tên bước...';nameIn.value=s.name;
+    nameIn.addEventListener('input',e=>{s.name=e.target.value;renderPreview();save();});
+    const nameRow=div.querySelector('.item-name-row');nameRow.appendChild(nameIn);
+
+    const sub=div.querySelector('.item-sub');sub.textContent=s.durTyp||'Chưa đặt thời gian';
+
+    const detail=div.querySelector('.item-detail-inner');
+    detail.innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        ${mkField('Điển hình','text',s.durTyp||'','durTyp-'+s.id,'VD: 2–3 ngày')}
+        ${mkField('Tốt nhất','text',s.durBest||'','durBest-'+s.id,'VD: 1 ngày')}
+        ${mkField('Xấu nhất','text',s.durWorst||'','durWorst-'+s.id,'VD: 7+ ngày')}
+        ${mkField('Nguyên nhân','text',s.durDriver||'','durDriver-'+s.id,'Nguyên nhân gây chậm')}
+      </div>
+      <div class="field-group">
+        <div class="field-label">Tài liệu đầu ra <span class="badge-opt">TÙY CHỌN</span></div>
+        <textarea id="art-${s.id}" rows="3" placeholder="Mỗi dòng một tài liệu...">${s.artifacts||''}</textarea>
+      </div>`;
+    el.appendChild(div);
+
+    ['durTyp','durBest','durWorst','durDriver'].forEach(k=>{
+      const inp=el.querySelector('#'+k+'-'+s.id);
+      if(inp) inp.addEventListener('input',e=>{s[k]=e.target.value;div.querySelector('.item-sub').textContent=s.durTyp||'No duration set';renderPreview();save();});
+    });
+    const artTa=el.querySelector('#art-'+s.id);
+    if(artTa) artTa.addEventListener('input',e=>{s.artifacts=e.target.value;renderPreview();save();});
+  });
+}
+
+function renderStakeholders(){
+  const el=document.getElementById('stakeholders-list');
+  el.innerHTML='';
+  state.stakeholders.forEach((sh,i)=>{
+    const C=COLORS[sh.color]||COLORS.Blue;
+    const div=makeItemRow(sh.id,'stkh',i);
+    const nameRow=div.querySelector('.item-name-row');
+
+    const dot=document.createElement('div');
+    dot.style.cssText=`width:10px;height:10px;border-radius:50%;background:${C.dark};flex-shrink:0;transition:background .2s`;
+    nameRow.appendChild(dot);
+
+    const nameIn=document.createElement('input');
+    nameIn.style.cssText='border:none;background:transparent;padding:0;font-size:12px;font-weight:500;width:100%;outline:none;color:var(--text)';
+    nameIn.placeholder='Tên vai trò...';nameIn.value=sh.name;
+    nameIn.addEventListener('input',e=>{sh.name=e.target.value;renderPreview();save();});
+    nameRow.appendChild(nameIn);
+
+    div.querySelector('.item-sub').textContent=`${sh.label||'?'} · ${sh.resp||'Chưa có trách nhiệm'}`;
+
+    const detail=div.querySelector('.item-detail-inner');
+    detail.innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        ${mkField('Ký hiệu','text',sh.label||'','lbl-'+sh.id,'VD: SIC')}
+        <div></div>
+      </div>
+      ${mkField('Trách nhiệm','text',sh.resp||'','resp-'+sh.id,'VD: Nghiên cứu · Đánh giá · Trao đổi')}
+      <div class="field-group">
+        <div class="field-label">Màu sắc</div>
+        <div class="color-picker" id="cp-${sh.id}">
+          ${Object.keys(COLORS).map(cn=>`<div class="color-swatch${sh.color===cn?' selected':''}" data-color="${cn}" style="background:${COLORS[cn].dark}" title="${cn}"></div>`).join('')}
+        </div>
+      </div>`;
+    el.appendChild(div);
+
+    el.querySelector('#lbl-'+sh.id).addEventListener('input',e=>{sh.label=e.target.value;div.querySelector('.item-sub').textContent=`${sh.label||'?'} · ${sh.resp||''}`;renderPreview();save();});
+    el.querySelector('#resp-'+sh.id).addEventListener('input',e=>{sh.resp=e.target.value;div.querySelector('.item-sub').textContent=`${sh.label||'?'} · ${sh.resp||''}`;renderPreview();save();});
+    el.querySelector('#cp-'+sh.id).querySelectorAll('.color-swatch').forEach(sw=>{
+      sw.addEventListener('click',()=>{
+        sh.color=sw.dataset.color;
+        const C2=COLORS[sh.color];
+        dot.style.background=C2.dark;
+        el.querySelector('#cp-'+sh.id).querySelectorAll('.color-swatch').forEach(s2=>s2.classList.toggle('selected',s2.dataset.color===sh.color));
+        renderPreview();save();
+      });
+    });
+  });
+}
+
+function renderContent(){
+  // Step pills
+  const pills=document.getElementById('content-step-pills');
+  pills.innerHTML='';
+  state.steps.forEach(s=>{
+    const p=document.createElement('div');
+    p.className='step-pill'+(contentStep===s.id?' active':'');
+    p.textContent=s.name||'Untitled';
+    p.addEventListener('click',()=>{contentStep=s.id;renderContent();});
+    pills.appendChild(p);
+  });
+  if(!contentStep&&state.steps.length) contentStep=state.steps[0].id;
+
+  const body=document.getElementById('content-body');
+  body.innerHTML='';
+  if(!contentStep){body.innerHTML='<div style="color:var(--hint);font-size:11px;padding:8px">Hãy thêm bước trước.</div>';return;}
+  ensureStepData(contentStep);
+
+  if(contentSubtab==='actions') renderActions(body);
+  else if(contentSubtab==='touchpoints') renderTouchpoints(body);
+  else if(contentSubtab==='pain') renderPain(body);
+  else if(contentSubtab==='backend') renderBackend(body);
+}
+
+function ensureStepData(sid){
+  if(!state.actions[sid]) state.actions[sid]={};
+  if(!state.touchpoints[sid]) state.touchpoints[sid]=[];
+  if(!state.pain[sid]) state.pain[sid]=[];
+  if(!state.backend[sid]) state.backend[sid]=[];
+}
+
+function renderActions(body){
+  state.stakeholders.forEach(sh=>{
+    const C=COLORS[sh.color]||COLORS.Blue;
+    const a=(state.actions[contentStep]||{})[sh.id]||{action:'',arrow:'',isBot:false,botNote:''};
+    const wrap=document.createElement('div');
+    wrap.style.cssText='margin-bottom:10px;border:0.5px solid var(--border);border-radius:6px;overflow:hidden';
+    wrap.innerHTML=`
+      <div style="display:flex;align-items:center;gap:7px;padding:7px 10px;background:${C.dark}14;border-bottom:0.5px solid var(--border)">
+        <div style="width:8px;height:8px;border-radius:50%;background:${C.dark};flex-shrink:0"></div>
+        <span style="font-size:11px;font-weight:600;color:${C.dark}">${esc(sh.label||sh.name)}</span>
+        <span style="font-size:10px;color:var(--hint)">${esc(sh.name)}</span>
+      </div>
+      <div style="padding:9px;display:flex;flex-direction:column;gap:7px">
+        ${mkField('Hành động','textarea',a.action,'act-'+sh.id,'Vai trò này làm gì ở bước này?')}
+        ${mkField('Nhãn mũi tên','text',a.arrow||'','arr-'+sh.id,'VD: chuyển cho SIC')}
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--muted)">
+          <input type="checkbox" id="bot-${sh.id}" ${a.isBot?'checked':''} style="width:auto;accent-color:#EF4444">
+          <span>Đánh dấu ⚠ điểm tắc nghẽn</span>
+        </label>
+        ${mkField('Ghi chú tắc nghẽn','text',a.botNote||'','botn-'+sh.id,'VD: quá tải (hiển thị inline)')}
+      </div>`;
+    body.appendChild(wrap);
+
+    const ensure=()=>{if(!state.actions[contentStep])state.actions[contentStep]={};if(!state.actions[contentStep][sh.id])state.actions[contentStep][sh.id]={};};
+    ['act','arr','botn'].forEach(pfx=>{
+      const el=wrap.querySelector('#'+pfx+'-'+sh.id);
+      if(!el)return;
+      const key=pfx==='act'?'action':pfx==='arr'?'arrow':'botNote';
+      el.addEventListener('input',e=>{ensure();state.actions[contentStep][sh.id][key]=e.target.value;renderPreview();save();});
+    });
+    const botCb=wrap.querySelector('#bot-'+sh.id);
+    botCb.addEventListener('change',e=>{ensure();state.actions[contentStep][sh.id].isBot=e.target.checked;renderPreview();save();});
+  });
+}
+
+function renderTouchpoints(body){
+  const items=state.touchpoints[contentStep]||[];
+  renderSortableItems(body, items, 'tp', tp=>{
+    return `
+      ${mkField('Tên ứng dụng / công cụ','text',tp.app||'','tpapp-'+tp.id,'VD: Microsoft Outlook')}
+      ${mkField('Nhãn chip','text',tp.chip||'','tpchip-'+tp.id,'VD: ✉ Email')}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div class="field-group">
+          <div class="field-label">Loại tương tác</div>
+          <select id="tptype-${tp.id}">${['Async','Sync','Cả hai'].map(v=>`<option${tp.type===v?' selected':''}>${v}</option>`).join('')}</select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Chiều tương tác</div>
+          <select id="tpdir-${tp.id}">${['Nội bộ','Đến client','Hai chiều'].map(v=>`<option${tp.dir===v?' selected':''}>${v}</option>`).join('')}</select>
+        </div>
+      </div>
+      ${mkField('Mô tả','textarea',tp.desc||'','tpdesc-'+tp.id,'Công cụ này được dùng như thế nào ở bước này?')}`;
+  }, (tp,el)=>{
+    ['app','chip','desc'].forEach((k,i)=>{
+      const inp=el.querySelector('#tp'+(['app','chip','desc'][i])+'-'+tp.id);
+      if(inp) inp.addEventListener('input',e=>{tp[k]=e.target.value;renderPreview();save();});
+    });
+    el.querySelector('#tptype-'+tp.id).addEventListener('change',e=>{tp.type=e.target.value;renderPreview();save();});
+    el.querySelector('#tpdir-'+tp.id).addEventListener('change',e=>{tp.dir=e.target.value;renderPreview();save();});
+  }, ()=>({id:uid(),app:'',chip:'',type:'Async',dir:'To client',desc:''}), '＋ Thêm touchpoint');
+}
+
+function renderPain(body){
+  const items=state.pain[contentStep]||[];
+  renderSortableItems(body, items, 'pa', p=>{
+    return `
+      ${mkField('Tiêu đề','text',p.title||'','patit-'+p.id,'Tên ngắn gọn cho vấn đề này')}
+      <div class="field-group">
+        <div class="field-label">Loại vấn đề</div>
+        <div class="pain-types" id="ptypes-${p.id}">
+          ${PAIN_TYPES.map(t=>`<button class="ptag-btn ptag-${t.replace(/ /g,'-')}${(p.types||[]).includes(t)?' active':''}" data-pt="${t}">${t}</button>`).join('')}
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Mức độ</div>
+        <div class="sev-group" id="psev-${p.id}">
+          ${['HIGH','MED','LOW'].map(s=>`<button class="sev-btn sev-${s}${p.sev===s?' active':''}" data-sev="${s}">${s}</button>`).join('')}
+        </div>
+      </div>
+      ${mkField('Mô tả','textarea',p.desc||'','padesc-'+p.id,'Nguyên nhân gốc rễ + cơ chế gây ra vấn đề')}
+      ${mkField('Tác động','textarea',p.impact||'','painp-'+p.id,'Hậu quả, thời gian mất, rủi ro phát sinh')}`;
+  }, (p,el)=>{
+    el.querySelector('#patit-'+p.id).addEventListener('input',e=>{p.title=e.target.value;renderPreview();save();});
+    el.querySelector('#padesc-'+p.id).addEventListener('input',e=>{p.desc=e.target.value;renderPreview();save();});
+    el.querySelector('#painp-'+p.id).addEventListener('input',e=>{p.impact=e.target.value;renderPreview();save();});
+    el.querySelector('#ptypes-'+p.id).querySelectorAll('.ptag-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const t=btn.dataset.pt;
+        if(!p.types)p.types=[];
+        const idx=p.types.indexOf(t);
+        if(idx>=0)p.types.splice(idx,1);else p.types.push(t);
+        btn.classList.toggle('active',p.types.includes(t));
+        renderPreview();save();
+      });
+    });
+    el.querySelector('#psev-'+p.id).querySelectorAll('.sev-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        p.sev=btn.dataset.sev;
+        el.querySelector('#psev-'+p.id).querySelectorAll('.sev-btn').forEach(b=>b.classList.toggle('active',b.dataset.sev===p.sev));
+        renderPreview();save();
+      });
+    });
+  }, ()=>({id:uid(),title:'',types:[],sev:'MED',desc:'',impact:''}), '＋ Thêm vấn đề');
+}
+
+function renderBackend(body){
+  const items=state.backend[contentStep]||[];
+  renderSortableItems(body, items, 'be', b=>{
+    return `
+      ${mkField('Tên hệ thống / nhóm','text',b.name||'','bename-'+b.id,'VD: Risk / CEAC')}
+      <div class="field-group">
+        <div class="field-label">Phân loại</div>
+        <select id="becat-${b.id}">${BE_CATS.map(v=>`<option${b.cat===v?' selected':''}>${v}</option>`).join('')}</select>
+      </div>
+      ${mkField('Mô tả','textarea',b.desc||'','bedesc-'+b.id,'Hệ thống/nhóm này làm gì ở bước này?')}
+      ${mkField('Ghi chú phụ thuộc','text',b.dep||'','bedep-'+b.id,'Điều kiện tiên quyết? Để trống nếu không có.')}`;
+  }, (b,el)=>{
+    el.querySelector('#bename-'+b.id).addEventListener('input',e=>{b.name=e.target.value;renderPreview();save();});
+    el.querySelector('#bedesc-'+b.id).addEventListener('input',e=>{b.desc=e.target.value;renderPreview();save();});
+    el.querySelector('#bedep-'+b.id).addEventListener('input',e=>{b.dep=e.target.value;renderPreview();save();});
+    el.querySelector('#becat-'+b.id).addEventListener('change',e=>{b.cat=e.target.value;renderPreview();save();});
+  }, ()=>({id:uid(),name:'',cat:'RM Tool',desc:'',dep:''}), '＋ Thêm hệ thống');
+}
+
+// ─────────────────────────────────────────────────────────
+//  SORTABLE ITEMS HELPER
+// ─────────────────────────────────────────────────────────
+function renderSortableItems(container, items, prefix, buildDetail, bindDetail, createNew, addLabel){
+  items.forEach((item,i)=>{
+    const wrap=makeItemRow(item.id, prefix, i, true);
+    wrap.querySelector('.item-name').textContent=item.title||item.app||item.name||'Mục mới';
+    const detail=wrap.querySelector('.item-detail-inner');
+    detail.innerHTML=buildDetail(item);
+    bindDetail(item, detail);
+    container.appendChild(wrap);
+
+    // Re-sync label on any input
+    detail.querySelectorAll('input,textarea').forEach(inp=>{
+      inp.addEventListener('input',()=>{
+        const lbl=item.title||item.app||item.name||'Mục';
+        wrap.querySelector('.item-name').textContent=lbl;
+      });
+    });
+  });
+  const addBtn=document.createElement('button');
+  addBtn.className='add-btn';addBtn.textContent=addLabel;
+  addBtn.addEventListener('click',()=>{
+    const ni=createNew();items.push(ni);
+    renderContent();renderPreview();save();
+  });
+  container.appendChild(addBtn);
+  setupDragList(container, items, ()=>{renderPreview();save();});
+}
+
+function makeItemRow(id, type, idx, showDragHandle=true){
+  const wrap=document.createElement('div');
+  wrap.className='item-row';wrap.dataset.id=id;wrap.draggable=true;
+  let expanded=false;
+  wrap.innerHTML=`
+    <div class="drag-handle" title="Kéo để sắp xếp lại">⠿</div>
+    <div class="item-content">
+      <div class="item-name-row"><span class="item-name"></span><span class="item-sub"></span></div>
+      <div class="item-detail"><div class="item-detail-inner"></div></div>
+    </div>
+    <button class="item-expand-btn" title="Mở rộng">▾</button>
+    <button class="item-del" title="Xóa">✕</button>`;
+
+  const expandBtn=wrap.querySelector('.item-expand-btn');
+  const detail=wrap.querySelector('.item-detail');
+  expandBtn.addEventListener('click',()=>{
+    expanded=!expanded;
+    detail.classList.toggle('open',expanded);
+    expandBtn.textContent=expanded?'▴':'▾';
+    if(expanded){requestAnimationFrame(()=>{detail.querySelector('input,textarea')&&detail.querySelector('input,textarea').focus();});}
+  });
+
+  wrap.querySelector('.item-del').addEventListener('click',()=>{
+    wrap.style.opacity='0';wrap.style.transform='translateX(-10px)';wrap.style.transition='all .2s';
+    setTimeout(()=>{
+      if(type==='step'){
+        state.steps=state.steps.filter(s=>s.id!==id);
+        if(contentStep===id)contentStep=state.steps[0]?.id||null;
+        renderSteps();renderContent();
+      } else if(type==='stkh'){
+        state.stakeholders=state.stakeholders.filter(s=>s.id!==id);
+        renderStakeholders();
+      } else {
+        // remove from items array by finding parent list
+        ['touchpoints','pain','backend'].forEach(k=>{
+          if(state[k][contentStep]){state[k][contentStep]=state[k][contentStep].filter(x=>x.id!==id);}
+        });
+        renderContent();
+      }
+      renderPreview();save();
+    },200);
+  });
+  return wrap;
+}
+
+// ─────────────────────────────────────────────────────────
+//  DRAG & DROP
+// ─────────────────────────────────────────────────────────
+function setupDragList(container, dataArr, onChange){
+  let dragId=null,overEl=null;
+  container.addEventListener('dragstart',e=>{
+    const row=e.target.closest('.item-row');
+    if(!row)return;
+    dragId=row.dataset.id;
+    row.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain',dragId);
+  });
+  container.addEventListener('dragend',e=>{
+    container.querySelectorAll('.item-row').forEach(r=>{r.classList.remove('dragging','drag-over');});
+    dragId=null;overEl=null;
+  });
+  container.addEventListener('dragover',e=>{
+    e.preventDefault();e.dataTransfer.dropEffect='move';
+    const row=e.target.closest('.item-row');
+    if(!row||row.dataset.id===dragId)return;
+    if(overEl&&overEl!==row)overEl.classList.remove('drag-over');
+    overEl=row;row.classList.add('drag-over');
+  });
+  container.addEventListener('dragleave',e=>{
+    if(!e.relatedTarget||!container.contains(e.relatedTarget)){
+      if(overEl)overEl.classList.remove('drag-over');overEl=null;
+    }
+  });
+  container.addEventListener('drop',e=>{
+    e.preventDefault();
+    const targetId=overEl?.dataset.id;
+    if(!targetId||targetId===dragId)return;
+    const fi=dataArr.findIndex(x=>x.id===dragId);
+    const ti=dataArr.findIndex(x=>x.id===targetId);
+    if(fi<0||ti<0)return;
+    const [item]=dataArr.splice(fi,1);
+    dataArr.splice(ti,0,item);
+    onChange();
+    if(dataArr===state.steps)renderSteps();
+    else if(dataArr===state.stakeholders)renderStakeholders();
+    else renderContent();
+  });
+}
+
+function mkField(label, type, val, id, placeholder){
+  if(type==='textarea')
+    return `<div class="field-group"><div class="field-label">${label}</div><textarea id="${id}" rows="2" placeholder="${placeholder}">${val}</textarea></div>`;
+  return `<div class="field-group"><div class="field-label">${label}</div><input type="text" id="${id}" value="${val.replace(/"/g,'&quot;')}" placeholder="${placeholder}"></div>`;
+}
+
+// ─────────────────────────────────────────────────────────
+//  ZOOM
+// ─────────────────────────────────────────────────────────
+function applyZoom(){
+  document.getElementById('preview-wrap').style.transform=`scale(${zoom})`;
+  document.getElementById('zoom-label').textContent=Math.round(zoom*100)+'%';
+}
+document.getElementById('zoom-in').addEventListener('click',()=>{zoom=Math.min(zoom+.1,3);applyZoom();});
+document.getElementById('zoom-out').addEventListener('click',()=>{zoom=Math.max(zoom-.1,.2);applyZoom();});
+document.getElementById('zoom-fit').addEventListener('click',()=>{
+  const outer=document.getElementById('preview-outer');
+  const table=document.querySelector('.bp-table');
+  if(!table){zoom=1;applyZoom();return;}
+  const fit=Math.min((outer.clientWidth-40)/table.offsetWidth,(outer.clientHeight-40)/table.offsetHeight,2);
+  zoom=Math.max(.2,fit);applyZoom();
+});
+document.getElementById('preview-outer').addEventListener('wheel',e=>{
+  if(e.ctrlKey||e.metaKey){e.preventDefault();zoom=Math.max(.2,Math.min(3,zoom-(e.deltaY*0.001)));applyZoom();}
+},{passive:false});
+
+// ─────────────────────────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────────────────────────
+document.querySelectorAll('.ltab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    activeTab=btn.dataset.tab;
+    document.querySelectorAll('.ltab').forEach(b=>b.classList.toggle('active',b===btn));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.style.display='none');
+    document.getElementById('tab-'+activeTab).style.display='block';
+    if(activeTab==='info')renderInfo();
+    else if(activeTab==='steps')renderSteps();
+    else if(activeTab==='stakeholders')renderStakeholders();
+    else if(activeTab==='content'){renderContent();}
+  });
+});
+
+document.querySelectorAll('.subtab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    contentSubtab=btn.dataset.st;
+    document.querySelectorAll('.subtab').forEach(b=>b.classList.toggle('active',b===btn));
+    renderContent();
+  });
+});
+
+// ─────────────────────────────────────────────────────────
+//  INFO FORM BINDING
+// ─────────────────────────────────────────────────────────
+['name','desc','org','owner'].forEach(k=>{
+  document.getElementById('info-'+k).addEventListener('input',e=>{
+    state.info[k]=e.target.value;
+    if(k==='name') document.getElementById('bp-name').value=e.target.value;
+    save();
+  });
+});
+document.getElementById('bp-name').addEventListener('input',e=>{
+  state.info.name=e.target.value;
+  document.getElementById('info-name').value=e.target.value;
+  save();
+});
+
+// ─────────────────────────────────────────────────────────
+//  ADD BUTTONS
+// ─────────────────────────────────────────────────────────
+document.getElementById('add-step').addEventListener('click',()=>{
+  const id=uid();
+  state.steps.push({id,name:'New Step',durTyp:'',durBest:'',durWorst:'',durDriver:'',artifacts:''});
+  state.actions[id]={};state.touchpoints[id]=[];state.pain[id]=[];state.backend[id]=[];
+  renderSteps();renderContent();renderPreview();save();
+});
+document.getElementById('add-stakeholder').addEventListener('click',()=>{
+  const colors=Object.keys(COLORS);
+  const used=new Set(state.stakeholders.map(s=>s.color));
+  const available=colors.find(c=>!used.has(c))||colors[0];
+  state.stakeholders.push({id:uid(),name:'New Role',label:'NR',resp:'',color:available});
+  renderStakeholders();renderPreview();save();
+  setupDragForSteps();
+});
+
+function setupDragForSteps(){
+  const el=document.getElementById('steps-list');
+  setupDragList(el,state.steps,()=>{renderSteps();renderContent();renderPreview();save();});
+}
+function setupDragForStkh(){
+  const el=document.getElementById('stakeholders-list');
+  setupDragList(el,state.stakeholders,()=>{renderStakeholders();renderPreview();save();});
+}
+
+// ─────────────────────────────────────────────────────────
+//  EXPORT HTML
+// ─────────────────────────────────────────────────────────
+document.getElementById('export-btn').addEventListener('click',()=>{
+  const preview=document.getElementById('preview').innerHTML;
+  const bpName=state.info.name||'Blueprint';
+  const html=`<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>${bpName}</title>
+<style>
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F7F6F3;padding:24px;min-width:900px}
+.bp-table{border-collapse:collapse;border:1px solid #D8D8D4;border-radius:10px;overflow:hidden;table-layout:fixed}
+.bp-table th,.bp-table td{border:0.5px solid #D8D8D4;vertical-align:top;padding:0}
+.label-col{width:112px}.step-col{min-width:200px;width:200px}
+${document.querySelector('style').textContent}
+</style>
+</head><body>
+<div style="margin-bottom:16px"><h1 style="font-size:18px;font-weight:600">${bpName}</h1>${state.info.org?`<div style="font-size:11px;color:#6B6B6B;margin-top:2px">${state.info.org}</div>`:''}</div>
+<div style="overflow-x:auto">${preview}</div>
+</body></html>`;
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=bpName.replace(/[^a-zA-Z0-9]/g,'_')+'-blueprint.html';a.click();
+});
+
+// ─────────────────────────────────────────────────────────
+//  PAN (drag to scroll preview)
+// ─────────────────────────────────────────────────────────
+const outer=document.getElementById('preview-outer');
+let panning=false,panX=0,panY=0,scrollX=0,scrollY=0;
+outer.addEventListener('mousedown',e=>{
+  if(e.button!==0)return;
+  panning=true;panX=e.clientX;panY=e.clientY;scrollX=outer.scrollLeft;scrollY=outer.scrollTop;
+});
+window.addEventListener('mousemove',e=>{
+  if(!panning)return;
+  outer.scrollLeft=scrollX-(e.clientX-panX);outer.scrollTop=scrollY-(e.clientY-panY);
+});
+window.addEventListener('mouseup',()=>panning=false);
+
+// ─────────────────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────────────────
+load();
+document.getElementById('bp-name').value=state.info.name||'';
+document.getElementById('info-name').value=state.info.name||'';
+document.getElementById('info-desc').value=state.info.desc||'';
+document.getElementById('info-org').value=state.info.org||'';
+document.getElementById('info-owner').value=state.info.owner||'';
+renderLayerToggles();
+renderPreview();
+
+// Init drag lists after first render
+setTimeout(()=>{
+  const sl=document.getElementById('steps-list');
+  const sk=document.getElementById('stakeholders-list');
+  setupDragList(sl,state.steps,()=>{renderSteps();renderContent();renderPreview();save();});
+  setupDragList(sk,state.stakeholders,()=>{renderStakeholders();renderPreview();save();});
+},100);
+</script>
+</body>
+</html>
