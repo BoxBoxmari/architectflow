@@ -22,17 +22,60 @@
   }
 }
 
+/* ── Page entrance animation — staggered like other modules ── */
+@keyframes cp-pageReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero section slides in first */
+.current-process-page-inner .module-hero {
+  animation: cp-pageReveal 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.05s both;
+}
+
+/* Summary strip fades in after hero */
+.current-process-page-inner .cp-summary-strip {
+  animation: cp-pageReveal 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.12s both;
+}
+
+/* Toolbar slides in third */
+.current-process-page-inner .cp-workspace-toolbar {
+  animation: cp-pageReveal 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.19s both;
+}
+
+/* Main editor panel comes in last */
+.current-process-page-inner .cp-workspace {
+  animation: cp-pageReveal 0.45s cubic-bezier(0.4, 0, 0.2, 1) 0.26s both;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .current-process-page-inner .module-hero,
+  .current-process-page-inner .cp-summary-strip,
+  .current-process-page-inner .cp-workspace-toolbar,
+  .current-process-page-inner .cp-workspace {
+    animation: none;
+  }
+}
+
+
 /* ── Workspace Toolbar ────────────────────────────────────── */
 .cp-workspace-toolbar {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;  /* left fills, right hugs content */
   align-items: center;
-  gap: 8px;
+  column-gap: 12px;
   padding: 10px 16px;
   background: var(--kpmg-surface-container);
   border: 2px solid var(--kpmg-outline-variant);
   border-radius: 12px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
   box-shadow: var(--shadow-card);
 }
 
@@ -40,16 +83,25 @@ html.dark .cp-workspace-toolbar {
   background: #111827;
   border-color: #374151;
 }
+/* Left group: name + sep + zoom controls */
+.cp-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;        /* allow shrink inside grid cell */
+  overflow: hidden;
+}
 
 .cp-toolbar-name {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
   border: none;
   background: transparent;
   padding: 4px 8px;
   border-radius: 8px;
-  min-width: 200px;
-  flex: 1;
+  min-width: 140px;
+  max-width: 280px;
+  flex: 1 1 auto;
   color: var(--kpmg-on-surface);
   font-family: var(--font-body);
   outline: none;
@@ -76,15 +128,15 @@ html.dark .cp-workspace-toolbar {
   align-items: center;
   gap: 5px;
   font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   padding: 6px 12px;
   border-radius: 12px;
   border: 1px solid var(--kpmg-outline-variant);
   color: var(--kpmg-on-surface-variant);
   background: var(--kpmg-surface-container-lowest);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 
@@ -112,7 +164,9 @@ html.dark .cp-toolbar-btn:hover {
 }
 
 .cp-toolbar-btn--primary:hover {
-  opacity: 0.92;
+  background: var(--navy-gradient); /* explicitly keep navy — prevent base hover from overriding */
+  color: #fff;
+  opacity: 0.9;
 }
 
 .cp-zoom-ctrl {
@@ -120,6 +174,29 @@ html.dark .cp-toolbar-btn:hover {
   align-items: center;
   gap: 4px;
 }
+
+/* Right group: Export PDF + Clear + Saved — pinned by grid auto column */
+.cp-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Toolbar Export PDF: subtle shadow only, NO color change */
+#cp-export-btn {
+  box-shadow:
+    0 2px 10px rgba(0, 32, 95, 0.28),
+    0 0 0 1px rgba(0, 51, 141, 0.18);
+  transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+}
+#cp-export-btn:hover {
+  box-shadow:
+    0 4px 18px rgba(0, 32, 95, 0.38),
+    0 0 0 1px rgba(0, 51, 141, 0.25);
+  opacity: 0.94;
+}
+
 
 .cp-zoom-label {
   font-size: 11px;
@@ -158,13 +235,31 @@ html.dark .cp-workspace {
 
 /* ── Left Panel ───────────────────────────────────────────── */
 .cp-left-panel {
-  width: 400px;
+  width: 320px;
   flex-shrink: 0;
   background: var(--kpmg-surface-container-lowest);
   border-right: 2px solid var(--kpmg-outline-variant);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+.cp-workspace.left-panel-collapsed .cp-left-panel {
+  width: 48px;
+}
+.cp-workspace.left-panel-collapsed .cp-tab {
+  display: none;
+}
+.cp-workspace.left-panel-collapsed .cp-left-body {
+  display: none;
+}
+.cp-workspace.left-panel-collapsed .cp-tabs {
+  padding: 10px 0;
+  justify-content: center;
+}
+.cp-workspace.left-panel-collapsed .cp-panel-toggle svg {
+  transform: scaleX(-1);
 }
 
 html.dark .cp-left-panel {
@@ -188,17 +283,17 @@ html.dark .cp-tabs {
 
 .cp-tab {
   font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   padding: 10px 10px;
   color: var(--kpmg-on-surface-variant);
   border: none;
   border-bottom: 2px solid transparent;
   background: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -267,7 +362,7 @@ html.dark .cp-form-section {
   cursor: pointer;
   user-select: none;
   background: var(--kpmg-surface-container);
-  transition: background 0.15s ease;
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html.dark .cp-fs-head {
@@ -283,7 +378,7 @@ html.dark .cp-fs-head:hover {
 }
 
 .cp-fs-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--kpmg-on-surface);
   flex: 1;
@@ -300,7 +395,7 @@ html.dark .cp-fs-head:hover {
 .cp-fs-chevron {
   font-size: 10px;
   color: var(--kpmg-on-surface-variant);
-  transition: transform 0.25s ease;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cp-fs-body {
@@ -361,12 +456,12 @@ html.dark .cp-fs-head:hover {
   background: var(--kpmg-surface-container-lowest);
   color: var(--kpmg-on-surface);
   padding: 8px 10px;
-  font-size: 12px;
+  font-size: 13px;
   outline: none;
   width: 100%;
   transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html.dark .cp-input,
@@ -398,15 +493,15 @@ html.dark .cp-select {
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   background: var(--kpmg-surface-container-lowest);
   border: 1px solid var(--kpmg-outline-variant);
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 6px;
   cursor: default;
-  transition: box-shadow 0.15s ease;
+  transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  animation: cp-fadeIn 0.2s ease;
+  animation: cp-fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html.dark .cp-item-row {
@@ -418,10 +513,25 @@ html.dark .cp-item-row {
   box-shadow: var(--shadow-elevated);
 }
 
+.cp-item-row.dragging {
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+.cp-item-row.drag-over {
+  border-top: 2px solid var(--kpmg-primary);
+  box-shadow: 0 -2px 0 var(--kpmg-primary);
+}
+
+html.dark .cp-item-row.drag-over {
+  border-top-color: #60a5fa;
+  box-shadow: 0 -2px 0 #60a5fa;
+}
+
 @keyframes cp-fadeIn {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -432,11 +542,19 @@ html.dark .cp-item-row {
 .cp-drag-handle {
   cursor: grab;
   color: var(--kpmg-on-surface-variant);
-  font-size: 13px;
-  padding: 2px 0;
+  padding: 4px 2px;
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
-  line-height: 1.2;
   user-select: none;
+  margin-top: 2px;
+  border-radius: 4px;
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cp-drag-handle:hover {
+  background: var(--kpmg-surface-container);
+  color: var(--kpmg-on-surface);
 }
 
 .cp-drag-handle:active {
@@ -455,7 +573,7 @@ html.dark .cp-item-row {
 }
 
 .cp-item-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   flex: 1;
   min-width: 0;
@@ -466,44 +584,58 @@ html.dark .cp-item-row {
 }
 
 .cp-item-sub {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--kpmg-on-surface-variant);
+}
+
+.cp-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.cp-item-expand-btn, .cp-item-del {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  color: var(--kpmg-on-surface-variant);
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .cp-item-expand-btn {
-  font-size: 10px;
-  color: var(--kpmg-on-surface-variant);
-  padding: 2px 5px;
-  border-radius: 3px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-  margin-top: 2px;
+  border-color: var(--kpmg-outline-variant);
+  background: var(--kpmg-surface-container);
 }
 
 .cp-item-expand-btn:hover {
-  background: var(--kpmg-surface-container);
+  background: var(--kpmg-surface-container-high);
   color: var(--kpmg-on-surface);
+  border-color: var(--kpmg-secondary);
 }
 
-.cp-item-del {
-  color: var(--kpmg-on-surface-variant);
-  font-size: 12px;
-  padding: 2px 5px;
-  border-radius: 3px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-  margin-top: 2px;
+html.dark .cp-item-expand-btn {
+  border-color: #374151;
+  background: #1f2937;
+}
+html.dark .cp-item-expand-btn:hover {
+  background: #374151;
+  color: #e5e5e5;
+  border-color: #60a5fa;
 }
 
 .cp-item-del:hover {
   background: rgba(200, 75, 90, 0.1);
   color: var(--kpmg-accent-negative);
+  border-color: rgba(200, 75, 90, 0.2);
 }
 
 .cp-item-detail {
@@ -792,37 +924,37 @@ html.dark .cp-bp-table td {
 /* Step header cells */
 .cp-sh-cell {
   background: var(--kpmg-primary);
-  padding: 12px 14px;
+  padding: 16px 14px;
 }
 
 .cp-sh-num {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.6);
-  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
   font-family: var(--font-body);
 }
 
 .cp-sh-name {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   color: #fff;
-  line-height: 1.3;
+  line-height: 1.35;
   word-break: break-word;
 }
 
 .cp-sh-dur {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: 3px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
 }
 
 /* Row labels */
 .cp-row-label {
-  padding: 12px 10px 12px 22px;
+  padding: 14px 12px 14px 22px;
   background: var(--kpmg-surface-container-lowest);
   position: relative;
   min-height: 44px;
@@ -843,9 +975,9 @@ html.dark .cp-row-label {
 }
 
 .cp-rl-name {
-  font-size: 11px;
+  font-size: 14px;          /* +1px — clearer on dense blueprint table */
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--kpmg-on-surface);
   line-height: 1.35;
   word-break: break-word;
@@ -854,48 +986,49 @@ html.dark .cp-row-label {
 }
 
 .cp-rl-sub {
-  font-size: 9px;
+  font-size: 12px;          /* +1px — easier to scan */
   color: var(--kpmg-on-surface-variant);
-  margin-top: 3px;
+  margin-top: 5px;
   line-height: 1.4;
   word-break: break-word;
   overflow-wrap: break-word;
   white-space: normal;
 }
 
-/* Stakeholder UML rows */
-.cp-uml-label {
+/* Dark Blue Labels (Stakeholder UML & Duration) */
+.cp-uml-label,
+.cp-dur-label {
   background: var(--kpmg-primary);
 }
-.cp-uml-label .cp-rl-name {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 11px;
+.cp-uml-label .cp-rl-name,
+.cp-dur-label .cp-rl-name {
+  color: rgba(255, 255, 255, 0.95) !important;
 }
-.cp-uml-label .cp-rl-sub {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 9px;
+.cp-uml-label .cp-rl-sub,
+.cp-dur-label .cp-rl-sub {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 .cp-role-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+  gap: 6px;
+  padding: 6px 12px;
   border-radius: 20px;
   border: 1px solid;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   white-space: normal;
   word-break: break-word;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   max-width: 100%;
 }
 
 .cp-uml-cell {
   background: var(--kpmg-surface-container-low);
-  padding: 10px;
+  padding: 12px 14px;
   position: relative;
-  min-height: 44px;
+  min-height: 48px;
 }
 
 html.dark .cp-uml-cell {
@@ -904,9 +1037,9 @@ html.dark .cp-uml-cell {
 
 .cp-uml-action {
   border-radius: 4px;
-  padding: 4px 7px;
-  font-size: 9.5px;
-  line-height: 1.4;
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 1.45;
   border: 1px solid;
   position: relative;
   z-index: 1;
@@ -1009,8 +1142,15 @@ html.dark .cp-dur-breakdown {
 }
 
 /* Process row */
+/* Documents — Teal bar (Color 3) */
 .cp-proc-label::before {
-  background: var(--kpmg-outline);
+  background: var(--kpmg-accent-faster);
+}
+.cp-proc-label .cp-rl-name {
+  color: var(--kpmg-on-surface);  /* neutral, readable */
+}
+html.dark .cp-proc-label .cp-rl-name {
+  color: var(--kpmg-on-surface);
 }
 .cp-proc-cell {
   padding: 10px;
@@ -1032,13 +1172,15 @@ html.dark .cp-artifact-card {
   border-color: #374151;
 }
 
-/* Touchpoint row */
+/* Touchpoints — KPMG Blue (Color 2) */
 .cp-tp-label::before {
   background: var(--kpmg-secondary);
 }
 .cp-tp-label .cp-rl-name {
-  color: var(--kpmg-secondary);
-  font-size: 11px;
+  color: var(--kpmg-secondary);   /* KPMG Blue #006397 */
+}
+html.dark .cp-tp-label .cp-rl-name {
+  color: #60a5fa;                 /* bright blue for dark bg */
 }
 .cp-tp-cell {
   padding: 10px;
@@ -1098,13 +1240,15 @@ html.dark .cp-tp-card {
   margin-top: 3px;
 }
 
-/* Pain row */
+/* Pain Points — Warning Red (Color 5) */
 .cp-pain-label::before {
   background: var(--kpmg-accent-negative);
 }
 .cp-pain-label .cp-rl-name {
-  color: var(--kpmg-accent-negative);
-  font-size: 11px;
+  color: var(--kpmg-accent-negative);  /* #c84b5a — warning, intentional */
+}
+html.dark .cp-pain-label .cp-rl-name {
+  color: #f87171;                      /* lighter red for dark bg */
 }
 .cp-pain-cell {
   padding: 10px;
@@ -1138,10 +1282,42 @@ html.dark .cp-pain-card-preview {
   margin-bottom: 4px;
 }
 .cp-pain-tag {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 3px;
+  border: 1px solid;
+}
+/* Severity-based colors — semantic exception to 5-color rule */
+.cp-pain-sev-high {
+  background: rgba(200, 75, 90, 0.1);
+  color: var(--kpmg-accent-negative);
+  border-color: rgba(200, 75, 90, 0.3);
+}
+html.dark .cp-pain-sev-high {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.35);
+}
+.cp-pain-sev-med {
+  background: rgba(146, 64, 14, 0.08);
+  color: #92400e;
+  border-color: rgba(146, 64, 14, 0.25);
+}
+html.dark .cp-pain-sev-med {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.3);
+}
+.cp-pain-sev-low {
+  background: rgba(15, 110, 86, 0.08);
+  color: var(--kpmg-accent-positive);
+  border-color: rgba(15, 110, 86, 0.25);
+}
+html.dark .cp-pain-sev-low {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.3);
 }
 .cp-pain-desc-preview {
   font-size: 10px;
@@ -1157,82 +1333,99 @@ html.dark .cp-pain-card-preview {
   line-height: 1.4;
 }
 
-/* Backend row */
+/* Backend — KPMG Blue (Color 2, same family as Touchpoints) */
 .cp-be-label::before {
-  background: var(--kpmg-accent-deeper);
+  background: var(--kpmg-secondary);        /* #006397 blue bar */
 }
 .cp-be-label .cp-rl-name {
-  color: var(--kpmg-accent-deeper);
-  font-size: 11px;
+  color: var(--kpmg-secondary);             /* blue, not amber */
+}
+html.dark .cp-be-label .cp-rl-name {
+  color: #60a5fa;                           /* bright blue for dark bg */
 }
 .cp-be-cell {
   padding: 10px;
-  background: rgba(243, 156, 18, 0.04);
+  background: rgba(0, 99, 151, 0.04);       /* subtle blue tint */
 }
 html.dark .cp-be-cell {
-  background: rgba(243, 156, 18, 0.08);
+  background: rgba(0, 99, 151, 0.08);
 }
 .cp-be-card {
   background: var(--kpmg-surface-container-lowest);
-  border: 1px solid rgba(243, 156, 18, 0.2);
+  border: 1px solid rgba(0, 99, 151, 0.2);  /* blue border */
   border-radius: 6px;
   padding: 7px 9px;
   margin-bottom: 5px;
 }
 html.dark .cp-be-card {
   background: #1f2937;
-  border-color: rgba(243, 156, 18, 0.35);
+  border-color: rgba(96, 165, 250, 0.3);
 }
 .cp-be-badge {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 3px 7px;
+  padding: 3px 8px;
   border-radius: 4px;
-  border: 1px solid;
+  border: 1px solid rgba(0, 99, 151, 0.35);
+  background: rgba(0, 99, 151, 0.08);
+  color: var(--kpmg-secondary);
   margin-bottom: 4px;
   display: inline-block;
 }
+html.dark .cp-be-badge {
+  background: rgba(96, 165, 250, 0.12);
+  border-color: rgba(96, 165, 250, 0.35);
+  color: #60a5fa;
+}
 .cp-be-desc {
-  font-size: 10px;
+  font-size: 11px;                          /* +1px for readability */
   color: var(--kpmg-on-surface-variant);
   line-height: 1.45;
   margin-bottom: 2px;
 }
 .cp-be-dep {
-  font-size: 9px;
-  color: var(--kpmg-accent-deeper);
+  font-size: 10px;
+  color: var(--kpmg-secondary);
   font-style: italic;
-  border-top: 1px solid rgba(243, 156, 18, 0.2);
+  border-top: 1px solid rgba(0, 99, 151, 0.15);
   padding-top: 4px;
   margin-top: 4px;
 }
 
-/* Dividers */
+/* ── Blueprint Row Dividers — 5-color KPMG system ─────────── */
+
+/* VISIBILITY LINE — Navy Blue (Color 1) */
 .cp-dv-vis td {
-  background: rgba(69, 0, 79, 0.06);
-  color: var(--kpmg-tertiary);
-  font-size: 10px;
+  background: rgba(0, 51, 141, 0.06);
+  color: var(--kpmg-primary-container);     /* #00338D navy */
+  font-size: 11px;                          /* +1px more readable */
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 8px 14px;
-  border-top: 2px dashed var(--kpmg-tertiary) !important;
+  padding: 9px 14px;
+  border-top: 2px solid var(--kpmg-primary-container) !important;
 }
 html.dark .cp-dv-vis td {
-  background: rgba(69, 0, 79, 0.15);
+  background: rgba(96, 165, 250, 0.08);
+  color: #60a5fa;
+  border-top-color: #60a5fa !important;
 }
+
+/* INTERNAL ANALYSIS — Teal (Color 3) */
 .cp-dv-int td {
-  background: rgba(0, 184, 169, 0.06);
-  color: var(--kpmg-accent-positive);
-  font-size: 10px;
+  background: rgba(0, 184, 169, 0.07);
+  color: var(--kpmg-accent-faster);         /* #00B8A9 teal */
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 8px 14px;
-  border-top: 2px dashed var(--kpmg-accent-faster) !important;
+  padding: 9px 14px;
+  border-top: 2px solid var(--kpmg-accent-faster) !important;
 }
 html.dark .cp-dv-int td {
-  background: rgba(0, 184, 169, 0.15);
+  background: rgba(45, 212, 191, 0.1);
+  color: #2dd4bf;
+  border-top-color: #2dd4bf !important;
 }
 
 /* Empty cell */
@@ -1299,6 +1492,238 @@ html.dark .cp-empty-cell {
 .cp-layer-toggle span {
   font-size: 11px;
   color: var(--kpmg-on-surface-variant);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   REFINEMENT ADDITIONS — UI/UX upgrade pass
+   All overrides are additive; existing rule order is preserved.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Summary Strip ────────────────────────────────────────── */
+.cp-summary-strip {
+  display: flex;
+  gap: 0;
+  background: var(--kpmg-surface-container);
+  border: 1px solid var(--kpmg-outline-variant);
+  border-radius: 12px;
+  padding: 0;
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+html.dark .cp-summary-strip {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.cp-summary-stat {
+  flex: 1;
+  padding: 12px 16px;
+  border-right: 1px solid var(--kpmg-outline-variant);
+  min-width: 0;
+}
+
+html.dark .cp-summary-stat {
+  border-color: #374151;
+}
+
+.cp-summary-stat:last-child {
+  border-right: none;
+}
+
+.cp-summary-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--kpmg-on-surface-variant);
+  margin-bottom: 3px;
+}
+
+.cp-summary-stat-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--kpmg-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Tab refinements ──────────────────────────────────────── */
+.cp-tab {
+  font-size: 11px;
+  padding: 12px 10px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+}
+
+.cp-tab.active {
+  font-weight: 700;
+}
+
+/* ── Form field spacing improvements ─────────────────────── */
+.cp-field-group {
+  margin-bottom: 16px;
+}
+
+.cp-field-label {
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+}
+
+/* Hide REQUIRED/OPTIONAL badges to reduce visual density */
+.cp-badge-req,
+.cp-badge-opt {
+  display: none;
+}
+
+.cp-input,
+.cp-textarea,
+.cp-select {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.cp-textarea {
+  min-height: 72px;
+}
+
+/* ── View Controls (replacing raw layer checkboxes) ─────── */
+.cp-view-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cp-view-mode-group {
+  display: flex;
+  gap: 4px;
+  background: var(--kpmg-surface-container);
+  border-radius: 8px;
+  padding: 3px;
+  margin-bottom: 4px;
+}
+
+html.dark .cp-view-mode-group {
+  background: #111827;
+}
+
+.cp-view-mode-btn {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  color: var(--kpmg-on-surface-variant);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.cp-view-mode-btn:hover {
+  color: var(--kpmg-on-surface);
+}
+
+.cp-view-mode-btn.active {
+  background: var(--kpmg-surface-container-lowest);
+  color: var(--kpmg-on-surface);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+html.dark .cp-view-mode-btn.active {
+  background: #374151;
+}
+
+.cp-view-toggle-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background 0.12s ease;
+  font-size: 12px;
+  color: var(--kpmg-on-surface-variant);
+  user-select: none;
+}
+
+.cp-view-toggle-label:hover {
+  background: var(--kpmg-surface-container);
+  color: var(--kpmg-on-surface);
+}
+
+html.dark .cp-view-toggle-label:hover {
+  background: #374151;
+}
+
+.cp-view-toggle-label input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--kpmg-secondary);
+  flex-shrink: 0;
+}
+
+/* ── Calmer divider rows ──────────────────────────────────── */
+.cp-dv-vis td {
+  border-top: 1px solid var(--kpmg-outline-variant) !important;
+  padding: 6px 14px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.cp-dv-int td {
+  border-top: 1px solid var(--kpmg-outline-variant) !important;
+  padding: 6px 14px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+/* ── Empty cell refinement ────────────────────────────────── */
+.cp-empty-cell {
+  border: none;
+  font-style: italic;
+  font-size: 11px;
+  padding: 8px;
+  text-align: left;
+  color: var(--kpmg-on-surface-variant);
+  opacity: 0.5;
+}
+
+/* ── Blueprint table cell padding base ────────────────────── */
+.cp-bp-table .cp-proc-cell,
+.cp-bp-table .cp-uml-cell,
+.cp-bp-table .cp-dur-cell,
+.cp-bp-table .cp-tp-cell,
+.cp-bp-table .cp-pain-cell,
+.cp-bp-table .cp-be-cell {
+  padding: 12px;
+}
+
+/* Fix for row label padding specificity so it overrides .cp-bp-table td */
+.cp-bp-table .cp-row-label {
+  padding: 12px 10px 12px 22px;
+}
+
+/* ── Row label text improvements ─────────────────────────── */
+.cp-rl-name {
+  font-size: 12px;
+}
+
+.cp-rl-sub {
+  font-size: 10px;
+}
+
+/* ── Left panel body more breathing room ─────────────────── */
+.cp-left-body {
+  padding: 16px 16px 48px;
 }
 
 /* ── Responsive ───────────────────────────────────────────── */

@@ -101,27 +101,50 @@
 
         <!-- Page Content -->
         <main class="page-content" id="main-content" role="main">
-          <div class="current-process-page-inner">
+          <div class="current-process-page-inner animate-fade-in">
             <section class="module-hero">
               <p class="module-hero-kicker">CURRENT PROCESS</p>
               <h1 class="module-hero-title">Process Blueprint</h1>
               <p class="module-hero-sub">Map your current business process to identify bottlenecks, stakeholders, and improvement opportunities.</p>
             </section>
 
+            <!-- Summary strip (rendered by JS) -->
+            <div class="cp-summary-strip" id="cp-summary-strip">
+              <div class="cp-summary-stat">
+                <div class="cp-summary-stat-label">Process owner</div>
+                <div class="cp-summary-stat-value" id="cp-sum-owner">—</div>
+              </div>
+              <div class="cp-summary-stat">
+                <div class="cp-summary-stat-label">Steps</div>
+                <div class="cp-summary-stat-value" id="cp-sum-steps">—</div>
+              </div>
+              <div class="cp-summary-stat">
+                <div class="cp-summary-stat-label">Cycle time</div>
+                <div class="cp-summary-stat-value" id="cp-sum-time">—</div>
+              </div>
+              <div class="cp-summary-stat">
+                <div class="cp-summary-stat-label">Friction points</div>
+                <div class="cp-summary-stat-value" id="cp-sum-friction">—</div>
+              </div>
+            </div>
+
             <!-- Workspace Toolbar -->
             <div class="cp-workspace-toolbar">
-              <input type="text" class="cp-toolbar-name" id="cp-bp-name" placeholder="Process name..." />
-              <div class="cp-toolbar-sep"></div>
-              <div class="cp-zoom-ctrl">
-                <button class="cp-toolbar-btn" id="cp-zoom-out" title="Zoom out">−</button>
-                <span class="cp-zoom-label" id="cp-zoom-label">100%</span>
-                <button class="cp-toolbar-btn" id="cp-zoom-in" title="Zoom in">+</button>
-                <button class="cp-toolbar-btn" id="cp-zoom-fit" title="Fit to view">⊞</button>
+              <div class="cp-toolbar-left">
+                <input type="text" class="cp-toolbar-name" id="cp-bp-name" placeholder="Process name..." />
+                <div class="cp-toolbar-sep"></div>
+                <div class="cp-zoom-ctrl">
+                  <button class="cp-toolbar-btn" id="cp-zoom-out" title="Zoom out">−</button>
+                  <span class="cp-zoom-label" id="cp-zoom-label">100%</span>
+                  <button class="cp-toolbar-btn" id="cp-zoom-in" title="Zoom in">+</button>
+                  <button class="cp-toolbar-btn" id="cp-zoom-fit" title="Fit to view">⊞</button>
+                </div>
               </div>
-              <div class="cp-toolbar-sep"></div>
-              <button class="cp-toolbar-btn cp-toolbar-btn--primary" id="cp-export-btn">Export HTML</button>
-              <button class="cp-toolbar-btn" id="cp-clear-btn">Clear</button>
-              <span class="cp-saved-badge" id="cp-saved">Saved</span>
+              <div class="cp-toolbar-actions">
+                <button class="cp-toolbar-btn cp-toolbar-btn--primary" id="cp-export-btn">Export PDF</button>
+                <button class="cp-toolbar-btn" id="cp-clear-btn">Clear</button>
+                <span class="cp-saved-badge" id="cp-saved">Saved</span>
+              </div>
             </div>
 
             <!-- Split workspace -->
@@ -134,6 +157,11 @@
                   <button class="cp-tab" data-tab="steps">Steps</button>
                   <button class="cp-tab" data-tab="stakeholders">Stakeholders</button>
                   <button class="cp-tab" data-tab="content">Content</button>
+                  <button class="cp-panel-toggle" id="cp-toggle-panel" title="Toggle Sidebar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </button>
                 </div>
 
                 <!-- Body -->
@@ -157,8 +185,8 @@
                       <input class="cp-input" type="text" id="cp-info-owner" placeholder="e.g. Service Delivery Lead" />
                     </div>
                     <div class="cp-field-group" style="margin-top:16px">
-                      <div class="cp-field-label">Preview layers</div>
-                      <div id="cp-layers"></div>
+                      <div class="cp-field-label">View mode</div>
+                      <div class="cp-view-controls" id="cp-view-controls"></div>
                     </div>
                   </div>
 
@@ -206,6 +234,10 @@
         </main>
       </div>
     </div>
+
+    <!-- PDF Export Dependencies -->
+    <script src="../assets/vendor/jspdf.min.js"></script>
+    <script src="../assets/vendor/jspdf.plugin.autotable.min.js"></script>
 
     <script src="../assets/js/theme.js"></script>
     <script src="../assets/js/toast.js"></script>

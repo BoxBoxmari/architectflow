@@ -12,6 +12,79 @@ const CurrentProcess = (() => {
   let contentStep = null;
   let contentSubtab = 'actions';
   let zoom = 1;
+  let viewMode = 'detailed'; // 'leadership' | 'detailed'
+
+  /* ── Sample Processes ───────────────────────────────────── */
+  function buildSample() {
+    const s1 = S.uid(), s2 = S.uid(), s3 = S.uid(), s4 = S.uid();
+    const sh1 = S.uid(), sh2 = S.uid(), sh3 = S.uid();
+    const sample = S.defaultState();
+    sample.info = {
+      name: 'Client Onboarding',
+      desc: 'End-to-end onboarding for new advisory clients from engagement letter to first deliverable.',
+      org: 'KPMG Advisory',
+      owner: 'Service Delivery Lead',
+    };
+    sample.steps = [
+      { id: s1, name: 'Engagement Setup',  durTyp: '1–2 days',  durBest: '1 day',  durWorst: '4 days', durDriver: 'Partner availability', artifacts: 'Engagement letter\nConflict check log' },
+      { id: s2, name: 'KYC & Compliance',  durTyp: '3–5 days',  durBest: '2 days', durWorst: '10 days', durDriver: 'Client document speed', artifacts: 'KYC form\nRisk assessment\nAML checklist' },
+      { id: s3, name: 'Team Briefing',     durTyp: '1 day',     durBest: '0.5 days', durWorst: '2 days', durDriver: 'Availability of project lead', artifacts: 'Kick-off deck\nRACI matrix' },
+      { id: s4, name: 'First Deliverable', durTyp: '5–7 days',  durBest: '4 days', durWorst: '14 days', durDriver: 'Scope clarity and data access', artifacts: 'Diagnostic report\nStakeholder briefing note' },
+    ];
+    sample.stakeholders = [
+      { id: sh1, name: 'Partner / Director', label: 'PD', resp: 'Sign-off · Relationship', color: 'Blue' },
+      { id: sh2, name: 'Engagement Manager', label: 'EM', resp: 'Coordination · Delivery', color: 'Teal' },
+      { id: sh3, name: 'Client Contact',     label: 'CL', resp: 'Approvals · Data access', color: 'Amber' },
+    ];
+    sample.actions[s1] = {
+      [sh1]: { action: 'Signs engagement letter. Reviews conflict check output.', arrow: 'Forwards to EM', isBot: false, botNote: '' },
+      [sh2]: { action: 'Opens job code. Creates team channel. Sends welcome email.', arrow: '', isBot: false, botNote: '' },
+      [sh3]: { action: 'Countersigns engagement letter. Nominates internal point of contact.', arrow: '', isBot: false, botNote: '' },
+    };
+    sample.actions[s2] = {
+      [sh1]: { action: 'Reviews AML checklist. Approves risk rating.', arrow: '', isBot: false, botNote: '' },
+      [sh2]: { action: 'Chases client for outstanding documents. Escalates blockers.', arrow: 'Escalates if >5 days', isBot: true, botNote: 'Often blocked on client response' },
+      [sh3]: { action: 'Submits KYC documents. Provides beneficial ownership details.', arrow: '', isBot: false, botNote: '' },
+    };
+    sample.actions[s3] = {
+      [sh1]: { action: 'Sets strategic direction. Confirms scope and success criteria.', arrow: '', isBot: false, botNote: '' },
+      [sh2]: { action: 'Runs kick-off session. Distributes RACI matrix.', arrow: 'Shares action log with client', isBot: false, botNote: '' },
+      [sh3]: { action: 'Attends kick-off. Confirms data contacts and access levels.', arrow: '', isBot: false, botNote: '' },
+    };
+    sample.actions[s4] = {
+      [sh1]: { action: 'Reviews draft. Approves for release.', arrow: 'Releases to client', isBot: false, botNote: '' },
+      [sh2]: { action: 'Manages drafting cycle. Coordinates SME input.', arrow: '', isBot: true, botNote: 'Multiple revision rounds add 2–3 days' },
+      [sh3]: { action: 'Provides data. Attends interim check-in.', arrow: '', isBot: false, botNote: '' },
+    };
+    sample.touchpoints[s1] = [
+      { id: S.uid(), app: 'DocuSign',       chip: 'E-sign',    type: 'Async', dir: 'To client',  desc: 'Engagement letter signature workflow' },
+      { id: S.uid(), app: 'KPMG Conflicts', chip: 'Internal',  type: 'Sync',  dir: 'Internal',   desc: 'Conflict check system clearance' },
+    ];
+    sample.touchpoints[s2] = [
+      { id: S.uid(), app: 'Outlook',        chip: 'Email',     type: 'Async', dir: 'To client',  desc: 'KYC document request and follow-up' },
+      { id: S.uid(), app: 'SharePoint',     chip: 'Portal',    type: 'Async', dir: 'Two-way',    desc: 'Secure document upload portal' },
+    ];
+    sample.touchpoints[s3] = [
+      { id: S.uid(), app: 'Teams / Zoom',   chip: 'Meeting',   type: 'Sync',  dir: 'To client',  desc: 'Kick-off meeting and screen-share session' },
+    ];
+    sample.touchpoints[s4] = [
+      { id: S.uid(), app: 'Outlook',        chip: 'Email',     type: 'Async', dir: 'To client',  desc: 'Draft report distribution for review' },
+      { id: S.uid(), app: 'Teams',          chip: 'Chat',      type: 'Sync',  dir: 'Two-way',    desc: 'Real-time feedback and Q&A' },
+    ];
+    sample.pain[s2] = [
+      { id: S.uid(), title: 'KYC delays', types: ['DELAY', 'BOTTLENECK'], sev: 'HIGH', desc: 'Clients slow to provide KYC documents, blocking compliance clearance.', impact: 'Average 3–5 extra days added to onboarding cycle.' },
+    ];
+    sample.pain[s4] = [
+      { id: S.uid(), title: 'Revision cycle', types: ['REPETITIVE', 'OVERLOAD'], sev: 'MED', desc: 'Multiple unstructured feedback rounds on draft deliverable.', impact: 'Adds 2–3 days per engagement; increases write-off risk.' },
+    ];
+    sample.backend[s2] = [
+      { id: S.uid(), name: 'KPMG AML System', cat: 'Risk / Compliance', desc: 'Automated risk scoring and sanction screening.', dep: 'Client data must be complete before submission.' },
+    ];
+    sample.backend[s4] = [
+      { id: S.uid(), name: 'Document Management', cat: 'IT / Infra', desc: 'Versioned storage for all client deliverables.', dep: '' },
+    ];
+    return sample;
+  }
 
   /* ── DOM helper ─────────────────────────────────────────── */
   const $ = (id) => document.getElementById(id);
@@ -22,6 +95,7 @@ const CurrentProcess = (() => {
       localStorage.setItem(S.STORAGE_KEY, JSON.stringify(state));
       const badge = $('cp-saved');
       if (badge) { badge.classList.add('show'); setTimeout(() => badge.classList.remove('show'), 1500); }
+      renderSummaryStrip();
     } catch (e) { /* quota exceeded */ }
   }
 
@@ -30,9 +104,10 @@ const CurrentProcess = (() => {
       const raw = localStorage.getItem(S.STORAGE_KEY);
       if (raw) {
         const saved = JSON.parse(raw);
-        if (saved && saved.steps) state = saved;
+        if (saved && saved.steps && saved.steps.length > 0) { state = saved; return; }
       }
     } catch (e) { /* parse error */ }
+    state = buildSample();
   }
 
   /* ── Tab Switching ──────────────────────────────────────── */
@@ -91,7 +166,7 @@ const CurrentProcess = (() => {
       const artTa = detail.querySelector('#art-' + s.id);
       if (artTa) artTa.addEventListener('input', e => { s.artifacts = e.target.value; renderPreview(); save(); });
     });
-    setupDrag(el, state.steps, () => { renderSteps(); renderContent(); renderPreview(); save(); });
+    setupDrag(el, () => state.steps, () => { renderSteps(); renderContent(); renderPreview(); save(); });
   }
 
   /* ── Render: Stakeholders ───────────────────────────────── */
@@ -144,7 +219,7 @@ const CurrentProcess = (() => {
         });
       });
     });
-    setupDrag(el, state.stakeholders, () => { renderStakeholders(); renderPreview(); save(); });
+    setupDrag(el, () => state.stakeholders, () => { renderStakeholders(); renderPreview(); save(); });
   }
 
   /* ── Render: Content ────────────────────────────────────── */
@@ -257,8 +332,12 @@ const CurrentProcess = (() => {
       wrap.innerHTML = `<div class="cp-fs-head" style="background:${C.dark}14;border-bottom:1px solid ${C.border}">
         <div style="width:8px;height:8px;border-radius:50%;background:${C.dark};flex-shrink:0"></div>
         <div class="cp-fs-title" style="color:${C.dark}">${S.esc(sh.label || sh.name)}</div>
-        <span style="font-size:10px;color:var(--kpmg-on-surface-variant)">${S.esc(sh.name)}</span>
-        <span class="cp-fs-chevron">▾</span>
+        <span style="font-size:10px;color:var(--kpmg-on-surface-variant);margin-right:8px;">${S.esc(sh.name)}</span>
+        <div class="cp-item-actions">
+          <button class="cp-item-expand-btn cp-fs-chevron" title="Toggle details" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; transform: rotate(180deg);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+        </div>
       </div>
       <div class="cp-fs-body open"><div class="cp-fs-inner">
         ${mkField('Action', 'textarea', a.action, 'act-' + sh.id, 'What does this role do at this step?')}
@@ -275,7 +354,8 @@ const CurrentProcess = (() => {
       wrap.querySelector('.cp-fs-head').addEventListener('click', () => {
         const b = wrap.querySelector('.cp-fs-body');
         b.classList.toggle('open');
-        wrap.querySelector('.cp-fs-chevron').textContent = b.classList.contains('open') ? '▴' : '▾';
+        const svg = wrap.querySelector('.cp-fs-chevron svg');
+        if(svg) svg.style.transform = b.classList.contains('open') ? 'rotate(180deg)' : '';
       });
 
       const ensure = () => {
@@ -330,7 +410,6 @@ const CurrentProcess = (() => {
       let html = '<th class="cp-step-col"><div class="cp-sh-cell">';
       html += '<span class="cp-sh-num">STEP ' + (i + 1) + '</span>';
       html += '<span class="cp-sh-name">' + S.esc(s.name || 'Untitled') + '</span>';
-      if (s.durTyp) html += '<span class="cp-sh-dur">' + S.esc(s.durTyp) + '</span>';
       html += '</div></th>';
       return html;
     }).join('');
@@ -441,7 +520,7 @@ const CurrentProcess = (() => {
             rows += '<div class="cp-pain-title">' + (p.sev === 'HIGH' ? '⚠ ' : '') + S.esc(p.title || 'Untitled') + '</div>';
             if ((p.types || []).length) {
               rows += '<div class="cp-pain-tags-row">';
-              p.types.forEach(t => rows += '<span class="cp-pain-tag" style="background:rgba(200,75,90,0.1);color:' + (sevColors[p.sev] || '#666') + '">' + S.esc(t) + '</span>');
+              p.types.forEach(t => rows += '<span class="cp-pain-tag cp-pain-sev-' + (p.sev || 'low').toLowerCase() + '">' + S.esc(t) + '</span>');
               rows += '</div>';
             }
             if (p.desc) rows += '<div class="cp-pain-desc-preview">' + S.esc(p.desc) + '</div>';
@@ -466,7 +545,7 @@ const CurrentProcess = (() => {
         if (bes.length) {
           bes.forEach(b => {
             rows += '<div class="cp-be-card">';
-            if (b.cat) rows += '<span class="cp-be-badge" style="background:rgba(243,156,18,0.1);color:#92400E;border-color:rgba(243,156,18,0.3)">' + S.esc(b.cat) + '</span>';
+            if (b.cat) rows += '<span class="cp-be-badge">' + S.esc(b.cat) + '</span>';
             rows += '<div class="cp-be-desc"><strong>' + S.esc(b.name || '') + '</strong>' + (b.desc ? ' — ' + S.esc(b.desc) : '') + '</div>';
             if (b.dep) rows += '<div class="cp-be-dep">Depends on: ' + S.esc(b.dep) + '</div>';
             rows += '</div>';
@@ -480,28 +559,64 @@ const CurrentProcess = (() => {
     }
 
     pv.innerHTML = '<table class="cp-bp-table"><thead><tr><th class="cp-label-col"></th>' + stepCols + '</tr></thead><tbody>' + rows + '</tbody></table>';
+    renderSummaryStrip();
+  }
+
+  /* ── Summary Strip ──────────────────────────────────────── */
+  function renderSummaryStrip() {
+    const ownerEl    = document.getElementById('cp-sum-owner');
+    const stepsEl    = document.getElementById('cp-sum-steps');
+    const timeEl     = document.getElementById('cp-sum-time');
+    const frictionEl = document.getElementById('cp-sum-friction');
+    if (!ownerEl) return;
+
+    ownerEl.textContent = state.info.owner || state.info.org || '—';
+    stepsEl.textContent = state.steps.length || '—';
+
+    // Aggregate typical durations (numeric days only)
+    let totalDays = 0, hasDur = false;
+    state.steps.forEach(s => {
+      const m = (s.durTyp || '').match(/(\d+)/);
+      if (m) { totalDays += parseInt(m[1]); hasDur = true; }
+    });
+    timeEl.textContent = hasDur ? totalDays + '+ days' : '—';
+
+    // Count pain points across all steps
+    let frictionCount = 0;
+    Object.values(state.pain).forEach(arr => { frictionCount += (arr || []).length; });
+    frictionEl.textContent = frictionCount || '—';
   }
 
   /* ── Item Row Factory ───────────────────────────────────── */
   function makeItemRow(item, type, idx) {
     const wrap = document.createElement('div');
-    wrap.className = 'cp-item-row'; wrap.dataset.id = item.id; wrap.draggable = true;
+    wrap.className = 'cp-item-row'; wrap.dataset.id = item.id;
+    // draggable is enabled dynamically via the handle mousedown (see setupDrag)
     let expanded = false;
-    wrap.innerHTML = `<div class="cp-drag-handle" title="Drag to reorder">⠿</div>
+    wrap.innerHTML = `<div class="cp-drag-handle" title="Drag to reorder">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+      </div>
       <div class="cp-item-content">
         <div class="cp-item-name-row"><span class="cp-item-name"></span></div>
         <span class="cp-item-sub"></span>
         <div class="cp-item-detail"><div class="cp-item-detail-inner"></div></div>
       </div>
-      <button class="cp-item-expand-btn" title="Expand">▾</button>
-      <button class="cp-item-del" title="Delete">✕</button>`;
+      <div class="cp-item-actions">
+        <button class="cp-item-expand-btn" title="Toggle details">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <button class="cp-item-del" title="Delete">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>`;
 
     const expandBtn = wrap.querySelector('.cp-item-expand-btn');
     const detail = wrap.querySelector('.cp-item-detail');
     expandBtn.addEventListener('click', () => {
       expanded = !expanded;
       detail.classList.toggle('open', expanded);
-      expandBtn.textContent = expanded ? '▴' : '▾';
+      const svg = expandBtn.querySelector('svg');
+      if(svg) svg.style.transform = expanded ? 'rotate(180deg)' : '';
     });
 
     wrap.querySelector('.cp-item-del').addEventListener('click', () => {
@@ -527,39 +642,111 @@ const CurrentProcess = (() => {
   }
 
   /* ── Drag & Drop ────────────────────────────────────────── */
-  function setupDrag(container, dataArr, onChange) {
-    let dragId = null, overEl = null;
+  function setupDrag(container, getArray, onChange) {
+    if (container.dataset.dragInit) {
+      container._dragOnChange = onChange;
+      container._dragGetArray = getArray;
+      return;
+    }
+    container.dataset.dragInit = 'true';
+    container._dragOnChange = onChange;
+    container._dragGetArray = getArray;
+
+    let dragId = null, overEl = null, activeRow = null;
+
+    // ── Enable draggable only via handle mousedown ──────────
+    // Prevents browser from treating text/input clicks as a drag.
+    container.addEventListener('mousedown', e => {
+      const handle = e.target.closest('.cp-drag-handle');
+      const row    = e.target.closest('.cp-item-row');
+      if (handle && row) {
+        row.draggable = true;
+        activeRow = row;
+      }
+      // Note: do NOT reset draggable=false here on non-handle clicks —
+      // that would cancel the drag before dragstart fires.
+    });
+
+    // Reset draggable on mouseup (if drag never started)
+    document.addEventListener('mouseup', () => {
+      if (activeRow) { activeRow.draggable = false; activeRow = null; }
+    });
+
+    // ── dragstart ───────────────────────────────────────────
     container.addEventListener('dragstart', e => {
       const row = e.target.closest('.cp-item-row');
-      if (!row) return;
+      if (!row || !row.draggable) { e.preventDefault(); return; }
+
       dragId = row.dataset.id;
       row.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', dragId);
+
+      // Ghost: clone the collapsed card header.
+      // KEY: opacity must be > 0 (use 1 + top:-500px) so the browser
+      // can render and capture the snapshot for setDragImage.
+      // opacity:0 produces a fully transparent ghost and the browser
+      // falls back to showing the entire draggable element.
+      const ghost = row.cloneNode(true);
+      const detail = ghost.querySelector('.cp-item-detail');
+      if (detail) detail.remove();
+      ghost.classList.remove('dragging');
+      ghost.style.cssText = [
+        'position:fixed',
+        'top:-500px',          // off-screen above viewport — user won't see it
+        'left:0',
+        'opacity:1',           // MUST be > 0 for browser snapshot to work
+        `width:${row.offsetWidth}px`,
+        'pointer-events:none',
+        'z-index:99999',
+        'border-radius:12px',
+        'box-shadow:0 8px 28px rgba(0,0,0,.45)',
+        'transform:rotate(-1.5deg) scale(1.03)',
+        'background:var(--kpmg-surface-container-lowest,#1f2937)',
+        'border:1px solid rgba(96,165,250,.4)',
+      ].join(';');
+      document.body.appendChild(ghost);
+      void ghost.offsetWidth; // force reflow so dimensions are accurate
+      e.dataTransfer.setDragImage(ghost, Math.round(ghost.offsetWidth / 2), 28);
+      // Wait 100ms before removing — browser needs time to capture the snapshot
+      setTimeout(() => ghost.remove(), 100);
     });
+
+    // ── dragend ─────────────────────────────────────────────
     container.addEventListener('dragend', () => {
-      container.querySelectorAll('.cp-item-row').forEach(r => r.classList.remove('dragging', 'drag-over'));
-      dragId = null; overEl = null;
+      container.querySelectorAll('.cp-item-row').forEach(r => {
+        r.classList.remove('dragging', 'drag-over');
+        r.draggable = false;
+      });
+      dragId = null; overEl = null; activeRow = null;
     });
+
+    // ── dragover (required to allow drop) ───────────────────
     container.addEventListener('dragover', e => {
-      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
       const row = e.target.closest('.cp-item-row');
       if (!row || row.dataset.id === dragId) return;
       if (overEl && overEl !== row) overEl.classList.remove('drag-over');
-      overEl = row; row.classList.add('drag-over');
+      overEl = row;
+      row.classList.add('drag-over');
     });
+
+    // ── drop ────────────────────────────────────────────────
     container.addEventListener('drop', e => {
       e.preventDefault();
       const targetId = overEl?.dataset.id;
       if (!targetId || targetId === dragId) return;
-      const fi = dataArr.findIndex(x => x.id === dragId);
-      const ti = dataArr.findIndex(x => x.id === targetId);
+      const arr = container._dragGetArray();
+      const fi = arr.findIndex(x => x.id === dragId);
+      const ti = arr.findIndex(x => x.id === targetId);
       if (fi < 0 || ti < 0) return;
-      const [item] = dataArr.splice(fi, 1);
-      dataArr.splice(ti, 0, item);
-      onChange();
+      const [moved] = arr.splice(fi, 1);
+      arr.splice(ti, 0, moved);
+      container._dragOnChange();
     });
   }
+
 
   /* ── Field Builders ─────────────────────────────────────── */
   function mkField(label, type, val, id, placeholder) {
@@ -580,7 +767,7 @@ const CurrentProcess = (() => {
     $('cp-zoom-in')?.addEventListener('click', () => { zoom = Math.min(zoom + 0.1, 3); applyZoom(); });
     $('cp-zoom-out')?.addEventListener('click', () => { zoom = Math.max(zoom - 0.1, 0.2); applyZoom(); });
     $('cp-zoom-fit')?.addEventListener('click', () => {
-      const table = pv.querySelector('.cp-bp-table');
+      const table = $('cp-preview').querySelector('.cp-bp-table');
       if (!table) { zoom = 1; applyZoom(); return; }
       const fit = Math.min((outer.clientWidth - 40) / table.offsetWidth, (outer.clientHeight - 40) / table.offsetHeight, 2);
       zoom = Math.max(0.2, fit); applyZoom();
@@ -604,7 +791,67 @@ const CurrentProcess = (() => {
     if (label) label.textContent = Math.round(zoom * 100) + '%';
   }
 
-  /* ── Layer Toggles ──────────────────────────────────────── */
+  /* ── View Controls ──────────────────────────────────────── */
+  function initViewControls() {
+    const el = $('cp-view-controls');
+    if (!el) {
+      initLayers();
+      return;
+    }
+    el.innerHTML = '';
+
+    // Mode group: Leadership / Detailed
+    const modeGroup = document.createElement('div');
+    modeGroup.className = 'cp-view-mode-group';
+    ['Leadership', 'Detailed'].forEach(mode => {
+      const btn = document.createElement('button');
+      btn.className = 'cp-view-mode-btn' + (viewMode === mode.toLowerCase() ? ' active' : '');
+      btn.textContent = mode + ' view';
+      btn.addEventListener('click', () => {
+        viewMode = mode.toLowerCase();
+        el.querySelectorAll('.cp-view-mode-btn').forEach(b => b.classList.toggle('active', b === btn));
+        if (viewMode === 'leadership') {
+          state.layers.pain    = false;
+          state.layers.backend = false;
+        } else {
+          state.layers.pain    = true;
+          state.layers.backend = true;
+        }
+        el.querySelectorAll('.cp-view-toggle-label input').forEach(inp => {
+          inp.checked = state.layers[inp.dataset.key] !== false;
+        });
+        renderPreview(); save();
+      });
+      modeGroup.appendChild(btn);
+    });
+    el.appendChild(modeGroup);
+
+    // Individual toggles for pain / backend / touchpoint
+    const toggleLayers = [
+      { key: 'pain',       label: 'Show pain points' },
+      { key: 'backend',    label: 'Show systems' },
+      { key: 'touchpoint', label: 'Show touchpoints' },
+    ];
+    toggleLayers.forEach(l => {
+      const label = document.createElement('label');
+      label.className = 'cp-view-toggle-label';
+      const span = document.createElement('span');
+      span.textContent = l.label;
+      const inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.dataset.key = l.key;
+      inp.checked = state.layers[l.key] !== false;
+      inp.addEventListener('change', e => {
+        state.layers[l.key] = e.target.checked;
+        renderPreview(); save();
+      });
+      label.appendChild(span);
+      label.appendChild(inp);
+      el.appendChild(label);
+    });
+  }
+
+  /* ── Layer Toggles (legacy fallback) ──────────────────── */
   function initLayers() {
     const el = $('cp-layers');
     if (!el) return;
@@ -618,25 +865,215 @@ const CurrentProcess = (() => {
     });
   }
 
-  /* ── Export HTML ─────────────────────────────────────────── */
-  function exportHTML() {
-    const preview = $('cp-preview').innerHTML;
-    const name = state.info.name || 'Process Blueprint';
-    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${S.esc(name)}</title>
-<style>body{font-family:'Inter',system-ui,sans-serif;background:#FAFAFA;padding:24px;min-width:900px}
-.cp-bp-table{border-collapse:collapse;border:1px solid #D8D8D4;border-radius:10px;overflow:hidden;table-layout:fixed}
-.cp-bp-table th,.cp-bp-table td{border:0.5px solid #D8D8D4;vertical-align:top;padding:0}
-.cp-label-col{width:112px}.cp-step-col{min-width:200px;width:200px}</style>
-</head><body>
-<div style="margin-bottom:16px"><h1 style="font-size:18px;font-weight:600">${S.esc(name)}</h1>${state.info.org ? '<div style="font-size:11px;color:#6B6B6B;margin-top:2px">' + S.esc(state.info.org) + '</div>' : ''}</div>
-<div style="overflow-x:auto">${preview}</div>
-</body></html>`;
-    const blob = new Blob([html], { type: 'text/html' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = name.replace(/[^a-zA-Z0-9]/g, '_') + '-blueprint.html';
-    a.click();
-    if (window.Toast) Toast.show('Blueprint exported');
+  /* ── Export PDF ──────────────────────────────────────────── */
+  async function exportPDF() {
+    const btn = $('cp-export-btn');
+    if (!btn) return;
+    btn.textContent = 'Generating...';
+    btn.disabled = true;
+
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const margin = 14;
+      let y = 0;
+
+      // Colors matching KPMG styling from other sheets
+      const NAVY = [0, 32, 95];
+      const BLUE = [0, 99, 151];
+      const TEAL = [0, 184, 169];
+      const AMBER = [243, 156, 18];
+      const GREEN = [15, 110, 86];
+      const LIGHT_BG = [252, 249, 248];
+      const BORDER = [235, 231, 231];
+      const TEXT = [28, 27, 27];
+      const MUTED = [116, 118, 131];
+      const WHITE = [255, 255, 255];
+      
+      const processName = state.info.name || 'Process Blueprint';
+      const processOrg = state.info.org || 'N/A';
+      const processOwner = state.info.owner || 'N/A';
+      const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      function addPageHeader() {
+        doc.setFillColor(NAVY[0], NAVY[1], NAVY[2]);
+        doc.rect(0, 0, pageW, 12, 'F');
+        doc.setFontSize(7);
+        doc.setTextColor(WHITE[0], WHITE[1], WHITE[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.text('KPMG AI Intelligence Hub', margin, 8);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Process Blueprint — ' + processName, pageW - margin, 8, { align: 'right' });
+        y = 20;
+      }
+
+      function checkPageBreak(needed) {
+        if (y + needed > pageH - 16) { doc.addPage(); addPageHeader(); }
+      }
+
+      // Title & Summary
+      addPageHeader();
+      
+      doc.setFontSize(18);
+      doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+      doc.setFont('helvetica', 'bold');
+      doc.text(processName, margin, y + 5);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.setFont('helvetica', 'normal');
+      doc.text(state.info.desc || 'No description provided', margin, y + 12, { maxWidth: pageW - margin * 2 });
+      
+      y += 24;
+
+      doc.setFillColor(LIGHT_BG[0], LIGHT_BG[1], LIGHT_BG[2]);
+      doc.roundedRect(margin, y, pageW - margin * 2, 16, 2, 2, 'F');
+      
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(NAVY[0], NAVY[1], NAVY[2]);
+      doc.text('OWNER', margin + 4, y + 6);
+      doc.text('STEPS', margin + 60, y + 6);
+      doc.text('ORGANISATION', margin + 116, y + 6);
+      doc.text('DATE', margin + 172, y + 6);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
+      doc.text(processOwner, margin + 4, y + 12);
+      doc.text(state.steps.length.toString(), margin + 60, y + 12);
+      doc.text(processOrg, margin + 116, y + 12);
+      doc.text(dateStr, margin + 172, y + 12);
+      
+      y += 24;
+
+      if (state.steps.length === 0) {
+        doc.setFontSize(10);
+        doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+        doc.text('No steps defined yet.', margin, y);
+      } else {
+        // Build autoTable headers
+        const headRow = ['Layer'];
+        state.steps.forEach((step, i) => {
+           headRow.push(`STEP ${i+1}\n${step.name}`);
+        });
+
+        const bodyData = [];
+
+        // Stakeholders
+        state.stakeholders.forEach(sh => {
+           const row = [`${sh.label}\n${sh.name}\n${sh.resp}`];
+           state.steps.forEach(step => {
+              const act = state.actions[step.id]?.[sh.id];
+              let cellTxt = '';
+              if (act) {
+                 cellTxt = act.action;
+                 if (act.isBot) cellTxt += '\n\n[!] Bottleneck: ' + (act.botNote || '');
+                 if (act.arrow) cellTxt += '\n\n-> ' + act.arrow;
+              }
+              row.push(cellTxt);
+           });
+           bodyData.push(row);
+        });
+
+        // Duration Layer
+        if (state.layers.dur !== false) {
+           const durRow = ['Duration'];
+           state.steps.forEach(step => {
+              let cellTxt = step.durTyp ? `Type: ${step.durTyp}` : '';
+              if (step.durBest || step.durWorst) {
+                 if (cellTxt) cellTxt += '\n';
+                 cellTxt += `Range: ${step.durBest} - ${step.durWorst}`;
+              }
+              if (step.durDriver) {
+                 if (cellTxt) cellTxt += '\n';
+                 cellTxt += `Driver: ${step.durDriver}`;
+              }
+              durRow.push(cellTxt);
+           });
+           bodyData.push(durRow);
+        }
+
+        // Documents Layer
+        if (state.layers.docs !== false) {
+           const docRow = ['Documents & Inputs'];
+           state.steps.forEach(step => {
+              docRow.push(step.artifacts || '');
+           });
+           bodyData.push(docRow);
+        }
+
+        // Touchpoints Layer
+        if (state.layers.tp !== false) {
+           const tpRow = ['Touchpoints'];
+           state.steps.forEach(step => {
+              const tps = state.touchpoints[step.id] || [];
+              const cellTxt = tps.map(tp => `[${tp.chip}] ${tp.type} - ${tp.dir}\nApp: ${tp.app}\n${tp.desc}`).join('\n\n');
+              tpRow.push(cellTxt);
+           });
+           bodyData.push(tpRow);
+        }
+
+        // Pain Points Layer
+        if (state.layers.pain !== false) {
+           const painRow = ['Pain Points'];
+           state.steps.forEach(step => {
+              const pains = state.pain[step.id] || [];
+              const cellTxt = pains.map(p => `[${p.sev}] ${p.title}\nTypes: ${(p.types||[]).join(', ')}\nImpact: ${p.impact}`).join('\n\n');
+              painRow.push(cellTxt);
+           });
+           bodyData.push(painRow);
+        }
+
+        // Backend Layer
+        if (state.layers.backend !== false) {
+           const beRow = ['Backend Systems'];
+           state.steps.forEach(step => {
+              const bes = state.backend[step.id] || [];
+              const cellTxt = bes.map(b => `[${b.cat}] ${b.name}\n${b.desc}\nDep: ${b.dep}`).join('\n\n');
+              beRow.push(cellTxt);
+           });
+           bodyData.push(beRow);
+        }
+
+        doc.autoTable({
+          startY: y,
+          head: [headRow],
+          body: bodyData,
+          margin: { left: margin, right: margin },
+          styles: { fontSize: 8, cellPadding: 3, textColor: TEXT, lineColor: BORDER, lineWidth: 0.1 },
+          headStyles: { fillColor: NAVY, textColor: WHITE, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: LIGHT_BG },
+          columnStyles: { 0: { cellWidth: 35, fontStyle: 'bold', textColor: NAVY } },
+          didDrawPage: function () { addPageHeader(); },
+        });
+        
+        y = doc.lastAutoTable.finalY + 10;
+      }
+
+      // Footer
+      var totalPages = doc.internal.getNumberOfPages();
+      for (var p = 1; p <= totalPages; p++) {
+        doc.setPage(p);
+        doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+        doc.text('Page ' + p + ' of ' + totalPages + '  |  KPMG AI Intelligence Hub', pageW / 2, pageH - 7, { align: 'center' });
+      }
+
+      const fileName = processName.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf';
+      doc.save(fileName);
+
+      if (window.Toast) Toast.showToast('success', 'Blueprint PDF downloaded');
+    } catch (e) {
+      console.error(e);
+      if (window.Toast) Toast.showToast('error', 'PDF export failed', { description: e.message });
+    } finally {
+      if (btn) {
+        btn.textContent = 'Export PDF';
+        btn.disabled = false;
+      }
+    }
   }
 
   /* ── Clear Workspace ────────────────────────────────────── */
@@ -647,11 +1084,13 @@ const CurrentProcess = (() => {
     save();
     switchTab('info');
     renderPreview();
-    if (window.Toast) Toast.show('Workspace cleared');
+    if (window.Toast) Toast.showToast('success', 'Workspace cleared');
   }
 
   /* ── Init ───────────────────────────────────────────────── */
   function init() {
+    if (window.AppShell) AppShell.init();
+    if (typeof ThemeManager !== 'undefined') ThemeManager.initTheme();
     load();
 
     // Tabs
@@ -707,12 +1146,24 @@ const CurrentProcess = (() => {
     });
 
     // Export & Clear
-    $('cp-export-btn')?.addEventListener('click', exportHTML);
+    $('cp-export-btn')?.addEventListener('click', exportPDF);
     $('cp-clear-btn')?.addEventListener('click', clearWorkspace);
+    
+    // Toggle Left Panel
+    $('cp-toggle-panel')?.addEventListener('click', () => {
+      const ws = document.querySelector('.cp-workspace');
+      const tb = document.querySelector('.cp-workspace-toolbar');
+      if (ws) ws.classList.toggle('left-panel-collapsed');
+      if (tb) tb.classList.toggle('left-panel-collapsed');
+    });
 
     initZoom();
-    initLayers();
+    initViewControls();
     renderPreview();
+
+    // Sync toolbar name if state loaded
+    const bpName2 = $('cp-bp-name');
+    if (bpName2 && state.info.name) bpName2.value = state.info.name;
   }
 
   const pv = null; // will be resolved at runtime via $

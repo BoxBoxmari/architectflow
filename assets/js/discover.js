@@ -274,6 +274,33 @@ const Discover = (() => {
     $('discover-port-proof').textContent = 'That\'s equivalent to ' + fte.toFixed(1) + ' full-time employees freed every month — without adding headcount.';
   }
 
+  /* ── Summary Strip ──────────────────────────────────────── */
+  function renderSummaryStrip() {
+    const strip = $('discover-summary-strip');
+    if (!strip) return;
+    if (state.portfolio.length === 0) {
+      strip.classList.remove('visible');
+      return;
+    }
+    // Compute total annual value
+    let totalCost = 0;
+    state.portfolio.forEach(p => {
+      const hrs = D.calcHoursSaved(p.people, p.freq, p.time, p.save);
+      totalCost += D.calcMonthlyCost(hrs);
+    });
+    // First workflow name as the "selected workflow" label
+    const firstWf = state.portfolio[0];
+    const wfName  = firstWf ? firstWf.name : '—';
+    const whyText = state.portfolio.length > 1
+      ? state.portfolio.length + ' workflows selected across ' + state.fnName
+      : 'Highest-impact opportunity in ' + state.fnName;
+    const el = id => document.getElementById(id);
+    if (el('dss-workflow')) el('dss-workflow').textContent = wfName;
+    if (el('dss-why'))      el('dss-why').textContent      = whyText;
+    if (el('dss-value'))   el('dss-value').textContent    = D.formatCurrency(totalCost * 12) + '/yr';
+    strip.classList.add('visible');
+  }
+
   /* ── Step 5: Blueprint ──────────────────────────────────── */
   function renderBlueprint() {
     $('discover-bp-list').innerHTML = $('discover-port-list').innerHTML;
@@ -289,6 +316,7 @@ const Discover = (() => {
     $('discover-bp-total-hrs').textContent = D.formatNumber(totalHrs) + ' hours/month recovered';
     $('discover-bp-cases').textContent = state.portfolio.length;
     $('discover-bp-fte').textContent = D.calcFTE(totalHrs).toFixed(1);
+    renderSummaryStrip();
   }
 
   /* ── Flow Navigation ────────────────────────────────────── */
@@ -304,6 +332,7 @@ const Discover = (() => {
         show(3);
       } else {
         buildPortfolio();
+        renderSummaryStrip();
         show(4);
       }
     }
@@ -375,6 +404,9 @@ const Discover = (() => {
 
   /* ── Init ───────────────────────────────────────────────── */
   function init() {
+    if (window.AppShell) AppShell.init();
+    if (typeof ThemeManager !== 'undefined') ThemeManager.initTheme();
+    
     initFunctions();
     initPains();
 

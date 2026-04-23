@@ -89,3 +89,6 @@ const ThemeManager = (() => {
 
   return { initTheme, setThemeMode, getThemeMode, onChange };
 })();
+
+// Expose on window — same reason as AppShell: `const` does not attach to window.
+window.ThemeManager = ThemeManager;

@@ -92,3 +92,7 @@ const AppShell = (() => {
 
   return { init };
 })();
+
+// Expose on window so other page scripts can guard with `if (window.AppShell)`.
+// `const` declarations do NOT become window properties — only `var` does.
+window.AppShell = AppShell;
