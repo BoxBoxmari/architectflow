@@ -27,6 +27,8 @@ npx serve . -p 4028
 | `/`                      | Redirects → `/value-simulator/` |
 | `/value-simulator/`      | AI Value Simulator              |
 | `/scaling-ai-framework/` | Scaling AI Framework            |
+| `/discover/`             | Discover (Gate 1)               |
+| `/current-process/`      | Current Process                 |
 
 ---
 
@@ -39,6 +41,10 @@ architectflow/
 │   └── index.html                    # Value Simulator page
 ├── scaling-ai-framework/
 │   └── index.html                    # Scaling AI Framework page
+├── discover/
+│   └── index.html                    # Discover (Gate 1) page
+├── current-process/
+│   └── index.html                    # Current Process page
 ├── assets/
 │   ├── css/
 │   │   ├── tokens.css                # Design tokens (colors, fonts, shadows)
@@ -46,12 +52,16 @@ architectflow/
 │   │   ├── layout.css                # App shell, sidebar, topbar, content area
 │   │   ├── components.css            # Buttons, cards, sliders, charts, toasts
 │   │   └── pages/
+│   │       ├── discover.css          # Page-specific styles (discover)
+│   │       ├── current-process.css   # Page-specific styles (current process)
 │   │       ├── value-simulator.css   # Page-specific styles (simulator)
 │   │       └── scaling-ai-framework.css  # Page-specific styles (framework)
 │   ├── js/
 │   │   ├── simulator-core.js         # Pure calculation engine (no DOM)
 │   │   ├── simulator-ui.js           # Render functions + static definitions
 │   │   ├── value-simulator.js        # Page driver: state, events, exports
+│   │   ├── discover.js               # Page driver: Discover (Gate 1)
+│   │   ├── current-process.js        # Page driver: Current Process
 │   │   ├── framework-data.js         # Framework content (single source of truth)
 │   │   ├── scaling-ai-framework.js  # Page driver: PDF export, init
 │   │   ├── chart-bar.js              # Bar chart renderer
@@ -68,6 +78,7 @@ architectflow/
 ├── firebase.json                     # Firebase Hosting config
 ├── wrangler.jsonc                    # Cloudflare Pages config
 ├── package.json
+├── package-lock.json                 # Dev-only tooling lockfile
 ├── GUARDRAILS.md                     # Hard constraints for this project
 └── ARCHITECTURE.md                   # Detailed technical reference
 ```
@@ -121,6 +132,13 @@ value-simulator.js    ← depends on: simulator-core.js, simulator-ui.js,
                          export-utils.js, theme.js, app-shell.js, toast.js
 scaling-ai-framework.js ← depends on: framework-data.js, jspdf, theme.js,
                            app-shell.js, toast.js
+discover.js           ← depends on: theme.js, app-shell.js, toast.js, (discover-gate1-*.js)
+current-process.js    ← depends on: theme.js, app-shell.js, toast.js
+
+discover-gate1-calc.js   ← no dependencies (pure functions)
+discover-gate1-data.js   ← no dependencies (static defs)
+discover-gate1-render.js ← depends on: discover-gate1-calc.js, discover-gate1-data.js
+discover-gate1-state.js  ← depends on: discover-gate1-calc.js, discover-gate1-data.js
 ```
 
 ---
