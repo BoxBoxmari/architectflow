@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Logs
 npm-debug.log*
@@ -18,3 +17,24 @@ coverage/
 
 # AI Agent
 .agent/
+
+# Cursor / IDE
+.cursor/
+.vscode/
+.idea/
+
+# Local python env
+.venv/
+
+# Local artifacts
+tmp/
+test-results/
+playwright-report/
+
+# Local notes
+openmemory.md
+todos.md
+
+# One-off exports
+Gate1_Mapping_Matrix*.xlsx
+gate1-v3*.html

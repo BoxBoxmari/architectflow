@@ -196,7 +196,7 @@
             <span class="topbar-context-value">Vietnam &amp; Cambodia</span>
             <span class="topbar-context-dot">·</span>
             <span class="topbar-context-label"
-              >Illustrative management view</span
+              >Management view</span
             >
           </div>
           <div class="theme-toggle" role="radiogroup" aria-label="Theme">
@@ -266,350 +266,120 @@
 
         <!-- Page Content -->
         <main class="page-content" id="main-content" role="main">
-          <div class="page-inner">
+          <div class="page-inner animate-fade-in">
             <section class="module-hero">
               <p class="module-hero-kicker">DISCOVER</p>
               <h1 class="module-hero-title">AI Value Discovery</h1>
               <p class="module-hero-sub">
-                Identify and prioritise the most valuable AI use cases for your
-                team.
+                Advisory intake to size opportunity and produce an evidence-backed
+                management signal.
               </p>
             </section>
 
-            <!-- Summary strip — shown by JS in steps 4 and 5 -->
-            <div
-              class="discover-summary-strip"
-              id="discover-summary-strip"
-              aria-live="polite"
-            >
-              <div class="discover-summary-cell">
-                <div class="discover-summary-cell-label">Selected workflow</div>
-                <div class="discover-summary-cell-value" id="dss-workflow">
-                  —
-                </div>
-              </div>
-              <div class="discover-summary-cell">
-                <div class="discover-summary-cell-label">Why it matters</div>
-                <div class="discover-summary-cell-value" id="dss-why">—</div>
-              </div>
-              <div class="discover-summary-cell">
-                <div class="discover-summary-cell-label">
-                  Projected annual value
-                </div>
-                <div class="discover-summary-cell-value" id="dss-value">—</div>
-              </div>
-              <div class="discover-summary-cell" style="flex: 0 0 auto">
-                <div class="discover-summary-cell-label">Next step</div>
-                <a
-                  href="../current-process/"
-                  class="discover-summary-cta"
-                  id="dss-cta"
-                  >Map current process →</a
-                >
-              </div>
-            </div>
-
             <section class="discover-flow" aria-live="polite">
-              <!-- STEP 0: Choose function -->
+              <!-- STEP 1: Function + service -->
               <div class="discover-step active" id="ds0">
-                <div class="discover-step-label">Let's start</div>
-                <div class="discover-step-title">
-                  Which function do you lead?
-                </div>
-                <div class="discover-step-sub">
-                  We'll tailor everything to your team's context.
-                </div>
-                <div class="discover-func-grid" id="discover-func-grid"></div>
-              </div>
-
-              <!-- STEP 1: Pain points -->
-              <div class="discover-step" id="ds1">
                 <div class="discover-step-label">Step 1</div>
-                <div class="discover-step-title">
-                  What slows your team down the most?
-                </div>
+                <div class="discover-step-title">Select function and service</div>
                 <div class="discover-step-sub">
-                  Pick 2–3 pain areas. We'll map them to AI opportunities.
+                  Which function are you in? Tap your function, then select your service.
                 </div>
-                <div class="discover-pain-grid" id="discover-pain-grid"></div>
-                <div
-                  class="discover-social-proof"
-                  id="discover-proof"
-                  style="display: none"
-                ></div>
+                <div class="g1-step1">
+                  <div class="g1-col">
+                    <div class="g1-col-title">Function</div>
+                    <div class="g1-fn-grid" id="g1-fn-grid"></div>
+                  </div>
+                  <div class="g1-col">
+                    <div class="g1-col-title">Service</div>
+                    <div class="g1-svc-list" id="g1-svc-list"></div>
+                  </div>
+                </div>
               </div>
 
-              <!-- STEP 2: Workflow selection -->
-              <div class="discover-step" id="ds2">
+              <!-- STEP 2: Goals -->
+              <div class="discover-step" id="ds1">
                 <div class="discover-step-label">Step 2</div>
-                <div class="discover-step-title">
-                  Which workflows should AI tackle first?
+                <div class="discover-step-title">Management goals</div>
+                <div class="discover-step-sub" id="g1-goals-helper">
+                  What do you want to achieve? Select up to two management goals.
                 </div>
-                <div class="discover-step-sub">
-                  Based on your pain areas, here are the highest-impact
-                  candidates. Pick 1–3.
-                </div>
-                <div class="discover-wf-list" id="discover-wf-list"></div>
+                <div class="g1-goals-grid" id="g1-goals-grid"></div>
                 <div
-                  class="discover-insight-bar"
-                  id="discover-wf-insight"
-                  style="display: none"
-                >
-                  <div class="discover-insight-text">
-                    Selected workflows affect an estimated
-                  </div>
-                  <div
-                    class="discover-insight-num"
-                    id="discover-wf-insight-num"
-                  >
-                    --
-                  </div>
-                  <div class="discover-insight-text">
-                    <strong>hours per month</strong> across your team
-                  </div>
-                </div>
-              </div>
-
-              <!-- STEP 3: Size it -->
-              <div class="discover-step" id="ds3">
-                <div class="discover-step-label" id="ds3-label">Step 3</div>
-                <div class="discover-step-title" id="ds3-title">
-                  Let's size it
-                </div>
-                <div class="discover-step-sub" id="ds3-sub">
-                  Adjust the estimates to match your reality.
-                </div>
-
-                <div class="discover-slider-group">
-                  <div class="discover-slider-header">
-                    <span class="discover-slider-label"
-                      >People who do this task</span
-                    >
-                    <span class="discover-slider-val" id="ds3-vPeople">20</span>
-                  </div>
-                  <input
-                    type="range"
-                    class="discover-range"
-                    min="1"
-                    max="500"
-                    value="20"
-                    step="1"
-                    id="ds3-rPeople"
-                  />
-                </div>
-
-                <div class="discover-slider-group">
-                  <div class="discover-slider-header">
-                    <span class="discover-slider-label"
-                      >Times per person per month</span
-                    >
-                    <span class="discover-slider-val" id="ds3-vFreq">8</span>
-                  </div>
-                  <input
-                    type="range"
-                    class="discover-range"
-                    min="1"
-                    max="200"
-                    value="8"
-                    step="1"
-                    id="ds3-rFreq"
-                  />
-                </div>
-
-                <div class="discover-slider-group">
-                  <div class="discover-slider-header">
-                    <span class="discover-slider-label"
-                      >Current time per task</span
-                    >
-                    <span class="discover-slider-val" id="ds3-vTime"
-                      >30 min</span
-                    >
-                  </div>
-                  <input
-                    type="range"
-                    class="discover-range"
-                    min="5"
-                    max="240"
-                    value="30"
-                    step="5"
-                    id="ds3-rTime"
-                  />
-                </div>
-
-                <div class="discover-slider-group">
-                  <div class="discover-slider-header">
-                    <span class="discover-slider-label"
-                      >AI could save approximately</span
-                    >
-                    <span
-                      class="discover-slider-val discover-slider-val--accent"
-                      id="ds3-vSave"
-                      >40%</span
-                    >
-                  </div>
-                  <input
-                    type="range"
-                    class="discover-range"
-                    min="10"
-                    max="80"
-                    value="40"
-                    step="5"
-                    id="ds3-rSave"
-                  />
-                </div>
-
-                <div class="discover-live-result">
-                  <div class="discover-live-label">
-                    This single workflow recovers
-                  </div>
-                  <div class="discover-live-num" id="ds3-liveHrs">--</div>
-                  <div class="discover-live-ctx">hours per month</div>
-                </div>
-
-                <div class="discover-live-row">
-                  <div class="discover-live-card">
-                    <div class="discover-live-card-label">Monthly savings</div>
-                    <div
-                      class="discover-live-card-num"
-                      style="color: var(--kpmg-accent-positive)"
-                      id="ds3-liveCost"
-                    >
-                      --
-                    </div>
-                  </div>
-                  <div class="discover-live-card">
-                    <div class="discover-live-card-label">Annual value</div>
-                    <div
-                      class="discover-live-card-num"
-                      style="color: var(--kpmg-primary-container)"
-                      id="ds3-liveYear"
-                    >
-                      --
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- STEP 4: Portfolio -->
-              <div class="discover-step" id="ds4">
-                <div class="discover-step-label">Your AI portfolio</div>
-                <div class="discover-step-title" id="ds4-title">
-                  Here's what you've built
-                </div>
-                <div class="discover-step-sub" id="ds4-sub"></div>
-                <div class="discover-portfolio" id="discover-port-list"></div>
-                <div class="discover-port-total">
-                  <div>
-                    <div class="discover-port-total-label">
-                      Total annual value
-                    </div>
-                  </div>
-                  <div style="text-align: right">
-                    <div
-                      class="discover-port-total-num"
-                      id="discover-port-total-num"
-                    >
-                      --
-                    </div>
-                    <div
-                      class="discover-port-total-sub"
-                      id="discover-port-total-hrs"
-                    >
-                      --
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="discover-social-proof"
-                  id="discover-port-proof"
+                  class="g1-goal-examples"
+                  id="g1-goal-examples"
+                  aria-live="polite"
                 ></div>
               </div>
 
-              <!-- STEP 5: Blueprint -->
-              <div class="discover-step" id="ds5">
-                <div class="discover-blueprint-header">
-                  <div class="discover-step-label">Your AI blueprint</div>
-                  <div class="discover-step-title" id="discover-bp-title">
-                    --
-                  </div>
-                  <div class="discover-step-sub" id="discover-bp-sub">--</div>
+              <!-- STEP 3: Service areas + sizing -->
+              <div class="discover-step" id="ds2">
+                <div class="discover-step-label">Step 3</div>
+                <div class="discover-step-title">Size the opportunity</div>
+                <div class="discover-step-sub">
+                  Where should AI focus? Select tasks by service area, then adjust workload assumptions.
                 </div>
-                <div class="discover-port-total" style="margin-bottom: 16px">
-                  <div>
-                    <div class="discover-port-total-label">
-                      Projected annual value
+
+                <div class="g1-step3">
+                  <div class="g1-main">
+                    <div class="g1-inputs">
+                      <div class="g1-input">
+                        <label for="g1-hourly-rate">Hourly rate</label>
+                        <input id="g1-hourly-rate" type="text" inputmode="decimal" autocomplete="off" />
+                      </div>
+                      <div class="g1-input">
+                        <label for="g1-capacity-hours">Monthly capacity hours</label>
+                        <input id="g1-capacity-hours" type="text" inputmode="decimal" autocomplete="off" />
+                      </div>
                     </div>
+
+                    <div class="g1-area-list" id="g1-area-list"></div>
                   </div>
-                  <div style="text-align: right">
-                    <div
-                      class="discover-port-total-num"
-                      id="discover-bp-total-num"
-                    >
-                      --
-                    </div>
-                    <div
-                      class="discover-port-total-sub"
-                      id="discover-bp-total-hrs"
-                    >
-                      --
-                    </div>
-                  </div>
+
+                  <aside class="g1-side" aria-label="Summary">
+                    <div class="g1-summary" id="g1-summary"></div>
+                  </aside>
                 </div>
-                <div class="discover-portfolio" id="discover-bp-list"></div>
-                <div class="discover-live-row" style="margin-top: 16px">
-                  <div class="discover-live-card">
-                    <div class="discover-live-card-label">
-                      Use cases identified
-                    </div>
-                    <div
-                      class="discover-live-card-num"
-                      style="color: var(--kpmg-accent-faster)"
-                      id="discover-bp-cases"
-                    >
-                      --
-                    </div>
-                  </div>
-                  <div class="discover-live-card">
-                    <div class="discover-live-card-label">
-                      FTEs recovered / month
-                    </div>
-                    <div
-                      class="discover-live-card-num"
-                      style="color: var(--kpmg-primary-container)"
-                      id="discover-bp-fte"
-                    >
-                      --
-                    </div>
-                  </div>
-                </div>
-                <div class="discover-bp-actions" style="margin-top: 20px">
-                  <div class="discover-bp-btn" id="discover-restart">
-                    <div class="discover-bp-btn-label">Add more use cases</div>
-                    <div class="discover-bp-btn-sub">
-                      Continue building your portfolio
-                    </div>
-                  </div>
-                  <div class="discover-bp-btn" id="discover-download">
-                    <div class="discover-bp-btn-label">Download blueprint</div>
-                    <div class="discover-bp-btn-sub">Save as text summary</div>
-                  </div>
-                </div>
-                <a
-                  href="../current-process/"
-                  class="discover-process-cta"
-                  id="discover-goto-process"
-                >
-                  <div>
-                    <div class="discover-process-cta-label">
-                      Map your current process
-                    </div>
-                    <div class="discover-process-cta-sub">
-                      Identify bottlenecks in the selected workflow
-                    </div>
-                  </div>
-                  <span class="discover-process-cta-arrow">→</span>
-                </a>
+
+                <div class="g1-sticky" id="g1-sticky" aria-live="polite"></div>
               </div>
+
+              <!-- STEP 4: Results -->
+              <div class="discover-step" id="ds3">
+                <div class="discover-step-label">Step 4</div>
+                <div class="discover-step-title">AI Focus Signal</div>
+                <div class="discover-step-sub">
+                  Management-facing summary with evidence blocks.
+                </div>
+
+                <div class="g1-result-hero" id="g1-result-hero">
+                  <div class="g1-hero-metric">
+                    <div class="g1-hero-k">Monthly hours saved</div>
+                    <div class="g1-hero-v" data-k="hours">—</div>
+                  </div>
+                  <div class="g1-hero-metric">
+                    <div class="g1-hero-k">Annual value</div>
+                    <div class="g1-hero-v" data-k="value">—</div>
+                  </div>
+                  <div class="g1-hero-metric">
+                    <div class="g1-hero-k">FTE / month</div>
+                    <div class="g1-hero-v" data-k="fte">—</div>
+                  </div>
+                </div>
+
+                <div class="g1-result-actions">
+                  <button class="module-btn module-btn--secondary" id="g1-download" type="button">
+                    Export PDF
+                  </button>
+                </div>
+
+                <div class="g1-result-list" id="g1-result-list"></div>
+              </div>
+            </section>
+
+            <section class="g1-print" id="g1-print" aria-hidden="true">
+              <div class="g1-print-title">Discover Gate</div>
+              <div class="g1-print-meta" id="g1-print-meta"></div>
+              <pre class="g1-print-pre" id="g1-print-pre"></pre>
             </section>
 
             <section class="module-sticky-actions">
@@ -636,7 +406,10 @@
     <script src="../assets/js/theme.js"></script>
     <script src="../assets/js/toast.js"></script>
     <script src="../assets/js/app-shell.js"></script>
-    <script src="../assets/js/discover-data.js"></script>
+    <script src="../assets/js/discover-gate1-data.js"></script>
+    <script src="../assets/js/discover-gate1-state.js"></script>
+    <script src="../assets/js/discover-gate1-calc.js"></script>
+    <script src="../assets/js/discover-gate1-render.js"></script>
     <script src="../assets/js/discover.js"></script>
   </body>
 </html>
